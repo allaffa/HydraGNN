@@ -18,7 +18,38 @@ from hydragnn.utils.model import loss_function_selection
 import sys
 from hydragnn.utils.distributed import get_device
 
+class Conv(torch.nn.Module):
+    """ conv module """
+    def __init__(self, conv, batch_norm, act=torch.nn.ReLU()):
+        super().__init__()
+        self.conv = conv
+        self.batch_norm = batch_norm
+        self.act = act
 
+    def forward(self, x=None, edge_index=None, edge_attr=None):
+        c = self.conv(x=x, edge_index=edge_index, edge_attr=edge_attr)
+        return self.act(self.batch_norm(c))
+
+class SkipConv(torch.nn.Module):
+    """ conv module with skip connection """
+    def __init__(self, conv, batch_norm, act=torch.nn.ReLU()):
+        super().__init__()
+        self.conv = conv
+        self.batch_norm = batch_norm
+        self.act = act
+
+    def forward(self, x=None, edge_index=None, edge_attr=None):
+        identity = x
+        c = self.conv(x=x, edge_index=edge_index, edge_attr=edge_attr)
+        return self.act(self.batch_norm(c)) + identity
+
+class ConvSequential(torch.nn.Sequential):
+    """ Extention to use graph inputs """
+    def forward(self, x=None, edge_index=None, edge_attr=None):
+        for module in self:
+            x = module(x=x, edge_index=edge_index, edge_attr=edge_attr)
+        return x
+    
 class Base(Module):
     def __init__(
         self,
@@ -101,6 +132,15 @@ class Base(Module):
         self._multihead()
         if self.initial_bias is not None:
             self._set_bias()
+      
+        self.layers = ModuleList()
+        for i, (conv, batch_norm) in enumerate(zip(self.convs, self.batch_norms)):
+            if i > 0 and self.skip_connection:
+                self.layers.append(SkipConv(conv, batch_norm))
+            else:
+                self.layers.append(Conv(conv, batch_norm))
+
+        self.conv_shared = ConvSequential(*self.layers)
 
     def _init_conv(self):
         self.convs.append(self.get_conv(self.input_dim, self.hidden_dim))
@@ -244,30 +284,13 @@ class Base(Module):
             data.batch,
         )
         use_edge_attr = False
+        edge_attr = None
         if (data.edge_attr is not None) and (self.use_edge_attr):
             use_edge_attr = True
-
-        count_conv_layers = 0
+            edge_attr = data.edge_attr
 
         ### encoder part ####
-        if use_edge_attr:
-            for conv, batch_norm in zip(self.convs, self.batch_norms):
-                c = conv(x=x, edge_index=edge_index, edge_attr=data.edge_attr)
-                if count_conv_layers > 0 and self.skip_connection:
-                    identity = x
-                    x = F.relu(batch_norm(c)) + identity
-                else:
-                    x = F.relu(batch_norm(c))
-                count_conv_layers += 1
-        else:
-            for conv, batch_norm in zip(self.convs, self.batch_norms):
-                c = conv(x=x, edge_index=edge_index)
-                if count_conv_layers > 0 and self.skip_connection:
-                    identity = x
-                    x = F.relu(batch_norm(c)) + identity
-                else:
-                    x = F.relu(batch_norm(c))
-                count_conv_layers += 1
+        x = self.conv_shared(x=x, edge_index=edge_index, edge_attr=edge_attr)
 
         #### multi-head decoder part####
         # shared dense layers for graph level output
