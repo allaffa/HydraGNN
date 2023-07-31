@@ -115,10 +115,97 @@ class DFTBDataset(AbstractBaseDataset):
             log("local dirlist", len(dirlist))
 
         for subdir in iterate_tqdm(dirlist, verbosity_level=2, desc="Load"):
-            data_object = dftb_to_graph(
-                os.path.join(dirpath, subdir), dftb_node_types, var_config
+            data_object = transform_input_to_data_object_base(
+                dirpath, subdir
             )
             self.dataset.append(data_object)
+
+
+    def transform_input_to_data_object_base(self, raw_data_path, dir):
+        data_object = self.__transform_DFTB_UV_input_to_data_object_base(raw_data_path, dir)
+
+        return data_object
+
+
+    def __transform_DFTB_UV_input_to_data_object_base(self, raw_data_path, dir):
+        """Transforms lines of strings read from the raw data DFTB+ file to Data object and returns it.
+
+        Parameters
+        ----------
+        lines:
+          content of data file with all the graph information
+        Returns
+        ----------
+        Data
+            Data object representing structure of a graph sample.
+        """
+
+        data_object = None
+
+        # collect information about molecular structure and chemical composition
+        try:
+            pdb_filename = raw_data_path + '/' + dir + '/' + 'smiles.pdb'
+            mol = MolFromPDBFile(pdb_filename, sanitize=False, proximityBonding=True,
+                                 removeHs=True)  # , sanitize=False , removeHs=False)
+        # file not found -> exit here
+        except IOError:
+            print(f"'{pdb_filename}'" + " not found")
+            sys.exit(1)
+
+        try:
+            spectrum_filename = raw_data_path + '/' + dir + '/' + 'EXC-smooth.DAT'
+            spectrum_energies = list()
+            with open(spectrum_filename, "r") as input_file:
+                count_line = 0
+                for line in input_file:
+                    spectrum_energies.append(float(line.strip().split()[1]))
+
+            valence_electrons_list = []
+            for atom in mol.GetAtoms():
+                valence_electrons_list.append(
+                    self.valence_electrons[dftb_node_types[atom.GetSymbol()]].item()
+                )
+            electron_affinity_list = []
+            for atom in mol.GetAtoms():
+                electron_affinity_list.append(
+                    self.electron_affinity[dftb_node_types[atom.GetSymbol()]].item()
+                )
+            atomic_weight_list = []
+            for atom in mol.GetAtoms():
+                atomic_weight_list.append(
+                    self.atomic_weight[dftb_node_types[atom.GetSymbol()]].item()
+                )
+            ion_energies_list = []
+            for atom in mol.GetAtoms():
+                ion_energies_list.append(
+                    self.ion_energies[dftb_node_types[atom.GetSymbol()]].item()
+                )
+
+            atomic_descriptors_list = [valence_electrons_list, electron_affinity_list, atomic_weight_list, ion_energies_list]
+            num_manually_constructed_atomic_descriptors = len({len(i) for i in atomic_descriptors_list})
+
+            # The list is empty if there are no atomic descirptors manually constructed, otherwise it shoulb have length=1
+            assert num_manually_constructed_atomic_descriptors <= 1, "manually constructed lists of atomic descriptors are not consistent in length"
+
+            if num_manually_constructed_atomic_descriptors == 1:
+                atomicdescriptors_torch_tensor = torch.cat([torch.tensor([descriptor]) for descriptor in atomic_descriptors_list],
+                               dim=0).t().contiguous()
+
+            data_object = generate_graphdata_from_rdkit_molecule(mol, torch.tensor(spectrum_energies), dftb_node_types, atomicdescriptors_torch_tensor)
+            atoms = io.read(raw_data_path + '/' + dir + '/' + 'geo_end.xyz')
+            data_object.pos = torch.from_numpy(atoms.positions)
+            spherical_transform = Spherical(norm=False)
+            data_object = spherical_transform(data_object)
+            data_object.pos = data_object.pos.to(torch.float32)
+            data_object.x = data_object.x.to(torch.float32)
+            data_object.edge_attr = data_object.edge_attr.to(torch.float32)
+            data_object.ID = dir.replace('mol_', '')
+
+        except:
+            print(f"Graph sample not created for {dir}")
+
+        return data_object
+    
 
     def len(self):
         return len(self.dataset)
