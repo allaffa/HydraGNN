@@ -15,6 +15,12 @@ from itertools import chain
 import argparse
 import time
 
+from torch_geometric.transforms import Spherical
+
+from hydragnn.utils.atomicdescriptors import atomicdescriptors
+
+from ase import io
+
 from rdkit.Chem.rdmolfiles import MolFromPDBFile
 
 import hydragnn
@@ -80,6 +86,19 @@ class DFTBDataset(AbstractBaseDataset):
     def __init__(self, dirpath, dftb_node_types, var_config, dist=False, sampling=None):
         super().__init__()
 
+        # atomic descriptors
+        atomicdescriptor = atomicdescriptors(
+            "./embedding_onehot.json",
+            overwritten=True,
+            element_types=list(dftb_node_types.keys()),
+            one_hot=True,
+        )
+        self.valence_electrons = atomicdescriptor.get_valence_electrons()
+        self.electron_affinity = atomicdescriptor.get_electron_affinity()
+        self.atomic_weight = atomicdescriptor.get_atomic_weight()
+        self.ion_energies = atomicdescriptor.get_ionenergies()
+
+
         self.dftb_node_types = dftb_node_types
         self.var_config = var_config
         self.dist = dist
@@ -115,7 +134,7 @@ class DFTBDataset(AbstractBaseDataset):
             log("local dirlist", len(dirlist))
 
         for subdir in iterate_tqdm(dirlist, verbosity_level=2, desc="Load"):
-            data_object = transform_input_to_data_object_base(
+            data_object = self.transform_input_to_data_object_base(
                 dirpath, subdir
             )
             self.dataset.append(data_object)
@@ -253,7 +272,7 @@ if __name__ == "__main__":
     graph_feature_names = ["spectrum"]
     graph_feature_dim = [37500]
     dirpwd = os.path.dirname(os.path.abspath(__file__))
-    datafile = os.path.join(dirpwd, "dataset/dftb_aisd_electronic_excitation_spectrum")
+    datafile = os.path.join(dirpwd, "dataset/GDB-9-Ex-TDDFTB")
     ##################################################################################################################
     input_filename = os.path.join(dirpwd, "dftb_smooth_uv_spectrum.json")
     ##################################################################################################################
