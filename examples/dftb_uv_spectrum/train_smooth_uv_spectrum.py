@@ -169,7 +169,7 @@ class DFTBDataset(AbstractBaseDataset):
         # file not found -> exit here
         except IOError:
             print(f"'{pdb_filename}'" + " not found")
-            sys.exit(1)
+            #sys.exit(1)
 
         try:
             spectrum_filename = raw_data_path + '/' + dir + '/' + 'EXC-smooth.DAT'
