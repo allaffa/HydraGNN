@@ -64,6 +64,7 @@ def info(*args, logtype="info", sep=" "):
 
 from hydragnn.utils.abstractbasedataset import AbstractBaseDataset
 
+spherical_coordinates = Spherical(norm=False, cat=True)
 
 def dftb_to_graph(moldir, dftb_node_types, var_config):
     pdb_filename = os.path.join(moldir, "smiles.pdb")
@@ -137,7 +138,8 @@ class DFTBDataset(AbstractBaseDataset):
             data_object = self.transform_input_to_data_object_base(
                 dirpath, subdir
             )
-            self.dataset.append(data_object)
+            if data_object is not None:
+                self.dataset.append(data_object)
 
 
     def transform_input_to_data_object_base(self, raw_data_path, dir):
@@ -177,50 +179,58 @@ class DFTBDataset(AbstractBaseDataset):
                 count_line = 0
                 for line in input_file:
                     spectrum_energies.append(float(line.strip().split()[1]))
-
-            valence_electrons_list = []
-            for atom in mol.GetAtoms():
-                valence_electrons_list.append(
-                    self.valence_electrons[dftb_node_types[atom.GetSymbol()]].item()
-                )
-            electron_affinity_list = []
-            for atom in mol.GetAtoms():
-                electron_affinity_list.append(
-                    self.electron_affinity[dftb_node_types[atom.GetSymbol()]].item()
-                )
-            atomic_weight_list = []
-            for atom in mol.GetAtoms():
-                atomic_weight_list.append(
-                    self.atomic_weight[dftb_node_types[atom.GetSymbol()]].item()
-                )
-            ion_energies_list = []
-            for atom in mol.GetAtoms():
-                ion_energies_list.append(
-                    self.ion_energies[dftb_node_types[atom.GetSymbol()]].item()
-                )
-
-            atomic_descriptors_list = [valence_electrons_list, electron_affinity_list, atomic_weight_list, ion_energies_list]
-            num_manually_constructed_atomic_descriptors = len({len(i) for i in atomic_descriptors_list})
-
-            # The list is empty if there are no atomic descirptors manually constructed, otherwise it shoulb have length=1
-            assert num_manually_constructed_atomic_descriptors <= 1, "manually constructed lists of atomic descriptors are not consistent in length"
-
-            if num_manually_constructed_atomic_descriptors == 1:
-                atomicdescriptors_torch_tensor = torch.cat([torch.tensor([descriptor]) for descriptor in atomic_descriptors_list],
-                               dim=0).t().contiguous()
-
-            data_object = generate_graphdata_from_rdkit_molecule(mol, torch.tensor(spectrum_energies), dftb_node_types, atomicdescriptors_torch_tensor)
-            atoms = io.read(raw_data_path + '/' + dir + '/' + 'geo_end.xyz')
-            data_object.pos = torch.from_numpy(atoms.positions)
-            spherical_transform = Spherical(norm=False)
-            data_object = spherical_transform(data_object)
-            data_object.pos = data_object.pos.to(torch.float32)
-            data_object.x = data_object.x.to(torch.float32)
-            data_object.edge_attr = data_object.edge_attr.to(torch.float32)
-            data_object.ID = dir.replace('mol_', '')
-
         except:
-            print(f"Graph sample not created for {dir}")
+            print(f"EXC-smooth.DAT not found for {dir}")
+            return None
+
+        valence_electrons_list = []
+        for atom in mol.GetAtoms():
+            valence_electrons_list.append(
+                self.valence_electrons[dftb_node_types[atom.GetSymbol()]].item()
+            )
+        electron_affinity_list = []
+        for atom in mol.GetAtoms():
+            electron_affinity_list.append(
+                self.electron_affinity[dftb_node_types[atom.GetSymbol()]].item()
+            )
+        atomic_weight_list = []
+        for atom in mol.GetAtoms():
+            atomic_weight_list.append(
+                self.atomic_weight[dftb_node_types[atom.GetSymbol()]].item()
+            )
+        ion_energies_list = []
+        for atom in mol.GetAtoms():
+            ion_energies_list.append(
+                self.ion_energies[dftb_node_types[atom.GetSymbol()]].item()
+            )
+
+        atomic_descriptors_list = [valence_electrons_list, electron_affinity_list, atomic_weight_list, ion_energies_list]
+        num_manually_constructed_atomic_descriptors = len({len(i) for i in atomic_descriptors_list})
+
+        # The list is empty if there are no atomic descirptors manually constructed, otherwise it shoulb have length=1
+        assert num_manually_constructed_atomic_descriptors <= 1, "manually constructed lists of atomic descriptors are not consistent in length"
+
+        if num_manually_constructed_atomic_descriptors == 1:
+            atomicdescriptors_torch_tensor = torch.cat([torch.tensor([descriptor]) for descriptor in atomic_descriptors_list],
+                           dim=0).t().contiguous()
+
+        data_object = generate_graphdata_from_rdkit_molecule(mol, torch.tensor(spectrum_energies), dftb_node_types, atomicdescriptors_torch_tensor)
+        atoms = io.read(raw_data_path + '/' + dir + '/' + 'geo_end.xyz')
+        data_object.pos = torch.from_numpy(atoms.positions)
+        try:
+            data_object = spherical_coordinates(data_object)
+        except: 
+            print(f"Spherical coordinates fails for {dir} - data_object.edge_index.shape: ", data_object.edge_index.shape)
+            print(f"Spherical coordinates fails for {dir} - data_object.edge_attr.shape: ", data_object.edge_attr.shape)
+            print(f"Spherical coordinates fails for {dir} - data.pos.shape: ", data_object.pos.shape)
+            return None
+        data_object.pos = data_object.pos.to(torch.float32)
+        data_object.x = data_object.x.to(torch.float32)
+        data_object.edge_attr = data_object.edge_attr.to(torch.float32)
+        data_object.ID = dir.replace('mol_', '')
+
+        #except:
+        #    print(f"Graph sample not created for {dir}")
 
         return data_object
     
