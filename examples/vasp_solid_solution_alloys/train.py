@@ -4,25 +4,150 @@ import sys
 from mpi4py import MPI
 import argparse
 
+import random
+import numpy as np
+
+import torch
+from torch import tensor
+from torch_geometric.data import Data
+
 import hydragnn
 from hydragnn.utils.time_utils import Timer
 from hydragnn.utils.config_utils import get_log_name_config
 from hydragnn.utils.model import print_model
-from hydragnn.utils.vaspdataset import VASPDataset
+from hydragnn.utils.abstractbasedataset import AbstractBaseDataset
 from hydragnn.utils.serializeddataset import SerializedWriter, SerializedDataset
-from hydragnn.preprocess.load_data import split_dataset
+
+from hydragnn.utils.distributed import nsplit, get_device
+
+from hydragnn.utils.print_utils import iterate_tqdm, log
+
+from ase.io.vasp import read_vasp_out
 
 try:
     from hydragnn.utils.adiosdataset import AdiosWriter, AdiosDataset
 except ImportError:
     pass
 
-import torch
-import torch.distributed as dist
-
 
 def info(*args, logtype="info", sep=" "):
     getattr(logging, logtype)(sep.join(map(str, args)))
+
+
+class VASPDataset(AbstractBaseDataset):
+    def __init__(self, config, dist=False, sampling=None):
+        super().__init__(config, dist, sampling)
+
+    def __init__(self, dirpath, var_config, dist=False):
+        super().__init__()
+
+        self.var_config = var_config
+        self.dist = dist
+        if self.dist:
+            assert torch.distributed.is_initialized()
+            self.world_size = torch.distributed.get_world_size()
+            self.rank = torch.distributed.get_rank()
+
+        for name in os.listdir(dirpath):
+            if name == ".DS_Store":
+                continue
+            # if the directory contains file, iterate over them
+            if os.path.isfile(os.path.join(dirpath, name)):
+                data_object = self.transform_input_to_data_object_base(
+                    filepath=os.path.join(dirpath, name)
+                )
+                if not isinstance(data_object, type(None)):
+                    self.dataset.append(data_object)
+            # if the directory contains subdirectories, explore their content
+            # if the directory contains subdirectories, explore their content
+            elif os.path.isdir(os.path.join(dirpath, name)):
+                if name == ".DS_Store":
+                    continue
+                dir_name = os.path.join(dirpath, name)
+                for subname in iterate_tqdm(os.listdir(dir_name), verbosity_level=2, desc="Load"):
+                    if subname == ".DS_Store":
+                        continue
+                    subdir_name = os.listdir(os.path.join(dir_name, subname))
+                    subdir_name = list(nsplit(subdir_name, self.world_size))[
+                        self.rank]
+                    for subsubname in subdir_name:
+                        data_object = (
+                            self.transform_input_to_data_object_base(
+                                filepath=os.path.join(dir_name, subname, subsubname)+'/'+'OUTCAR'
+                            )
+                        )
+                        if not isinstance(data_object, type(None)):
+                            self.dataset.append(data_object)
+
+            if self.dist:
+                torch.distributed.barrier()
+
+    def transform_input_to_data_object_base(self, filepath):
+        data_object = self.__transform_VASP_input_to_data_object_base(filepath=filepath)
+        return data_object
+
+    def __transform_VASP_input_to_data_object_base(self, filepath):
+        """Transforms lines of strings read from the raw data EAM file to Data object and returns it.
+
+        Parameters
+        ----------
+        lines:
+          content of data file with all the graph information
+        Returns
+        ----------
+        Data
+            Data object representing structure of a graph sample.
+        """
+
+        if "OUTCAR" in filepath:
+
+            ase_object = read_vasp_out(filepath)
+
+            dirpath = filepath.split("OUTCAR")[0]
+            data_object = self.__transform_ASE_object_to_data_object(
+                dirpath, ase_object
+            )
+
+            return data_object
+
+        else:
+            return None
+
+    def __transform_ASE_object_to_data_object(self, filepath, ase_object):
+        # FIXME:
+        #  this still assumes bulk modulus is specific to the CFG format.
+        #  To deal with multiple files across formats, one should generalize this function
+        #  by moving the reading of the .bulk file in a standalone routine.
+        #  Morevoer, this approach assumes tha there is only one global feature to look at,
+        #  and that this global feature is specicially retrieveable in a file with the string *bulk* inside.
+
+        data_object = Data()
+
+        data_object.supercell_size = tensor(ase_object.cell.array).float()
+        data_object.pos = tensor(ase_object.arrays["positions"]).float()
+        proton_numbers = np.expand_dims(ase_object.arrays["numbers"], axis=1)
+        forces = ase_object.calc.results["forces"]
+        stress = ase_object.calc.results["stress"]
+        fermi_energy = ase_object.calc.eFermi
+        free_energy = ase_object.calc.results["free_energy"]
+        energy = ase_object.calc.results["energy"]
+        node_feature_matrix = np.concatenate((proton_numbers, forces), axis=1)
+        data_object.x = tensor(node_feature_matrix).float()
+
+        formation_energy_file = open(filepath + 'formation_energy.txt', 'r')
+        Lines = formation_energy_file.readlines()
+
+        # Strips the newline character
+        for line in Lines:
+            data_object.y = tensor([float(line.strip())])
+
+        return data_object
+
+    def len(self):
+        return len(self.dataset)
+
+    def get(self, idx):
+        return self.dataset[idx]
 
 
 if __name__ == "__main__":
@@ -74,20 +199,12 @@ if __name__ == "__main__":
         datefmt="%H:%M:%S",
     )
 
-    os.environ["SERIALIZED_DATA_PATH"] = dirpwd + "/dataset"
     datasetname = config["Dataset"]["name"]
     fname_adios = dirpwd + "/dataset/%s.bp" % (datasetname)
     config["Dataset"]["name"] = "%s_%d" % (datasetname, rank)
     if not args.loadexistingsplit:
-        total = VASPDataset(config)
+        total = VASPDataset(dirpwd + "/dataset/bcc_enthalpy", config, dist=True)
 
-        """
-        trainset, valset, testset = split_dataset(
-            dataset=total,
-            perc_train=config["NeuralNetwork"]["Training"]["perc_train"],
-            stratify_splitting=config["Dataset"]["compositional_stratified_splitting"],
-        )
-        """
         trainset = total
         valset = total
         testset = total
