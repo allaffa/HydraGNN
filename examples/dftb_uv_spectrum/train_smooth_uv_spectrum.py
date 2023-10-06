@@ -227,7 +227,7 @@ class DFTBDataset(AbstractBaseDataset):
         data_object.pos = data_object.pos.to(torch.float32)
         data_object.x = data_object.x.to(torch.float32)
         data_object.edge_attr = data_object.edge_attr.to(torch.float32)
-        data_object.ID = dir.replace('mol_', '')
+        data_object.ID = torch.tensor((int(dir.replace("mol_", "")),))
 
         return data_object
     
@@ -277,6 +277,8 @@ if __name__ == "__main__":
 
     graph_feature_names = ["spectrum"]
     graph_feature_dim = [37500]
+    node_feature_names = ["atomic_features"]
+    node_feature_dims = [16]
     dirpwd = os.path.dirname(os.path.abspath(__file__))
     datafile = os.path.join(dirpwd, "dataset/GDB-9-Ex-TDDFTB")
     ##################################################################################################################
@@ -293,10 +295,9 @@ if __name__ == "__main__":
     ]
     var_config["graph_feature_names"] = graph_feature_names
     var_config["graph_feature_dims"] = graph_feature_dim
-    (
-        var_config["input_node_feature_names"],
-        var_config["input_node_feature_dims"],
-    ) = get_node_attribute_name(dftb_node_types)
+    var_config["node_feature_names"] = node_feature_names
+    var_config["node_feature_dims"] = node_feature_dims
+
     if args.batch_size is not None:
         config["NeuralNetwork"]["Training"]["batch_size"] = args.batch_size
     ##################################################################################################################
@@ -404,9 +405,9 @@ if __name__ == "__main__":
         basedir = os.path.join(
             os.path.dirname(__file__), "dataset", "%s.pickle" % modelname
         )
-        trainset = SimplePickleDataset(basedir, "trainset")
-        valset = SimplePickleDataset(basedir, "valset")
-        testset = SimplePickleDataset(basedir, "testset")
+        trainset = SimplePickleDataset(basedir, "trainset", var_config=var_config)
+        valset = SimplePickleDataset(basedir, "valset", var_config=var_config)
+        testset = SimplePickleDataset(basedir, "testset", var_config=var_config)
         # minmax_node_feature = trainset.minmax_node_feature
         # minmax_graph_feature = trainset.minmax_graph_feature
         pna_deg = trainset.pna_deg
