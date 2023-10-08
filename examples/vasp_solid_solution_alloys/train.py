@@ -139,7 +139,9 @@ class VASPDataset(AbstractBaseDataset):
 
         # Strips the newline character
         for line in Lines:
-            data_object.y = tensor([float(line.strip())])
+            formation_energy = tensor([float(line.strip())])
+            # convert formation energy from eV to meV/atom
+            data_object.y = formation_energy * 1000/data.num_nodes
 
         return data_object
 
