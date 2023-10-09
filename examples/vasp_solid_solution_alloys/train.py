@@ -141,7 +141,7 @@ class VASPDataset(AbstractBaseDataset):
         for line in Lines:
             formation_energy = tensor([float(line.strip())])
             # convert formation energy from eV to meV/atom
-            data_object.y = formation_energy * 1000/data.num_nodes
+            data_object.y = formation_energy * 1000/data_object.num_nodes
 
         return data_object
 
@@ -205,7 +205,7 @@ if __name__ == "__main__":
     fname_adios = dirpwd + "/dataset/%s.bp" % (datasetname)
     config["Dataset"]["name"] = "%s_%d" % (datasetname, rank)
     if not args.loadexistingsplit:
-        total = VASPDataset(dirpwd + "/dataset/bcc_enthalpy", config, dist=True)
+        total = VASPDataset(dirpwd + "/dataset/bcc_binaries_enthalpy", config, dist=True)
 
         trainset = total
         valset = total
