@@ -99,7 +99,7 @@ class VASPDataset(AbstractBaseDataset):
             Data object representing structure of a graph sample.
         """
 
-        if "OUTCAR" in filepath:
+        if  os.path.exists(filepath):
 
             ase_object = read_vasp_out(filepath)
 
@@ -114,12 +114,6 @@ class VASPDataset(AbstractBaseDataset):
             return None
 
     def __transform_ASE_object_to_data_object(self, filepath, ase_object):
-        # FIXME:
-        #  this still assumes bulk modulus is specific to the CFG format.
-        #  To deal with multiple files across formats, one should generalize this function
-        #  by moving the reading of the .bulk file in a standalone routine.
-        #  Morevoer, this approach assumes tha there is only one global feature to look at,
-        #  and that this global feature is specicially retrieveable in a file with the string *bulk* inside.
 
         data_object = Data()
 
