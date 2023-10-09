@@ -17,6 +17,7 @@ from hydragnn.utils.config_utils import get_log_name_config
 from hydragnn.utils.model import print_model
 from hydragnn.utils.abstractbasedataset import AbstractBaseDataset
 from hydragnn.utils.serializeddataset import SerializedWriter, SerializedDataset
+from hydragnn.preprocess.load_data import split_dataset
 
 from hydragnn.utils.distributed import nsplit, get_device
 
