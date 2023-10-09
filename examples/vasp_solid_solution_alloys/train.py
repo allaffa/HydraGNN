@@ -201,9 +201,11 @@ if __name__ == "__main__":
     if not args.loadexistingsplit:
         total = VASPDataset(dirpwd + "/dataset/bcc_binaries_enthalpy", config, dist=True)
 
-        trainset = total
-        valset = total
-        testset = total
+        trainset, valset, testset = split_dataset(
+            dataset=total,
+            perc_train=config["NeuralNetwork"]["Training"]["perc_train"],
+            stratify_splitting=False,
+        )
         print(len(total), len(trainset), len(valset), len(testset))
 
         if args.format == "adios":
@@ -226,8 +228,8 @@ if __name__ == "__main__":
                 basedir,
                 datasetname,
                 "trainset",
-                minmax_node_feature=total.minmax_node_feature,
-                minmax_graph_feature=total.minmax_graph_feature,
+                #minmax_node_feature=total.minmax_node_feature,
+                #minmax_graph_feature=total.minmax_graph_feature,
             )
             SerializedWriter(
                 valset,
