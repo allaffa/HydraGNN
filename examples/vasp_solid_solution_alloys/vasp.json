@@ -47,8 +47,8 @@
             "input_node_features": [0],
             "output_names": ["formation_enthalpy"],
             "output_index": [0],
-            "type": ["graph"],
-            "denormalize_output": true
+            "output_dim": [1],
+            "type": ["graph"]
         },
         "Training": {
             "num_epoch": 50,
