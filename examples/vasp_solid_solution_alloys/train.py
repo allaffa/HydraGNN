@@ -11,6 +11,8 @@ import torch
 from torch import tensor
 from torch_geometric.data import Data
 
+from torch_geometric.transforms import Spherical
+
 import hydragnn
 from hydragnn.utils.time_utils import Timer
 from hydragnn.utils.config_utils import get_log_name_config
@@ -18,6 +20,7 @@ from hydragnn.utils.model import print_model
 from hydragnn.utils.abstractbasedataset import AbstractBaseDataset
 from hydragnn.utils.serializeddataset import SerializedWriter, SerializedDataset
 from hydragnn.preprocess.load_data import split_dataset
+from hydragnn.preprocess.utils import RadiusGraphPBC
 
 from hydragnn.utils.distributed import nsplit, get_device
 
@@ -34,15 +37,19 @@ except ImportError:
 def info(*args, logtype="info", sep=" "):
     getattr(logging, logtype)(sep.join(map(str, args)))
 
+spherical_coordinates = Spherical(norm=False, cat=True)
 
 class VASPDataset(AbstractBaseDataset):
-    def __init__(self, config, dist=False, sampling=None):
-        super().__init__(config, dist, sampling)
 
     def __init__(self, dirpath, var_config, dist=False):
         super().__init__()
 
         self.var_config = var_config
+        self.radius_graph = RadiusGraphPBC(
+            self.var_config["NeuralNetwork"]["Architecture"]["radius"],
+            loop=False,
+            max_num_neighbors=self.var_config["NeuralNetwork"]["Architecture"]["max_neighbours"]
+        )
         self.dist = dist
         if self.dist:
             assert torch.distributed.is_initialized()
@@ -77,7 +84,9 @@ class VASPDataset(AbstractBaseDataset):
                                 filepath=os.path.join(dir_name, subname, subsubname)+'/'+'OUTCAR'
                             )
                         )
-                        if not isinstance(data_object, type(None)):
+                        if data_object is not None:
+                            data_object = self.radius_graph(data_object)
+                            data_object = spherical_coordinates(data_object)
                             self.dataset.append(data_object)
 
             if self.dist:
@@ -126,7 +135,8 @@ class VASPDataset(AbstractBaseDataset):
         fermi_energy = ase_object.calc.eFermi
         free_energy = ase_object.calc.results["free_energy"]
         energy = ase_object.calc.results["energy"]
-        node_feature_matrix = np.concatenate((proton_numbers, forces), axis=1)
+        #node_feature_matrix = np.concatenate((proton_numbers, forces), axis=1)
+        node_feature_matrix = proton_numbers
         data_object.x = tensor(node_feature_matrix).float()
 
         formation_energy_file = open(filepath + 'formation_energy.txt', 'r')
@@ -312,8 +322,8 @@ if __name__ == "__main__":
     log_name = get_log_name_config(config)
     writer = hydragnn.utils.get_summary_writer(log_name)
 
-    if dist.is_initialized():
-        dist.barrier()
+    if torch.distributed.is_initialized():
+        torch.distributed.barrier()
 
     hydragnn.utils.save_config(config, log_name)
 
