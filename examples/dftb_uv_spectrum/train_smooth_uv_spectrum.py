@@ -314,7 +314,7 @@ if __name__ == "__main__":
         datefmt="%H:%M:%S",
     )
 
-    log_name = "dftb_eV_fullx" if args.log is None else args.log
+    log_name = "dftb_nm" if args.log is None else args.log
     hydragnn.utils.setup_log(log_name)
     writer = hydragnn.utils.get_summary_writer(log_name)
 
