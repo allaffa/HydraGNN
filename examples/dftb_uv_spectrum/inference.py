@@ -119,13 +119,11 @@ for irun in range(1, 2):
     num_test_samples = len(testset)
     mol_ID = [item.ID for item in testset]
 
-    # bins = [lower + x * (upper - lower) / length for x in range(length)]
-    bins = range(length)
-
     FRQ=1
     error_mae, error_mse = [], []
     for sample_id, test_data in enumerate(tqdm(testset)):
         prediction = model(test_data.to(get_device()))[0].squeeze().detach().cpu().numpy()
+        prediction = np.expand_dims(prediction, axis=1)
         true = test_data.y.detach().to('cpu').numpy()
 
         error_mae += [np.sum(np.abs(true - prediction))]
@@ -162,7 +160,7 @@ for irun in range(1, 2):
     data = [testset[index] for index in indices]
     idx_strings = ['minimum', 'median', 'maximum']
 
-    for (idx, idx_str, test_data) in zip(indices, idx_strings, data):
+    for (idx, idx_str, test_data) in zip(indices[:10], idx_strings[:10], data[:10]):
         print(idx_str, error_mae[idx])
         prediction = model(test_data.to(get_device()))[0].squeeze().detach().cpu().numpy()
 
