@@ -167,7 +167,7 @@ for irun in range(1, 2):
         prediction = model(test_data.to(get_device()))[0].squeeze().detach().cpu().numpy()
 
         fig, ax = plt.subplots(1, 1)
-        ax.plot(bins[::FRQ], test_data.full_spectrum.detach().to('cpu')[::FRQ], color='black', label="TD-DFTB", linewidth=5, dashes=[1,0])
+        ax.plot(bins[::FRQ], test_data.y.detach().to('cpu')[::FRQ], color='black', label="TD-DFTB", linewidth=5, dashes=[1,0])
         ax.plot(bins[::FRQ], prediction[::FRQ], label=f"{model_name}", color='red', linewidth=5, dashes=[4,2])
         plt.title("molecule ID: "+mol_ID[idx])
         plt.legend(fancybox=True,handlelength=1,shadow=True,loc='upper right',bbox_to_anchor=(1.025,1.0),ncol=1)
@@ -207,7 +207,7 @@ for irun in range(1, 2):
         prediction = model(test_data.to(get_device()))[0].squeeze().detach().cpu().numpy()
 
         fig, ax = plt.subplots(1, 1)
-        ax.plot(bins[::FRQ], test_data.full_spectrum.detach().to('cpu')[::FRQ], color='black', label="TD-DFTB", linewidth=5, dashes=[1,0])
+        ax.plot(bins[::FRQ], test_data.y.detach().to('cpu')[::FRQ], color='black', label="TD-DFTB", linewidth=5, dashes=[1,0])
         ax.plot(bins[::FRQ], prediction[::FRQ], label=f"{model_name}", color='red', linewidth=5, dashes=[4,2])
         plt.title("molecule ID: "+mol_ID[idx])
         plt.legend(fancybox=True,handlelength=1,shadow=True,loc='upper right',bbox_to_anchor=(1.025,1.0),ncol=1)

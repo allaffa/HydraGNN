@@ -314,13 +314,13 @@ if __name__ == "__main__":
         datefmt="%H:%M:%S",
     )
 
-    log_name = "dftb_nm" if args.log is None else args.log
+    modelname = "dftb_smooth_uv_spectrum"
+    log_name = modelname if args.log is None else args.log
     hydragnn.utils.setup_log(log_name)
     writer = hydragnn.utils.get_summary_writer(log_name)
 
     log("Command: {0}\n".format(" ".join([x for x in sys.argv])), rank=0)
 
-    modelname = "dftb_smooth_uv_spectrum"
     if args.preonly:
         ## local data
         total = DFTBDataset(
