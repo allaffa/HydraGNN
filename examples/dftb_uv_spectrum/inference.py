@@ -119,6 +119,9 @@ for irun in range(1, 2):
     num_test_samples = len(testset)
     mol_ID = [item.ID for item in testset]
 
+    # bins = [lower + x * (upper - lower) / length for x in range(length)]
+    bins = range(length)
+
     FRQ=1
     error_mae, error_mse = [], []
     for sample_id, test_data in enumerate(tqdm(testset)):
