@@ -1,3 +1,4 @@
+import shutil
 import mpi4py
 
 mpi4py.rc.thread_level = "serialized"
@@ -30,6 +31,7 @@ from hydragnn.preprocess.load_data import split_dataset
 from hydragnn.utils.distdataset import DistDataset
 from hydragnn.utils.pickledataset import SimplePickleWriter, SimplePickleDataset
 from hydragnn.preprocess.utils import gather_deg
+from hydragnn.utils.tar_utils import extract_tar_file, get_mol_dir_list
 
 import numpy as np
 
@@ -77,7 +79,7 @@ def dftb_to_graph(moldir, dftb_node_types, var_config):
 class DFTBDataset(AbstractBaseDataset):
     """DFTBDataset dataset class"""
 
-    def __init__(self, dirpath, dftb_node_types, var_config, dist=False, sampling=None):
+    def __init__(self, dirpath, dftb_node_types, var_config, dist=False, sampling=None, tmpfs=None):
         super().__init__()
 
         self.dftb_node_types = dftb_node_types
@@ -114,11 +116,32 @@ class DFTBDataset(AbstractBaseDataset):
             dirlist = list(nsplit(dirlist, self.world_size))[self.rank]
             log("local dirlist", len(dirlist))
 
-        for subdir in iterate_tqdm(dirlist, verbosity_level=2, desc="Load"):
-            data_object = dftb_to_graph(
-                os.path.join(dirpath, subdir), dftb_node_types, var_config
-            )
-            self.dataset.append(data_object)
+        # Iterate through molecule directories or tar files and create graph objects
+        for item in iterate_tqdm(dirlist, verbosity_level=2, desc="Load"):
+            if 'readme' in item.lower(): continue
+            fullpath = os.path.join(dirpath, item)
+
+            # Verify that files in the directory are either tar.gz files or molecule directories
+            if (not fullpath.endswith(".tar.gz")) and (not os.path.isdir(fullpath)):
+                raise RuntimeError("Can't understand if {} is a molecule directory or tar.gz file".format(fullpath))
+
+            # If tar.gz files, extract tar file in a tmp dir
+            if fullpath.endswith(".tar.gz"):
+                if 'unprocessed' in os.path.basename(fullpath): continue
+                extract_path = extract_tar_file(fullpath, tmpfs)
+                mdirs = get_mol_dir_list(extract_path)
+                assert len(mdirs) > 0, f"No molecules found in tar file {fullpath} extracted at {extract_path}"
+                for mdir in mdirs:
+                    data_object = dftb_to_graph(mdir, dftb_node_types, var_config)
+                    self.dataset.append(data_object)
+
+                # Remove the temporary directory where the tar file was extracted
+                shutil.rmtree(extract_path)
+
+            # else if items in dirlist are molecule directories, parse them and create graph objects
+            else:
+                data_object = dftb_to_graph(fullpath, dftb_node_types, var_config)
+                self.dataset.append(data_object)
 
     def len(self):
         return len(self.dataset)
@@ -144,6 +167,14 @@ if __name__ == "__main__":
     parser.add_argument("--log", help="log name")
     parser.add_argument("--batch_size", type=int, help="batch_size", default=None)
     parser.add_argument("--everyone", action="store_true", help="gptimer")
+    parser.add_argument("--input_data", default=None,
+                        help="Input dataset to read in. Must be either a .txt file listing molecule directories or a "
+                             "directory containing .tar.gz files. Provide --tmpfs to extract tar files into fast, "
+                             "local storage.")
+    parser.add_argument("--tmpfs", default=None,
+                        help="Transient storage space such as /tmp/$USER which can be used as a temporary "
+                             "scratch space for caching and/or extracting data. "
+                             "The location must exist before use by HydraGNN.")
 
     group = parser.add_mutually_exclusive_group()
     group.add_argument(
@@ -166,7 +197,7 @@ if __name__ == "__main__":
     graph_feature_names = ["frequencies", "intensities"]
     graph_feature_dim = [50, 50]
     dirpwd = os.path.dirname(os.path.abspath(__file__))
-    datafile = os.path.join(dirpwd, "dataset/dftb_aisd_electronic_excitation_spectrum")
+    datafile = args.input_data
     ##################################################################################################################
     input_filename = os.path.join(dirpwd, "dftb_discrete_uv_spectrum.json")
     ##################################################################################################################
@@ -211,10 +242,11 @@ if __name__ == "__main__":
     if args.preonly:
         ## local data
         total = DFTBDataset(
-            os.path.join(datafile, "mollist.txt"),
+            datafile,
             dftb_node_types,
             var_config,
             dist=True,
+            tmpfs=args.tmpfs,
         )
         trainset, valset, testset = split_dataset(
             dataset=total,
