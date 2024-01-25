@@ -151,9 +151,8 @@ class DFTBDataset(AbstractBaseDataset):
                 extract_path = extract_tar_file(fullpath, tmpfs)
                 mdirs = get_mol_dir_list(extract_path)
                 assert len(mdirs) > 0, f"No molecules found in tar file {fullpath} extracted at {extract_path}"
-                for mdir in mdirs:
+                for mdir in iterate_tqdm(mdirs, verbosity_level=2, desc="Processing"):
                     data_object = dftb_to_graph(mdir, dftb_node_types, var_config)
-                    self.dataset.append(data_object)
                     data_object = self.transform_input_to_data_object_base(dirpath, mdir)
                     if data_object is not None:
                         self.dataset.append(data_object)
@@ -190,8 +189,9 @@ class DFTBDataset(AbstractBaseDataset):
         data_object = None
 
         # collect information about molecular structure and chemical composition
+        #print ("__transform_DFTB_UV_input_to_data_object_base:", raw_data_path, dir)
         try:
-            pdb_filename = raw_data_path + '/' + dir + '/' + 'smiles.pdb'
+            pdb_filename = dir + '/' + 'smiles.pdb'
             mol = MolFromPDBFile(pdb_filename, sanitize=False, proximityBonding=True,
                                  removeHs=True)  # , sanitize=False , removeHs=False)
         # file not found -> exit here
@@ -199,7 +199,7 @@ class DFTBDataset(AbstractBaseDataset):
             print(f"'{pdb_filename}'" + " not found")
             sys.exit(1)
         try:
-            spectrum_filename = raw_data_path + '/' + dir + '/' + 'EXC-smooth.DAT'
+            spectrum_filename = dir + '/' + 'EXC-smooth.DAT'
             spectrum_energies = list()
             with open(spectrum_filename, "r") as input_file:
                 count_line = 0
@@ -241,7 +241,7 @@ class DFTBDataset(AbstractBaseDataset):
                            dim=0).t().contiguous()
 
         data_object = generate_graphdata_from_rdkit_molecule(mol, torch.tensor(spectrum_energies), dftb_node_types, atomicdescriptors_torch_tensor)
-        atoms = io.read(raw_data_path + '/' + dir + '/' + 'geo_end.xyz', parallel=False)
+        atoms = io.read(dir + '/' + 'geo_end.xyz', parallel=False)
         data_object.pos = torch.from_numpy(atoms.positions)
         try:
             data_object = spherical_coordinates(data_object)
@@ -253,7 +253,7 @@ class DFTBDataset(AbstractBaseDataset):
         data_object.pos = data_object.pos.to(torch.float32)
         data_object.x = data_object.x.to(torch.float32)
         data_object.edge_attr = data_object.edge_attr.to(torch.float32)
-        data_object.ID = torch.tensor((int(dir.replace("mol_", "")),))
+        data_object.ID = torch.tensor((int(os.path.basename(dir).replace("mol_", "")),))
 
         return data_object
     

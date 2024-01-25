@@ -1,7 +1,7 @@
 import os
 import subprocess
 import traceback
-from file_utils import contains_subdirs
+from .file_utils import contains_subdirs
 
 
 def extract_tar_file(tar_file, dest, create_subdir=True):
