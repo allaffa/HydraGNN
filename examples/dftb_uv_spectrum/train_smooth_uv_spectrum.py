@@ -152,7 +152,7 @@ class DFTBDataset(AbstractBaseDataset):
                 mdirs = get_mol_dir_list(extract_path)
                 assert len(mdirs) > 0, f"No molecules found in tar file {fullpath} extracted at {extract_path}"
                 for mdir in iterate_tqdm(mdirs, verbosity_level=2, desc="Processing"):
-                    data_object = self.transform_input_to_data_object_base(dirpath, mdir)
+                    data_object = self.transform_input_to_data_object_base(mdir)
                     if data_object is not None:
                         self.dataset.append(data_object)
 
@@ -161,18 +161,18 @@ class DFTBDataset(AbstractBaseDataset):
 
             # else if items in dirlist are molecule directories, parse them and create graph objects
             else:
-                data_object = self.transform_input_to_data_object_base(dirpath, mdir)
+                data_object = self.transform_input_to_data_object_base(mdir)
                 if data_object is not None:
                     self.dataset.append(data_object)
                     
 
-    def transform_input_to_data_object_base(self, raw_data_path, dir):
-        data_object = self.__transform_DFTB_UV_input_to_data_object_base(raw_data_path, dir)
+    def transform_input_to_data_object_base(self, dir):
+        data_object = self.__transform_DFTB_UV_input_to_data_object_base(dir)
 
         return data_object
 
 
-    def __transform_DFTB_UV_input_to_data_object_base(self, raw_data_path, dir):
+    def __transform_DFTB_UV_input_to_data_object_base(self, dir):
         """Transforms lines of strings read from the raw data DFTB+ file to Data object and returns it.
 
         Parameters
@@ -188,7 +188,6 @@ class DFTBDataset(AbstractBaseDataset):
         data_object = None
 
         # collect information about molecular structure and chemical composition
-        #print ("__transform_DFTB_UV_input_to_data_object_base:", raw_data_path, dir)
         try:
             pdb_filename = dir + '/' + 'smiles.pdb'
             mol = MolFromPDBFile(pdb_filename, sanitize=False, proximityBonding=True,
