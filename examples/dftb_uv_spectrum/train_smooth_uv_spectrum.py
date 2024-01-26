@@ -152,7 +152,6 @@ class DFTBDataset(AbstractBaseDataset):
                 mdirs = get_mol_dir_list(extract_path)
                 assert len(mdirs) > 0, f"No molecules found in tar file {fullpath} extracted at {extract_path}"
                 for mdir in iterate_tqdm(mdirs, verbosity_level=2, desc="Processing"):
-                    data_object = dftb_to_graph(mdir, dftb_node_types, var_config)
                     data_object = self.transform_input_to_data_object_base(dirpath, mdir)
                     if data_object is not None:
                         self.dataset.append(data_object)
