@@ -12,7 +12,7 @@ try:
 except ImportError:
     pass
 
-import torch_geometric.data
+import torch_geometric
 import torch
 
 from multiprocessing.shared_memory import SharedMemory
