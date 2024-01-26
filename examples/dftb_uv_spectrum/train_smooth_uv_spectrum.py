@@ -152,7 +152,7 @@ class DFTBDataset(AbstractBaseDataset):
                 mdirs = get_mol_dir_list(extract_path)
                 assert len(mdirs) > 0, f"No molecules found in tar file {fullpath} extracted at {extract_path}"
                 for mdir in iterate_tqdm(mdirs, verbosity_level=2, desc="Processing"):
-                    data_object = self.transform_input_to_data_object_base(mdir)
+                    data_object = dftb_to_graph(mdir, dftb_node_types, var_config)
                     if data_object is not None:
                         self.dataset.append(data_object)
 
@@ -161,7 +161,7 @@ class DFTBDataset(AbstractBaseDataset):
 
             # else if items in dirlist are molecule directories, parse them and create graph objects
             else:
-                data_object = self.transform_input_to_data_object_base(mdir)
+                data_object = dftb_to_graph(mdir, dftb_node_types, var_config)
                 if data_object is not None:
                     self.dataset.append(data_object)
                     
@@ -243,7 +243,8 @@ class DFTBDataset(AbstractBaseDataset):
         data_object.pos = torch.from_numpy(atoms.positions)
         try:
             data_object = spherical_coordinates(data_object)
-        except: 
+        except Exception as error:
+            print(f"Spherical coordinates fails for {dir}: ", error)
             print(f"Spherical coordinates fails for {dir} - data_object.edge_index.shape: ", data_object.edge_index.shape)
             print(f"Spherical coordinates fails for {dir} - data_object.edge_attr.shape: ", data_object.edge_attr.shape)
             print(f"Spherical coordinates fails for {dir} - data.pos.shape: ", data_object.pos.shape)
