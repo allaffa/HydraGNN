@@ -328,8 +328,10 @@ if __name__ == "__main__":
     ]
     var_config["graph_feature_names"] = graph_feature_names
     var_config["graph_feature_dims"] = graph_feature_dim
-    var_config["node_feature_names"] = node_feature_names
-    var_config["node_feature_dims"] = node_feature_dims
+    (
+        var_config["input_node_feature_names"],
+        var_config["input_node_feature_dims"],
+    ) = get_node_attribute_name(dftb_node_types)
 
     if args.batch_size is not None:
         config["NeuralNetwork"]["Training"]["batch_size"] = args.batch_size
