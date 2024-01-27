@@ -16,6 +16,12 @@ from itertools import chain
 import argparse
 import time
 
+from torch_geometric.transforms import Spherical
+
+from hydragnn.utils.atomicdescriptors import atomicdescriptors
+
+from ase import io
+
 from rdkit.Chem.rdmolfiles import MolFromPDBFile
 
 import hydragnn
@@ -70,7 +76,7 @@ def dftb_to_graph(moldir, dftb_node_types, var_config):
     )
     ytarget = torch.tensor(ytarget.T.ravel())
     data = generate_graphdata_from_rdkit_molecule(
-        mol, ytarget, dftb_node_types, var_config
+        mol, ytarget, dftb_node_types, var_config=var_config
     )
     data.ID = torch.tensor((int(os.path.basename(moldir).replace("mol_", "")),))
     return data
@@ -81,6 +87,19 @@ class DFTBDataset(AbstractBaseDataset):
 
     def __init__(self, dirpath, dftb_node_types, var_config, dist=False, sampling=None, tmpfs=None):
         super().__init__()
+
+        # atomic descriptors
+        atomicdescriptor = atomicdescriptors(
+            "./embedding_onehot.json",
+            overwritten=True,
+            element_types=list(dftb_node_types.keys()),
+            one_hot=True,
+        )
+        self.valence_electrons = atomicdescriptor.get_valence_electrons()
+        self.electron_affinity = atomicdescriptor.get_electron_affinity()
+        self.atomic_weight = atomicdescriptor.get_atomic_weight()
+        self.ion_energies = atomicdescriptor.get_ionenergies()
+
 
         self.dftb_node_types = dftb_node_types
         self.var_config = var_config
@@ -131,18 +150,20 @@ class DFTBDataset(AbstractBaseDataset):
                 extract_path = extract_tar_file(fullpath, tmpfs)
                 mdirs = get_mol_dir_list(extract_path)
                 assert len(mdirs) > 0, f"No molecules found in tar file {fullpath} extracted at {extract_path}"
-                for mdir in mdirs:
+                for mdir in iterate_tqdm(mdirs, verbosity_level=2, desc="Processing"):
                     data_object = dftb_to_graph(mdir, dftb_node_types, var_config)
-                    self.dataset.append(data_object)
+                    if data_object is not None:
+                        self.dataset.append(data_object)
 
                 # Remove the temporary directory where the tar file was extracted
                 shutil.rmtree(extract_path)
 
             # else if items in dirlist are molecule directories, parse them and create graph objects
             else:
-                data_object = dftb_to_graph(fullpath, dftb_node_types, var_config)
-                self.dataset.append(data_object)
-
+                data_object = dftb_to_graph(mdir, dftb_node_types, var_config)
+                if data_object is not None:
+                    self.dataset.append(data_object)
+                    
     def len(self):
         return len(self.dataset)
 
@@ -196,6 +217,8 @@ if __name__ == "__main__":
 
     graph_feature_names = ["frequencies", "intensities"]
     graph_feature_dim = [50, 50]
+    node_feature_names = ["atomic_features"]
+    node_feature_dims = [16]
     dirpwd = os.path.dirname(os.path.abspath(__file__))
     datafile = args.input_data
     ##################################################################################################################
@@ -212,10 +235,9 @@ if __name__ == "__main__":
     ]
     var_config["graph_feature_names"] = graph_feature_names
     var_config["graph_feature_dims"] = graph_feature_dim
-    (
-        var_config["input_node_feature_names"],
-        var_config["input_node_feature_dims"],
-    ) = get_node_attribute_name(dftb_node_types)
+    var_config["node_feature_names"] = node_feature_names
+    var_config["node_feature_dims"] = node_feature_dims    
+    
     if args.batch_size is not None:
         config["NeuralNetwork"]["Training"]["batch_size"] = args.batch_size
     ##################################################################################################################
@@ -232,13 +254,13 @@ if __name__ == "__main__":
         datefmt="%H:%M:%S",
     )
 
-    log_name = "dftb_eV_fullx" if args.log is None else args.log
+    modelname = "dftb_discrete_uv_spectrum"
+    log_name = modelname if args.log is None else args.log
     hydragnn.utils.setup_log(log_name)
     writer = hydragnn.utils.get_summary_writer(log_name)
 
     log("Command: {0}\n".format(" ".join([x for x in sys.argv])), rank=0)
 
-    modelname = "dftb_discrete_uv_spectrum"
     if args.preonly:
         ## local data
         total = DFTBDataset(
@@ -324,9 +346,9 @@ if __name__ == "__main__":
         basedir = os.path.join(
             os.path.dirname(__file__), "dataset", "%s.pickle" % modelname
         )
-        trainset = SimplePickleDataset(basedir, "trainset")
-        valset = SimplePickleDataset(basedir, "valset")
-        testset = SimplePickleDataset(basedir, "testset")
+        trainset = SimplePickleDataset(basedir, "trainset", var_config=var_config)
+        valset = SimplePickleDataset(basedir, "valset", var_config=var_config)
+        testset = SimplePickleDataset(basedir, "testset", var_config=var_config)
         # minmax_node_feature = trainset.minmax_node_feature
         # minmax_graph_feature = trainset.minmax_graph_feature
         pna_deg = trainset.pna_deg
@@ -449,7 +471,7 @@ if __name__ == "__main__":
                 )
                 plt.draw()
                 plt.tight_layout()
-                plt.savefig(f"logs/{setname}_scatterplot_{varname}.png")
+                plt.savefig(f"logs/{log_name}/{setname}_scatterplot_{varname}.png")
                 plt.close(fig)
 
         for sample_id in range(0, num_test_samples):
@@ -494,11 +516,11 @@ if __name__ == "__main__":
             plt.draw()
             plt.tight_layout()
             # plt.ylim([-0.2, max(true_sample) + 0.2])
-            plt.savefig(f"logs/sample_{sample_id}.png")
+            plt.savefig(f"logs/{log_name}/sample_{sample_id}.png")
             plt.close(fig)
 
         if rank == 0:
-            fig.savefig("./logs/" + log_name + "/" + varname + "_all.png")
+            fig.savefig(f"./logs/{log_name}/{varname}_all.png")
         plt.close()
 
     if tr.has("GPTLTracer"):

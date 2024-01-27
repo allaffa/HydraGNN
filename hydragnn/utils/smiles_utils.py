@@ -114,7 +114,7 @@ def generate_graphdata_from_rdkit_molecule(
             var_config["type"],
             var_config["output_index"],
             var_config["graph_feature_dims"],
-            var_config["input_node_feature_dims"],
+            var_config["node_feature_dims"],
             data,
         )
 
