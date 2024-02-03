@@ -68,20 +68,6 @@ from hydragnn.utils.abstractbasedataset import AbstractBaseDataset
 
 spherical_coordinates = Spherical(norm=False, cat=True)
 
-def dftb_to_graph(moldir, dftb_node_types, var_config):
-    pdb_filename = os.path.join(moldir, "smiles.pdb")
-    mol = MolFromPDBFile(
-        pdb_filename, sanitize=False, proximityBonding=True, removeHs=True
-    )  # , sanitize=False , removeHs=False)
-    spectrum_filename = os.path.join(moldir, "EXC-smooth.DAT")
-    ytarget = np.loadtxt(spectrum_filename, usecols=1, dtype=np.float32)
-    ytarget = torch.tensor(ytarget)
-    data = generate_graphdata_from_rdkit_molecule(
-        mol, ytarget, dftb_node_types, var_config=var_config
-    )
-    data.ID = torch.tensor((int(os.path.basename(moldir).replace("mol_", "")),))
-    return data
-
 
 class DFTBDataset(AbstractBaseDataset):
     """DFTBDataset dataset class"""
@@ -152,7 +138,7 @@ class DFTBDataset(AbstractBaseDataset):
                 mdirs = get_mol_dir_list(extract_path)
                 assert len(mdirs) > 0, f"No molecules found in tar file {fullpath} extracted at {extract_path}"
                 for mdir in iterate_tqdm(mdirs, verbosity_level=2, desc="Processing"):
-                    data_object = dftb_to_graph(mdir, dftb_node_types, var_config)
+                    data_object = self.dftb_to_graph(mdir, dftb_node_types, var_config)
                     if data_object is not None:
                         self.dataset.append(data_object)
 
@@ -161,51 +147,18 @@ class DFTBDataset(AbstractBaseDataset):
 
             # else if items in dirlist are molecule directories, parse them and create graph objects
             else:
-                data_object = dftb_to_graph(mdir, dftb_node_types, var_config)
+                data_object = self.dftb_to_graph(mdir, dftb_node_types, var_config)
                 if data_object is not None:
                     self.dataset.append(data_object)
-                    
 
-    def transform_input_to_data_object_base(self, dir):
-        data_object = self.__transform_DFTB_UV_input_to_data_object_base(dir)
-
-        return data_object
-
-
-    def __transform_DFTB_UV_input_to_data_object_base(self, dir):
-        """Transforms lines of strings read from the raw data DFTB+ file to Data object and returns it.
-
-        Parameters
-        ----------
-        lines:
-          content of data file with all the graph information
-        Returns
-        ----------
-        Data
-            Data object representing structure of a graph sample.
-        """
-
-        data_object = None
-
-        # collect information about molecular structure and chemical composition
-        try:
-            pdb_filename = dir + '/' + 'smiles.pdb'
-            mol = MolFromPDBFile(pdb_filename, sanitize=False, proximityBonding=True,
-                                 removeHs=True)  # , sanitize=False , removeHs=False)
-        # file not found -> exit here
-        except IOError:
-            print(f"'{pdb_filename}'" + " not found")
-            sys.exit(1)
-        try:
-            spectrum_filename = dir + '/' + 'EXC-smooth.DAT'
-            spectrum_energies = list()
-            with open(spectrum_filename, "r") as input_file:
-                count_line = 0
-                for line in input_file:
-                    spectrum_energies.append(float(line.strip().split()[1]))
-        except:
-            print(f"EXC-smooth.DAT not found for {dir}")
-            return None
+    def dftb_to_graph(self, moldir, dftb_node_types, var_config):
+        pdb_filename = os.path.join(moldir, "smiles.pdb")
+        mol = MolFromPDBFile(
+            pdb_filename, sanitize=False, proximityBonding=True, removeHs=True
+        )  # , sanitize=False , removeHs=False)
+        spectrum_filename = os.path.join(moldir, "EXC-smooth.DAT")
+        ytarget = np.loadtxt(spectrum_filename, usecols=1, dtype=np.float32)
+        ytarget = torch.tensor(ytarget)
 
         valence_electrons_list = []
         for atom in mol.GetAtoms():
@@ -238,23 +191,30 @@ class DFTBDataset(AbstractBaseDataset):
             atomicdescriptors_torch_tensor = torch.cat([torch.tensor([descriptor]) for descriptor in atomic_descriptors_list],
                            dim=0).t().contiguous()
 
-        data_object = generate_graphdata_from_rdkit_molecule(mol, torch.tensor(spectrum_energies), dftb_node_types, atomicdescriptors_torch_tensor=atomicdescriptors_torch_tensor)
-        atoms = io.read(dir + '/' + 'geo_end.xyz', parallel=False)
-        data_object.pos = torch.from_numpy(atoms.positions)
+        data = generate_graphdata_from_rdkit_molecule(
+            mol, ytarget, dftb_node_types, atomicdescriptors_torch_tensor=atomicdescriptors_torch_tensor, var_config=var_config
+        )
+        data.ID = torch.tensor((int(os.path.basename(moldir).replace("mol_", "")),))
+
+        # the position of the atoms must be taken from the optimized geometry
+        atoms = io.read(moldir + '/' + 'geo_end.xyz', parallel=False)
+        data.pos = torch.from_numpy(atoms.positions)
+        """
         try:
-            data_object = spherical_coordinates(data_object)
+            data_object = spherical_coordinates(data)
         except Exception as error:
             print(f"Spherical coordinates fails for {dir}: ", error)
-            print(f"Spherical coordinates fails for {dir} - data_object.edge_index.shape: ", data_object.edge_index.shape)
-            print(f"Spherical coordinates fails for {dir} - data_object.edge_attr.shape: ", data_object.edge_attr.shape)
-            print(f"Spherical coordinates fails for {dir} - data.pos.shape: ", data_object.pos.shape)
+            print(f"Spherical coordinates fails for {dir} - data.edge_index.shape: ", data.edge_index.shape)
+            print(f"Spherical coordinates fails for {dir} - data.edge_attr.shape: ", data.edge_attr.shape)
+            print(f"Spherical coordinates fails for {dir} - data.pos.shape: ", data.pos.shape)
             return None
-        data_object.pos = data_object.pos.to(torch.float32)
-        data_object.x = data_object.x.to(torch.float32)
-        data_object.edge_attr = data_object.edge_attr.to(torch.float32)
-        data_object.ID = torch.tensor((int(os.path.basename(dir).replace("mol_", "")),))
+        """
+        data.pos = data.pos.to(torch.float32)
+        data.x = data.x.to(torch.float32)
+        data.edge_attr = data.edge_attr.to(torch.float32)
+        data.ID = torch.tensor((int(os.path.basename(moldir).replace("mol_", "")),))
 
-        return data_object
+        return data
     
 
     def len(self):
@@ -421,6 +381,7 @@ if __name__ == "__main__":
     tr.disable()
     timer = Timer("load_data")
     timer.start()
+
     if args.format == "adios":
         info("Adios load")
         assert not (args.shmem and args.ddstore), "Cannot use both ddstore and shmem"
@@ -518,7 +479,7 @@ if __name__ == "__main__":
         ##################################################################################################################
         fig, axs = plt.subplots(1, 3, figsize=(18, 6))
         for isub, (loader, setname) in enumerate(
-            zip([train_loader, val_loader, test_loader], ["train", "val", "test"])
+                zip([train_loader, val_loader, test_loader], ["train", "val", "test"])
         ):
             error, rmse_task, true_values, predicted_values = hydragnn.train.test(
                 loader, model, verbosity
@@ -540,38 +501,38 @@ if __name__ == "__main__":
                 error_mae += np.sum(
                     np.abs(
                         head_pred[
-                            (sample_id * graph_feature_dim[0]) : (sample_id + 1)
-                            * graph_feature_dim[0]
+                        (sample_id * graph_feature_dim[0]): (sample_id + 1)
+                                                            * graph_feature_dim[0]
                         ]
                         - head_true[
-                            (sample_id * graph_feature_dim[0]) : (sample_id + 1)
-                            * graph_feature_dim[0]
-                        ]
+                          (sample_id * graph_feature_dim[0]): (sample_id + 1)
+                                                              * graph_feature_dim[0]
+                          ]
                     )
                 )
                 error_mse += np.sum(
                     (
-                        head_pred[
-                            (sample_id * graph_feature_dim[0]) : (sample_id + 1)
-                            * graph_feature_dim[0]
-                        ]
-                        - head_true[
-                            (sample_id * graph_feature_dim[0]) : (sample_id + 1)
-                            * graph_feature_dim[0]
-                        ]
+                            head_pred[
+                            (sample_id * graph_feature_dim[0]): (sample_id + 1)
+                                                                * graph_feature_dim[0]
+                            ]
+                            - head_true[
+                              (sample_id * graph_feature_dim[0]): (sample_id + 1)
+                                                                  * graph_feature_dim[0]
+                              ]
                     )
                     ** 2
                 )
 
                 fig, ax = plt.subplots()
                 true_sample = head_true[
-                    (sample_id * graph_feature_dim[0]) : (sample_id + 1)
-                    * graph_feature_dim[0]
-                ]
+                              (sample_id * graph_feature_dim[0]): (sample_id + 1)
+                                                                  * graph_feature_dim[0]
+                              ]
                 pred_sample = head_pred[
-                    (sample_id * graph_feature_dim[0]) : (sample_id + 1)
-                    * graph_feature_dim[0]
-                ]
+                              (sample_id * graph_feature_dim[0]): (sample_id + 1)
+                                                                  * graph_feature_dim[0]
+                              ]
                 ax.plot(true_sample)
                 ax.plot(pred_sample)
                 plt.draw()
