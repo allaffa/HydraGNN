@@ -23,6 +23,7 @@ from hydragnn.utils.atomicdescriptors import atomicdescriptors
 from ase import io
 
 from rdkit.Chem.rdmolfiles import MolFromPDBFile
+from rdkit.Chem import AddHs
 
 import hydragnn
 from hydragnn.utils.print_utils import print_distributed, iterate_tqdm, log
@@ -154,7 +155,7 @@ class DFTBDataset(AbstractBaseDataset):
     def dftb_to_graph(self, moldir, dftb_node_types, var_config):
         pdb_filename = os.path.join(moldir, "smiles.pdb")
         mol = MolFromPDBFile(
-            pdb_filename, sanitize=False, proximityBonding=True, removeHs=True
+            pdb_filename, sanitize=False, proximityBonding=True, removeHs=False
         )  # , sanitize=False , removeHs=False)
         spectrum_filename = os.path.join(moldir, "EXC-smooth.DAT")
         ytarget = np.loadtxt(spectrum_filename, usecols=1, dtype=np.float32)
@@ -192,7 +193,7 @@ class DFTBDataset(AbstractBaseDataset):
                            dim=0).t().contiguous()
 
         data = generate_graphdata_from_rdkit_molecule(
-            mol, ytarget, dftb_node_types, atomicdescriptors_torch_tensor=atomicdescriptors_torch_tensor, var_config=var_config
+            mol, ytarget, dftb_node_types, atomicdescriptors_torch_tensor=atomicdescriptors_torch_tensor, var_config=var_config, add_hs=False
         )
         data.ID = torch.tensor((int(os.path.basename(moldir).replace("mol_", "")),))
 

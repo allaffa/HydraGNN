@@ -47,11 +47,13 @@ def generate_graphdata_from_smilestr(simlestr, ytarget, types, var_config=None):
 
 
 def generate_graphdata_from_rdkit_molecule(
-    mol, ytarget, types, atomicdescriptors_torch_tensor=None, var_config=None
+    mol, ytarget, types, atomicdescriptors_torch_tensor=None, var_config=None, add_hs=True
 ):
     bonds = {BT.SINGLE: 0, BT.DOUBLE: 1, BT.TRIPLE: 2, BT.AROMATIC: 3}
 
-    mol = Chem.AddHs(mol)
+    if add_hs:
+        mol = Chem.AddHs(mol)
+
     N = mol.GetNumAtoms()
 
     type_idx = []
@@ -103,7 +105,7 @@ def generate_graphdata_from_rdkit_molecule(
     if atomicdescriptors_torch_tensor is not None:
         assert (
             atomicdescriptors_torch_tensor.shape[0] == x.shape[0]
-        ), "tensor of atomic descriptors MUST have the number of rows equal to the number of atoms in the molecule"
+            ), "tensor of atomic descriptors MUST have the number of rows "+str(atomicdescriptors_torch_tensor.shape[0])+" equal to the number of atoms in the molecule "+str(x.shape[0])
         x = torch.cat([x, atomicdescriptors_torch_tensor], dim=-1).to(torch.float)
 
     y = ytarget  # .squeeze()
