@@ -213,7 +213,6 @@ class DFTBDataset(AbstractBaseDataset):
         data.pos = data.pos.to(torch.float32)
         data.x = data.x.to(torch.float32)
         data.edge_attr = data.edge_attr.to(torch.float32)
-        data.ID = torch.tensor((int(os.path.basename(moldir).replace("mol_", "")),))
 
         return data
     
