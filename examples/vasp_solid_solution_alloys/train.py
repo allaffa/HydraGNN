@@ -11,7 +11,7 @@ import torch
 from torch import tensor
 from torch_geometric.data import Data
 
-from torch_geometric.transforms import Spherical
+from torch_geometric.transforms import Spherical, LocalCartesian
 
 import hydragnn
 from hydragnn.utils.time_utils import Timer
@@ -38,6 +38,7 @@ def info(*args, logtype="info", sep=" "):
     getattr(logging, logtype)(sep.join(map(str, args)))
 
 spherical_coordinates = Spherical(norm=False, cat=True)
+cartesian_coordinates = LocalCartesian(norm=False, cat=True)
 
 class VASPDataset(AbstractBaseDataset):
 
@@ -86,7 +87,8 @@ class VASPDataset(AbstractBaseDataset):
                         )
                         if data_object is not None:
                             data_object = self.radius_graph(data_object)
-                            data_object = spherical_coordinates(data_object)
+                            #data_object = spherical_coordinates(data_object)
+                            data_object = cartesian_coordinates(data_object)
                             self.dataset.append(data_object)
 
             if self.dist:
