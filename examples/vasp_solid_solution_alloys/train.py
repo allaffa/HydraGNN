@@ -297,7 +297,7 @@ class VASPDataset(AbstractBaseDataset):
             outcar_files = [file for file in files if file.startswith("OUTCAR")]
             for file_name in outcar_files:
                 # If you want to work with the full path, you can join the directory path and file name
-                file_path = os.path.join(os.path.join(dirpath, "../", "Bulk-M-and-X/", file_name))
+                file_path = os.path.join(os.path.join(dirpath, "../", "pure_elements/", file_name))
 
                 element = name
                 dataset, _ = read_outcar_pure_elements_ground_state(file_path)
@@ -397,7 +397,7 @@ if __name__ == "__main__":
     fname_adios = dirpwd + "/dataset/%s.bp" % (datasetname)
     config["Dataset"]["name"] = "%s_%d" % (datasetname, rank)
     if not args.loadexistingsplit:
-        total = VASPDataset(dirpwd + "/dataset/binaries", config, dist=True)
+        total = VASPDataset(dirpwd + "/dataset/VASP_calculations/binaries", config, dist=True)
 
         trainset, valset, testset = split_dataset(
             dataset=total,
