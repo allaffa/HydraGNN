@@ -225,6 +225,8 @@ def read_outcar(file_path):
     result_atomic_structure_sections = read_sections_between(file_path, atomic_structure_start_marker,
                                                              atomic_structure_end_marker)
 
+    atom_numbers = extract_atom_species(file_path)
+
     # Extract POSITION and TOTAL-FORCE from each section
     for i, (supercell_section, atomic_structure_section) in enumerate(
             zip(result_supercell, result_atomic_structure_sections), start=1):
@@ -237,7 +239,6 @@ def read_outcar(file_path):
         data_object.pos = positions
         data_object.supercell_size = supercell
         data_object.forces = forces
-        atom_numbers = extract_atom_species(file_path)
         data_object.atom_numbers = atom_numbers
         data_object.x = torch.cat((atom_numbers, positions, forces), dim=1)
 
