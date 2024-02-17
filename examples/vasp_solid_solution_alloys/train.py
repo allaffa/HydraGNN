@@ -145,7 +145,7 @@ def read_sections_between(file_path, start_marker, end_marker):
                     current_section.append(line)
 
                 # Check if the current line contains the end marker
-                elif end_marker in line:
+                elif (end_marker in line) and in_section:
                     in_section = False
                     current_section.append(line)
                     sections.append(current_section)
@@ -209,8 +209,9 @@ def read_outcar(file_path):
     supercell_start_marker = 'VOLUME and BASIS-vectors are now :'
     supercell_end_marker = 'FORCES acting on ions'
     atomic_structure_start_marker = 'POSITION                                       TOTAL-FORCE (eV/Angst)'
-    atomic_structure_end_marker = 'stress matrix after NEB project (eV)'
+    # atomic_structure_end_marker = 'stress matrix after NEB project (eV)'
     # atomic_structure_end_marker = 'ENERGY OF THE ELECTRON-ION-THERMOSTAT SYSTEM (eV)'
+    atomic_structure_end_marker = 'POTLOK'
 
     dataset = []
 
@@ -226,6 +227,8 @@ def read_outcar(file_path):
                                                              atomic_structure_end_marker)
 
     atom_numbers = extract_atom_species(file_path)
+
+    assert len(result_supercell)==len(result_atomic_structure_sections), "The length of the list of supercells "+str(len(result_supercell))+" differs from the length of the list of atomistic structures "+str(len(result_atomic_structure_sections))
 
     # Extract POSITION and TOTAL-FORCE from each section
     for i, (supercell_section, atomic_structure_section) in enumerate(
@@ -314,29 +317,49 @@ class VASPDataset(AbstractBaseDataset):
             if name == ".DS_Store":
                 continue
             dir_name = os.path.join(dirpath, name)
-            for subname in iterate_tqdm(os.listdir(dir_name), verbosity_level=2, desc="Load"):
-                if subname == ".DS_Store":
+            for subdir_name in iterate_tqdm(os.listdir(dir_name), verbosity_level=2, desc="Load"):
+                if subdir_name == ".DS_Store":
                     continue
-                subdir_name = os.listdir(os.path.join(dir_name, subname))
-                subdir_name = list(nsplit(subdir_name, self.world_size))[
-                    self.rank]
-                for subsubname in subdir_name:
+                subdir_global_list = os.listdir(os.path.join(dir_name, subdir_name))
+                subdir_local_list = list(nsplit(subdir_global_list, self.world_size))[self.rank]
 
-                    files = os.listdir(os.path.join(dir_name, subname, subsubname))
+                #print("MASSI - ", str(self.rank), " - total list: ", len(subdir_global_list))
+                #print("MASSI - ", str(self.rank), " - about to read: ", subdir_name)
+                #print("MASSI - ", str(self.rank), " - about to read: ", subdir_local_list)
 
-                    for file in files:
+                count = 0
 
-                        if file == "OUTCAR" or file == "OUTCAR-bis":
+                for subsubdir_name in subdir_local_list:
 
-                            temp_dataset = read_outcar(os.path.join(dir_name, subname, subsubname) + '/' + file)
+                    count = count + 1
 
-                            for data_object in temp_dataset:
-                                if data_object is not None:
-                                    data_object = self.radius_graph(data_object)
-                                    data_object = transform_coordinates(data_object)
-                                    self.dataset.append(data_object)
+                    files_list = os.listdir(os.path.join(dir_name, subdir_name, subsubdir_name))
+                    #print("MASSI - ", str(self.rank), " - about to read: ", os.path.join(dir_name, subdir_name, subsubdir_name))
 
-            random.shuffle(self.dataset)
+                    for filename in files_list:
+
+                        if filename == "OUTCAR" or filename == "OUTCAR-bis":
+
+                            try:
+
+                               temp_dataset, _ = read_outcar(os.path.join(dir_name, subdir_name, subsubdir_name) + '/' + filename)
+
+                               for data_object in temp_dataset:
+                                   if data_object is not None:
+                                      data_object = self.radius_graph(data_object)
+                                      data_object = transform_coordinates(data_object)
+                                      self.dataset.append(data_object)
+
+                            except:
+                                pass
+                    #print("MASSI - ", str(self.rank), " - finished reading: ", count, " of ", len(subdir_local_list), " - ", os.path.join(dir_name, subdir_name, subsubdir_name))
+
+                #print("MASSI - before barrier ", str(self.rank), " - finished reading: ", subdir_name)
+
+
+                #print("MASSI - after barrier ", str(self.rank), " - finished reading: ", subdir_name)
+
+        random.shuffle(self.dataset)
 
     def len(self):
         return len(self.dataset)
@@ -415,8 +438,8 @@ if __name__ == "__main__":
             adwriter.add("trainset", trainset)
             adwriter.add("valset", valset)
             adwriter.add("testset", testset)
-            adwriter.add_global("minmax_node_feature", total.minmax_node_feature)
-            adwriter.add_global("minmax_graph_feature", total.minmax_graph_feature)
+            #adwriter.add_global("minmax_node_feature", total.minmax_node_feature)
+            #adwriter.add_global("minmax_graph_feature", total.minmax_graph_feature)
             adwriter.save()
         elif args.format == "pickle":
             basedir = os.path.join(
