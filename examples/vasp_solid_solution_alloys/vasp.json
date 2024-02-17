@@ -24,7 +24,7 @@
             "model_type": "PNA",
             "radius": 5.0,
             "max_neighbours": 100000,
-	    "edge_features": ["length", "polar_angle", "azimutal_angle"],
+	    "edge_features": ["bond_length", "local_x", "local_y", "local_z"],
 	    "periodic_boundary_conditions": true,
             "hidden_dim": 50,
             "num_conv_layers": 3,
@@ -51,11 +51,16 @@
             "type": ["graph"]
         },
         "Training": {
-            "num_epoch": 50,
+            "num_epoch": 20,
             "perc_train": 0.9,
             "loss_function_type": "mse",
             "batch_size": 32,
+            "EarlyStopping": true,
+            "patience": 20,
+            "Checkpoint": true,
+            "checkpoint_delay": 0,
             "continue": 0,
+	    "startfrom": "NbTaV",
             "Optimizer": {
                 "type": "AdamW",
                 "learning_rate": 1e-3
