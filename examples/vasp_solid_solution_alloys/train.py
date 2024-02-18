@@ -25,6 +25,7 @@ from hydragnn.preprocess.utils import RadiusGraphPBC
 from hydragnn.preprocess.utils import gather_deg
 
 from hydragnn.utils.distributed import nsplit, get_device
+import hydragnn.utils.tracer as tr
 
 from hydragnn.utils.print_utils import iterate_tqdm, log
 
