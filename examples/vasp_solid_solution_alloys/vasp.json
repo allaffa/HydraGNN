@@ -34,11 +34,6 @@
                     "dim_sharedlayers": 50,
                     "num_headlayers": 2,
                     "dim_headlayers": [50,25]
-                },
-                "node": {
-                    "num_headlayers": 2,
-                    "dim_headlayers": [50,25],
-                    "type": "mlp"
                 }
             },
             "task_weights": [1.0]
