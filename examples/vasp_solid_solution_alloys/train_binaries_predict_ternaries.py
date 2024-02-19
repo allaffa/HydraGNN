@@ -471,7 +471,7 @@ if __name__ == "__main__":
             stratify_splitting=False,
         )
         binaries_valset.extend(binaries_testset)
-        print("Local splitting for binaries: ", len(binaries_dataset), len(binaries_trainset), len(binaries_valset)
+        print("Local splitting for binaries: ", len(binaries_dataset), len(binaries_trainset), len(binaries_valset))
 
         deg = gather_deg(binaries_trainset)
         config["pna_deg"] = deg
