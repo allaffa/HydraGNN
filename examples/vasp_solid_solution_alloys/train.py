@@ -126,7 +126,7 @@ def extract_positions_forces_energy(section):
     # Convert lists to PyTorch tensors
     positions_tensor = torch.tensor(positions_list)
     forces_tensor = torch.tensor(forces_list)
-    energy_tensor = torch.tensor([energy]) / positions_tensor.shape[0]
+    energy_tensor = torch.tensor([energy])*1000 / positions_tensor.shape[0]
 
     return positions_tensor, forces_tensor, energy_tensor
 
@@ -168,8 +168,9 @@ def read_outcar_pure_elements_ground_state(file_path):
     supercell_start_marker = 'VOLUME and BASIS-vectors are now :'
     supercell_end_marker = 'FORCES acting on ions'
     atomic_structure_start_marker = 'POSITION                                       TOTAL-FORCE (eV/Angst)'
-    atomic_structure_end_marker = 'stress matrix after NEB project (eV)'
+    # atomic_structure_end_marker = 'stress matrix after NEB project (eV)'
     # atomic_structure_end_marker = 'ENERGY OF THE ELECTRON-ION-THERMOSTAT SYSTEM (eV)'
+    atomic_structure_end_marker = 'POTLOK'
 
     dataset = []
 
@@ -268,9 +269,6 @@ def read_outcar(file_path):
         data_object.energy = energy
         data_object.y = energy
 
-        data_object.energy = energy
-        data_object.y = energy
-
         dataset.append(data_object)
 
         # print("optimization step: i = ", i)
@@ -300,11 +298,11 @@ class VASPDataset(AbstractBaseDataset):
 
         # Extract information about pure elements
         for name in iterate_tqdm(os.listdir(os.path.join(dirpath, "../", "pure_elements")), verbosity_level=2, desc="Load"):
-            files = os.listdir(os.path.join(dirpath, "../", "pure_elements", name))
+            files = os.listdir(os.path.join(dirpath, "../", "pure_elements", name, name+'128', 'case-1'))
             outcar_files = [file for file in files if file.startswith("OUTCAR")]
             for file_name in outcar_files:
                 # If you want to work with the full path, you can join the directory path and file name
-                file_path = os.path.join(os.path.join(dirpath, "../", "pure_elements/", file_name))
+                file_path = os.path.join(os.path.join(dirpath, "../", "pure_elements", name, name+'128', 'case-1', file_name))
 
                 element = name
                 dataset, _ = read_outcar_pure_elements_ground_state(file_path)
