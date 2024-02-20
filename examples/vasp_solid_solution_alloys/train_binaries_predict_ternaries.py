@@ -342,17 +342,23 @@ class VASPDataset(AbstractBaseDataset):
                         if filename == "OUTCAR" or filename == "OUTCAR-bis":
 
                             try:
+                                #print(self.rank, "read_outcar:", os.path.join(subdir_name, subsubdir_name, filename), file=sys.stderr)
+                                temp_dataset, _ = read_outcar(os.path.join(dir_name, subdir_name, subsubdir_name) + '/' + filename)
 
-                               temp_dataset, _ = read_outcar(os.path.join(dir_name, subdir_name, subsubdir_name) + '/' + filename)
+                                for data_object in temp_dataset:
+                                    if data_object is not None:
+                                        data_object = self.radius_graph(data_object)
+                                        data_object = transform_coordinates(data_object)
+                                        self.dataset.append(data_object)
 
-                               for data_object in temp_dataset:
-                                   if data_object is not None:
-                                      data_object = self.radius_graph(data_object)
-                                      data_object = transform_coordinates(data_object)
-                                      self.dataset.append(data_object)
-
-                            except:
+                            except ValueError as e:
                                 pass
+                            except Exception as e:
+                                print(self.rank, "Exception:", os.path.join(subdir_name, subsubdir_name, filename), e, file=sys.stderr)
+                                # traceback.print_exc()
+                                pass
+            
+                torch.distributed.barrier()
                     #print("MASSI - ", str(self.rank), " - finished reading: ", count, " of ", len(subdir_local_list), " - ", os.path.join(dir_name, subdir_name, subsubdir_name))
 
                 #print("MASSI - before barrier ", str(self.rank), " - finished reading: ", subdir_name)
