@@ -351,8 +351,14 @@ class VASPDataset(AbstractBaseDataset):
                                       data_object = transform_coordinates(data_object)
                                       self.dataset.append(data_object)
 
-                            except:
+                            except ValueError as e:
                                 pass
+                            except Exception as e:
+                                print(self.rank, "Exception:", os.path.join(subdir_name, subsubdir_name, filename), e, file=sys.stderr)
+                                # traceback.print_exc()
+                                pass
+            
+                torch.distributed.barrier()
                     #print("MASSI - ", str(self.rank), " - finished reading: ", count, " of ", len(subdir_local_list), " - ", os.path.join(dir_name, subdir_name, subsubdir_name))
 
                 #print("MASSI - before barrier ", str(self.rank), " - finished reading: ", subdir_name)
@@ -459,6 +465,9 @@ if __name__ == "__main__":
             config,
             dist=True,
         )
+        print (rank, "VASPDataset ... done")
+        comm.Barrier()
+
         ## This is a local split
         trainset, valset, testset = split_dataset(
             dataset=total,
