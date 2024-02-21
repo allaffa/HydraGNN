@@ -458,7 +458,6 @@ if __name__ == "__main__":
 
     modelname = "NbTaV"
     if args.preonly:
-
         ## local data
         binaries_dataset = VASPDataset(
             os.path.join(datadir, 'binaries'),
@@ -500,7 +499,7 @@ if __name__ == "__main__":
             attrs=attrs,
         )
         SimplePickleWriter(
-            binaries_trainset,
+            binaries_valset,
             basedir,
             "valset",
             # minmax_node_feature=total.minmax_node_feature,
@@ -508,7 +507,7 @@ if __name__ == "__main__":
             use_subdir=True,
         )
         SimplePickleWriter(
-            ternaries_dataset,
+            ternaries_dataset.dataset,
             basedir,
             "testset",
             # minmax_node_feature=total.minmax_node_feature,
