@@ -48,6 +48,20 @@ transform_coordinates = LocalCartesian(norm=False, cat=True)
 
 energy_bulk_metals = generate_dictionary_bulk_energies()
 periodic_table = generate_dictionary_elements()
+atom_number_dict = {23: 0, 41: 1, 73: 2}  # Dictionary mapping atom numbers to classes
+
+
+def create_one_hot(atom_numbers, atom_number_dict):
+    num_classes = len(atom_number_dict)
+    one_hot = torch.zeros(atom_numbers.size(0), num_classes)  # Initialize one-hot tensor
+
+    # Convert atom_numbers to class indices using the dictionary
+    class_indices = [atom_number_dict[atom.item()] for atom in atom_numbers]
+
+    # Use scatter_ to fill the one-hot tensor
+    one_hot.scatter_(1, torch.tensor(class_indices).unsqueeze(1), 1)
+
+    return one_hot
 
 
 def extract_atom_species(outcar_path):
@@ -201,7 +215,8 @@ def read_outcar_pure_elements_ground_state(file_path):
     data_object.y = energy
     atom_numbers = extract_atom_species(file_path)
     data_object.atom_numbers = atom_numbers
-    data_object.x = torch.cat((atom_numbers, positions, forces), dim=1)
+    one_hot_atom_numbers = create_one_hot(atom_numbers, atom_number_dict)
+    data_object.x = torch.cat((one_hot_atom_numbers, positions, forces), dim=1)
 
     dataset.append(data_object)
 
@@ -417,7 +432,7 @@ if __name__ == "__main__":
     graph_feature_names = ["energy"]
     graph_feature_dims = [1]
     node_feature_names = ["atomic_number", "cartesian_coordinates", "forces"]
-    node_feature_dims = [1, 3, 3]
+    node_feature_dims = [3, 3, 3]
     dirpwd = os.path.dirname(os.path.abspath(__file__))
     datadir = os.path.join(dirpwd, "dataset/VASP_calculations")
     ##################################################################################################################
