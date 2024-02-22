@@ -49,7 +49,7 @@
         "Training": {
             "num_epoch": 40,
             "perc_train": 0.9,
-            "loss_function_type": "mse",
+            "loss_function_type": "mae",
             "batch_size": 32,
             "EarlyStopping": true,
             "patience": 20,
