@@ -26,6 +26,7 @@ import hydragnn.utils.tracer as tr
 
 from hydragnn.utils.abstractbasedataset import AbstractBaseDataset
 from hydragnn.utils import nsplit
+from hydragnn.preprocess import update_predicted_values, update_atom_features
 
 
 class AdiosWriter:
@@ -81,7 +82,7 @@ class AdiosWriter:
             self.dataset[label].extend(data)
         elif isinstance(data, torch_geometric.data.Data):
             self.dataset[label].append(data)
-        elif isinstance(data, BaseDataset):
+        elif isinstance(data, AbstractBaseDataset):
             self.dataset[label] = data
         else:
             raise Exception("Unsuppored data type yet.")
@@ -123,7 +124,19 @@ class AdiosWriter:
                 self.comm.allgather(keys)
 
             for k in keys:
-                arr_list = [data[k].cpu().numpy() for data in self.dataset[label]]
+                arr_list = list()
+                for data in self.dataset[label]:
+                    if isinstance(data[k], torch.Tensor):
+                        arr_list.append(data[k].cpu().numpy())
+                    elif isinstance(data[k], np.ndarray):
+                        arr_list.append(data[k])
+                    elif isinstance(data[k], (np.floating, np.integer)):
+                        arr_list.append(np.array((data[k],)))
+                    else:
+                        print("Error: type(data[k]):", label, k, type(data[k]))
+                        raise NotImplementedError(
+                            "Not supported: not tensor nor numpy array"
+                        )
                 m0 = np.min([x.shape for x in arr_list], axis=0)
                 m1 = np.max([x.shape for x in arr_list], axis=0)
                 vdims = list()
@@ -225,6 +238,7 @@ class AdiosDataset(AbstractBaseDataset):
         enable_cache=False,
         ddstore=False,
         ddstore_width=None,
+        var_config=None,
     ):
         """
         Parameters
@@ -424,6 +438,27 @@ class AdiosDataset(AbstractBaseDataset):
             self.f = ad2.open(self.filename, "r", MPI.COMM_SELF)
             self.f.__next__()
 
+        ## FIXME: Using the same routine in SimplePickleDataset. We need to make as a common function
+        self.var_config = var_config
+        self.input_node_features = var_config["input_node_features"]
+
+        if self.var_config is not None:
+            self.variables_type = self.var_config["type"]
+            self.output_index = self.var_config["output_index"]
+            self.graph_feature_dim = self.var_config["graph_feature_dims"]
+            self.node_feature_dim = self.var_config["node_feature_dims"]
+
+    def update_data_object(self, data_object):
+        if self.var_config is not None:
+            update_predicted_values(
+                self.variables_type,
+                self.output_index,
+                self.graph_feature_dim,
+                self.node_feature_dim,
+                data_object,
+            )
+            update_atom_features(self.input_node_features, data_object)
+
     def len(self):
         """
         Return the total size of dataset
@@ -495,6 +530,8 @@ class AdiosDataset(AbstractBaseDataset):
                 exec("data_object.%s = v" % (k))
             if self.enable_cache:
                 self.cache[idx] = data_object
+
+        self.update_data_object(data_object)
         return data_object
 
     def unlink(self):
