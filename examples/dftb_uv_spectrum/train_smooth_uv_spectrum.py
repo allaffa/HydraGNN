@@ -60,15 +60,14 @@ import hydragnn.utils.tracer as tr
 # for larger chemical spaces, the following atom representation has to be properly expanded
 dftb_node_types = {"C": 0, "F": 1, "H": 2, "N": 3, "O": 4, "S": 5}
 
-
-def info(*args, logtype="info", sep=" "):
-    getattr(logging, logtype)(sep.join(map(str, args)))
-
-
 from hydragnn.utils.abstractbasedataset import AbstractBaseDataset
 
 spherical_coordinates = Spherical(norm=False, cat=True)
 
+from utils import generate_xyz_files
+
+def info(*args, logtype="info", sep=" "):
+    getattr(logging, logtype)(sep.join(map(str, args)))
 
 class DFTBDataset(AbstractBaseDataset):
     """DFTBDataset dataset class"""
@@ -148,7 +147,7 @@ class DFTBDataset(AbstractBaseDataset):
 
             # else if items in dirlist are molecule directories, parse them and create graph objects
             else:
-                data_object = self.dftb_to_graph(mdir, dftb_node_types, var_config)
+                data_object = self.dftb_to_graph(fullpath, dftb_node_types, var_config)
                 if data_object is not None:
                     self.dataset.append(data_object)
 
@@ -197,10 +196,12 @@ class DFTBDataset(AbstractBaseDataset):
         )
         data.ID = torch.tensor((int(os.path.basename(moldir).replace("mol_", "")),))
 
+        if not os.path.exists(moldir + '/' + 'geo_end.xyz'):
+           generate_xyz_files(moldir)
+
         # the position of the atoms must be taken from the optimized geometry
         atoms = io.read(moldir + '/' + 'geo_end.xyz', parallel=False)
         data.pos = torch.from_numpy(atoms.positions)
-        """
         try:
             data_object = spherical_coordinates(data)
         except Exception as error:
@@ -209,7 +210,6 @@ class DFTBDataset(AbstractBaseDataset):
             print(f"Spherical coordinates fails for {dir} - data.edge_attr.shape: ", data.edge_attr.shape)
             print(f"Spherical coordinates fails for {dir} - data.pos.shape: ", data.pos.shape)
             return None
-        """
         data.pos = data.pos.to(torch.float32)
         data.x = data.x.to(torch.float32)
         data.edge_attr = data.edge_attr.to(torch.float32)
