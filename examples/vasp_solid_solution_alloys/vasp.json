@@ -40,7 +40,7 @@
             "task_weights": [1.0]
         },
         "Variables_of_interest": {
-            "input_node_features": [0, 1, 2],
+            "input_node_features": [0],
             "output_names": ["formation_enthalpy"],
             "output_index": [0],
             "output_dim": [1],

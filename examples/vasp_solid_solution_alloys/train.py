@@ -216,7 +216,7 @@ def read_outcar_pure_elements_ground_state(file_path):
     atom_numbers = extract_atom_species(file_path)
     data_object.atom_numbers = atom_numbers
     one_hot_atom_numbers = create_one_hot(atom_numbers, atom_number_dict)
-    data_object.x = torch.cat((one_hot_atom_numbers, positions, forces), dim=1)
+    data_object.x = torch.cat((atom_numbers, positions, forces), dim=1)
 
     dataset.append(data_object)
 
