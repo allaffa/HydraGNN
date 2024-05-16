@@ -505,12 +505,12 @@ if __name__ == "__main__":
         ## This is a local split
         binaries_trainset, binaries_valset, binaries_testset = split_dataset(
             dataset=binaries_dataset,
-            perc_train=0.9,
+            perc_train=config["NeuralNetwork"]["Training"]["perc_train"],
             stratify_splitting=False,
         )
         ternaries_trainset, ternaries_valset1, ternaries_valset2 = split_dataset(
             dataset=ternaries_train_validate_dataset,
-            perc_train=0.9,
+            perc_train=config["NeuralNetwork"]["Training"]["perc_train"],
             stratify_splitting=False,
         )
         binaries_valset.extend(binaries_testset)
