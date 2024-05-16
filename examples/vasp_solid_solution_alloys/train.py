@@ -486,7 +486,7 @@ if __name__ == "__main__":
         ## This is a local split
         trainset, valset, testset = split_dataset(
             dataset=total,
-            perc_train=config["NeuralNetwork"]["Training"]["perc_train"],,
+            perc_train=config["NeuralNetwork"]["Training"]["perc_train"],
             stratify_splitting=False,
         )
         print("Local splitting: ", len(total), len(trainset), len(valset), len(testset))
