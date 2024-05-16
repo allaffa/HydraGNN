@@ -295,7 +295,7 @@ def read_outcar(file_path):
 
 class VASPDataset(AbstractBaseDataset):
 
-    def __init__(self, dirpath, var_config, dist=False):
+    def __init__(self, dirpath, var_config, dist=False, cases_filter=None):
         super().__init__()
 
         self.var_config = var_config
@@ -305,6 +305,8 @@ class VASPDataset(AbstractBaseDataset):
             max_num_neighbors=self.var_config["NeuralNetwork"]["Architecture"]["max_neighbours"]
         )
         self.dist = dist
+
+        self.cases_filter = cases_filter
 
         if self.dist:
             assert torch.distributed.is_initialized()
@@ -338,6 +340,15 @@ class VASPDataset(AbstractBaseDataset):
                     continue
                 subdir_global_list = os.listdir(os.path.join(dir_name, subdir_name))
                 subdir_local_list = list(nsplit(subdir_global_list, self.world_size))[self.rank]
+
+                if self.cases_filter is not None:
+                    assert isinstance(self.cases_filter, list), "cases_filter is not a list"
+                    assert len(self.cases_filter)==2, "cases_filter does not have two entries"
+                    N1 = self.cases_filter[0]
+                    N2 = self.cases_filter[1]
+                    assert N1<=N2, f"lower bound {N1} of cases_filter is not smaller than upper bound {N2}" 
+                    filtered_cases = [case for case in subdir_local_list if N1 <= int(case.split('-')[1]) <= N2]
+                    subdir_local_list = filtered_cases
 
                 #print("MASSI - ", str(self.rank), " - total list: ", len(subdir_global_list))
                 #print("MASSI - ", str(self.rank), " - about to read: ", subdir_name)
@@ -479,10 +490,17 @@ if __name__ == "__main__":
             config,
             dist=True,
         )
-        ternaries_dataset = VASPDataset(
+        ternaries_train_validate_dataset = VASPDataset(
             os.path.join(datadir, 'ternaries'),
             config,
             dist=True,
+            cases_filter=[0,9]
+        )
+        ternaries_test_dataset = VASPDataset(
+            os.path.join(datadir, 'ternaries'),
+            config,
+            dist=True,
+            cases_filter=[10,99]
         )
         ## This is a local split
         binaries_trainset, binaries_valset, binaries_testset = split_dataset(
@@ -490,8 +508,17 @@ if __name__ == "__main__":
             perc_train=0.9,
             stratify_splitting=False,
         )
+        ternaries_trainset, ternaries_valset1, ternaries_valset2 = split_dataset(
+            dataset=ternaries_train_validate_dataset,
+            perc_train=0.9,
+            stratify_splitting=False,
+        )
         binaries_valset.extend(binaries_testset)
-        print("Local splitting for binaries: ", len(binaries_dataset), len(binaries_trainset), len(binaries_valset))
+        ternaries_valset = [*ternaries_valset1, *ternaries_valset2]
+        trainset = [*binaries_trainset, *ternaries_trainset]
+        valset = [*binaries_valset, *ternaries_valset]
+        testset = ternaries_test_dataset[:]
+        print("Local splitting: ", len(trainset), len(valset), len(testset))
 
         deg = gather_deg(binaries_trainset)
         config["pna_deg"] = deg
@@ -505,7 +532,7 @@ if __name__ == "__main__":
         attrs = dict()
         attrs["pna_deg"] = deg
         SimplePickleWriter(
-            binaries_trainset,
+            trainset,
             basedir,
             "trainset",
             # minmax_node_feature=total.minmax_node_feature,
@@ -514,7 +541,7 @@ if __name__ == "__main__":
             attrs=attrs,
         )
         SimplePickleWriter(
-            binaries_valset,
+            valset,
             basedir,
             "valset",
             # minmax_node_feature=total.minmax_node_feature,
@@ -522,7 +549,7 @@ if __name__ == "__main__":
             use_subdir=True,
         )
         SimplePickleWriter(
-            ternaries_dataset.dataset,
+            testset,
             basedir,
             "testset",
             # minmax_node_feature=total.minmax_node_feature,
