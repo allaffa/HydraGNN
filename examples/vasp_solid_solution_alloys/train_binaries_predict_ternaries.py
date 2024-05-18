@@ -412,7 +412,7 @@ if __name__ == "__main__":
         help="preprocess only (no training)",
     )
     parser.add_argument(
-        "--inputfile", help="input file", type=str, default="vasp.json"
+        "--inputfile", help="input file", type=str, default="vasp_energy.json"
     )
     parser.add_argument("--mae", action="store_true", help="do mae calculation")
     parser.add_argument("--ddstore", action="store_true", help="ddstore dataset")
