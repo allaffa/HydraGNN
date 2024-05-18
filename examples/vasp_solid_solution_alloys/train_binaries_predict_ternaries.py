@@ -443,7 +443,7 @@ if __name__ == "__main__":
     graph_feature_names = ["energy"]
     graph_feature_dims = [1]
     node_feature_names = ["atomic_number", "cartesian_coordinates", "forces"]
-    node_feature_dims = [3, 3, 3]
+    node_feature_dims = [1, 3, 3]
     dirpwd = os.path.dirname(os.path.abspath(__file__))
     datadir = os.path.join(dirpwd, "dataset/VASP_calculations")
     ##################################################################################################################
@@ -494,13 +494,13 @@ if __name__ == "__main__":
             os.path.join(datadir, 'ternaries'),
             config,
             dist=True,
-            cases_filter=[0,9]
+            cases_filter=[1,2]
         )
         ternaries_test_dataset = VASPDataset(
             os.path.join(datadir, 'ternaries'),
             config,
             dist=True,
-            cases_filter=[10,99]
+            cases_filter=[3,100]
         )
         ## This is a local split
         binaries_trainset, binaries_valset, binaries_testset = split_dataset(
