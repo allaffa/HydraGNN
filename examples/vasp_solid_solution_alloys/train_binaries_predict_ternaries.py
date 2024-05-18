@@ -139,7 +139,11 @@ def extract_positions_forces_energy(section):
 
     # Convert lists to PyTorch tensors
     positions_tensor = torch.tensor(positions_list)
-    forces_tensor = torch.tensor(forces_list)
+
+    # Convert formation energy in meV 
+    forces_tensor = torch.tensor(forces_list)*1000
+
+    # Convert forces in meV/angstrom
     energy_tensor = torch.tensor([energy])*1000 / positions_tensor.shape[0]
 
     return positions_tensor, forces_tensor, energy_tensor
