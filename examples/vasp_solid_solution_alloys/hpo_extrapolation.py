@@ -432,7 +432,7 @@ def objective(trial):
     # log("Command: {0}\n".format(" ".join([x for x in sys.argv])), rank=0)
 
     # Define the search space for hyperparameters
-    model_type = trial.suggest_categorical('model_type', ['EGNN', 'PNA', 'SchNet'])
+    model_type = trial.suggest_categorical('model_type', ['EGNN', 'PNA'])
     hidden_dim = trial.suggest_int('hidden_dim', 50, 300)
     num_conv_layers = trial.suggest_int('num_conv_layers', 1, 5)
     num_headlayers = trial.suggest_int('num_headlayers', 1, 3)
@@ -536,7 +536,7 @@ if __name__ == "__main__":
         help="preprocess only (no training)",
     )
     parser.add_argument(
-        "--inputfile", help="input file", type=str, default="vasp.json"
+        "--inputfile", help="input file", type=str, default="vasp_energy.json"
     )
     parser.add_argument("--mae", action="store_true", help="do mae calculation")
     parser.add_argument("--ddstore", action="store_true", help="ddstore dataset")
@@ -723,7 +723,7 @@ if __name__ == "__main__":
 
     # Create a study object and optimize the objective function
     study = optuna.create_study(direction='minimize')
-    study.optimize(objective, n_trials=5)
+    study.optimize(objective, n_trials=20)
 
     # Update the best trial information directly within the DataFrame
     best_trial_info = pd.Series({'Trial_ID': best_trial_id, 'Best_Validation_Loss': best_validation_loss})
