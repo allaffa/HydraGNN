@@ -216,6 +216,7 @@ def read_outcar(file_path, world_size, rank):
     atomic_structure_start_marker = 'POSITION                                       TOTAL-FORCE (eV/Angst)'
     #atomic_structure_end_marker = 'stress matrix after NEB project (eV)'
     atomic_structure_end_marker = 'ENERGY OF THE ELECTRON-ION-THERMOSTAT SYSTEM (eV)'
+    atomic_structure_end_marker2 = 'FREE ENERGIE OF THE ION-ELECTRON SYSTEM (eV)'
 
     dataset = []
 
@@ -228,6 +229,8 @@ def read_outcar(file_path, world_size, rank):
 
     # Read sections between specified markers
     result_atomic_structure_sections = read_sections_between(file_path, atomic_structure_start_marker, atomic_structure_end_marker)
+    if len(result_atomic_structure_sections) == 0:
+        result_atomic_structure_sections = read_sections_between(file_path, atomic_structure_start_marker, atomic_structure_end_marker2)
 
     local_result_supercell = list(nsplit(result_supercell, world_size))[rank]
     local_result_atomic_structure_sections = list(nsplit(result_atomic_structure_sections, world_size))[rank]
@@ -405,7 +408,6 @@ if __name__ == "__main__":
     node_feature_names = ["atomic_number", "cartesian_coordinates", "forces"]
     node_feature_dims = [1, 3, 3]
     dirpwd = os.path.dirname(os.path.abspath(__file__))
-    datadir = os.path.join(dirpwd, "dataset/aimd_baseline")
     ##################################################################################################################
     input_filename = os.path.join(dirpwd, args.inputfile)
     ##################################################################################################################
@@ -445,6 +447,7 @@ if __name__ == "__main__":
     modelname = "MO2"
     if args.preonly:
 
+        datadir = os.path.join(dirpwd, config["Dataset"]["path"]["total"])
         ## local data
         total = VASPDataset(
             os.path.join(datadir),
