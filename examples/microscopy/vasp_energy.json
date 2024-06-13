@@ -58,7 +58,11 @@
         },
         "Training": {
             "num_epoch": 50,
-            "perc_train": 0.8,
+            "EarlyStopping": true,
+	    "patience": 10,
+            "Checkpoint": true,
+            "checkpoint_warmup": 10,
+            "perc_train": 0.9,
             "loss_function_type": "mae",
             "batch_size": 32,
             "continue": 0,
