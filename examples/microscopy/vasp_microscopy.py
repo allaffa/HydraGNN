@@ -146,7 +146,7 @@ def read_sections_between(file_path, start_marker, end_marker):
                     current_section.append(line)
 
                 # Check if the current line contains the end marker
-                elif end_marker in line:
+                elif (end_marker in line) and in_section:
                     in_section = False
                     current_section.append(line)
                     sections.append(current_section)
@@ -215,13 +215,16 @@ def read_outcar(file_path, world_size, rank):
     supercell_end_marker = 'FORCES acting on ions'
     atomic_structure_start_marker = 'POSITION                                       TOTAL-FORCE (eV/Angst)'
     #atomic_structure_end_marker = 'stress matrix after NEB project (eV)'
-    atomic_structure_end_marker = 'ENERGY OF THE ELECTRON-ION-THERMOSTAT SYSTEM (eV)'
-    atomic_structure_end_marker2 = 'FREE ENERGIE OF THE ION-ELECTRON SYSTEM (eV)'
+    #atomic_structure_end_marker = 'ENERGY OF THE ELECTRON-ION-THERMOSTAT SYSTEM (eV)'
+    #atomic_structure_end_marker2 = 'FREE ENERGIE OF THE ION-ELECTRON SYSTEM (eV)'
+    atomic_structure_end_marker = 'POTLOK'
 
     dataset = []
 
     full_string = file_path
     filename = full_string.split("/")[-1]
+
+    atom_numbers = extract_atom_species(file_path)
 
     # Read sections between specified markers
     result_supercell = read_sections_between(file_path, supercell_start_marker,
@@ -229,8 +232,10 @@ def read_outcar(file_path, world_size, rank):
 
     # Read sections between specified markers
     result_atomic_structure_sections = read_sections_between(file_path, atomic_structure_start_marker, atomic_structure_end_marker)
-    if len(result_atomic_structure_sections) == 0:
-        result_atomic_structure_sections = read_sections_between(file_path, atomic_structure_start_marker, atomic_structure_end_marker2)
+    #if len(result_atomic_structure_sections) == 0:
+    #    result_atomic_structure_sections = read_sections_between(file_path, atomic_structure_start_marker, atomic_structure_end_marker2)
+
+    assert len(result_supercell) == len(result_atomic_structure_sections), f'FILE: {file_path} - result_supercell has {len(result_supercell)} elements and does not match with result_atomic_structure_sections that has {len(result_atomic_structure_sections)} elements'
 
     local_result_supercell = list(nsplit(result_supercell, world_size))[rank]
     local_result_atomic_structure_sections = list(nsplit(result_atomic_structure_sections, world_size))[rank]
@@ -242,38 +247,47 @@ def read_outcar(file_path, world_size, rank):
         supercell = extract_supercell(supercell_section)
         positions, forces, energy = extract_positions_forces_energy(atomic_structure_section)
 
-        data_object = Data()
+        max_force = torch.max(torch.abs(forces))
 
-        data_object.pos = positions
-        data_object.supercell_size = supercell
-        data_object.forces = forces
-        atom_numbers = extract_atom_species(file_path)
-        data_object.atom_numbers = atom_numbers
-        data_object.x = torch.cat((atom_numbers, positions, forces), dim=1)
+        if max_force < 10.0:
 
-        # compute the cohesive energy by removing the linear term of the energy from the total energy of the system
-        # Count occurrences of each element
-        element_counts = {}
-        for atom_number in atom_numbers:
-            if atom_number.item() not in element_counts:
-                element_counts[atom_number.item()] = 0
-            element_counts[atom_number.item()] += 1
+            # we need to keep track of this scaling factor to correctly rescale the gradients of the energy
+            grad_energy_post_scaling_factor = positions.shape[0] * torch.ones(positions.shape[0], 1)
 
-        # Calculate total number of atoms
-        total_atoms = data_object.pos.shape[0]
+            data_object = Data()
 
-        # Calculate ratio for each element
-        element_ratios = {element: count / total_atoms for element, count in element_counts.items()}
+            data_object.pos = positions
+            data_object.supercell_size = supercell
+            data_object.forces = forces
+            data_object.atom_numbers = atom_numbers
+            data_object.x = torch.cat((atom_numbers, positions, forces), dim=1)
 
-        for item in element_ratios.keys():
-            energy -= element_ratios[item] * energy_bulk_metals[periodic_table[item]]
+            # compute the cohesive energy by removing the linear term of the energy from the total energy of the system
+            # Count occurrences of each element
+            element_counts = {}
+            for atom_number in atom_numbers:
+                if atom_number.item() not in element_counts:
+                    element_counts[atom_number.item()] = 0
+                element_counts[atom_number.item()] += 1
 
-        data_object.energy = energy
-        data_object.y = energy
+            # Calculate total number of atoms
+            total_atoms = data_object.pos.shape[0]
 
-        dataset.append(data_object)
+            # Calculate ratio for each element
+            element_ratios = {element: count / total_atoms for element, count in element_counts.items()}
 
-        #print("optimization step: i = ", i)
+            for item in element_ratios.keys():
+                energy -= element_ratios[item] * energy_bulk_metals[periodic_table[item]]
+
+            data_object.energy = energy
+            data_object.y = energy
+
+            dataset.append(data_object)
+
+            #print("optimization step: i = ", i)
+
+        else:
+            print(f"Absolute value of components of forces reach values {max_force} eV/angstrom - File: {file_path}")
 
     #plot_forces(filename, dataset)
 
