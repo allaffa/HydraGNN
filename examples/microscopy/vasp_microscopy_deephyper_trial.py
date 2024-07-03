@@ -52,7 +52,7 @@ def main():
     parser.add_argument("--ddstore", action="store_true", help="ddstore dataset")
     parser.add_argument("--ddstore_width", type=int, help="ddstore width", default=None)
     parser.add_argument("--shmem", action="store_true", help="shmem")
-    parser.add_argument("--log", help="log name", default="gfm_test")
+    parser.add_argument("--log", help="log name", default="MO2_test")
     parser.add_argument("--num_epoch", type=int, help="num_epoch", default=None)
     parser.add_argument("--batch_size", type=int, help="batch_size", default=None)
     parser.add_argument("--everyone", action="store_true", help="gptimer")
@@ -159,7 +159,7 @@ def main():
         datefmt="%H:%M:%S",
     )
 
-    log_name = "gfm_test" if args.log is None else args.log
+    log_name = "MO2_test" if args.log is None else args.log
     hydragnn.utils.setup_log(log_name)
     writer = hydragnn.utils.get_summary_writer(log_name)
 
