@@ -47,7 +47,7 @@ def run(trial, dequed=None):
 
     # TODO: Launch a subprocess with `srun` to train neural networks
     params = trial.parameters
-    log_name = "gfm" + "_" + str(trial.id)
+    log_name = "MO2" + "_" + str(trial.id)
     master_addr = f"HYDRAGNN_MASTER_ADDR={dequed[0]}"
     nodelist = ",".join(dequed)
 
@@ -77,12 +77,11 @@ def run(trial, dequed=None):
             f"--num_conv_layers={trial.parameters['num_conv_layers']}",
             f"--num_headlayers={trial.parameters['num_headlayers']}",
             f"--dim_headlayers={trial.parameters['dim_headlayers']}",
-            f"--multi",
-            f"--ddstore",
-            f'--multi_model_list="ANI1x,MPTrj,OC2020-20M,OC2022,qm7x"',
+            f"--pickle",
+            ##f"--ddstore",
             ## debugging
             ##f'--multi_model_list="ANI1x"',
-            f"--num_epoch=10",
+            f"--num_epoch=50",
             f"--log={log_name}",
         ]
     )
@@ -117,7 +116,7 @@ def run(trial, dequed=None):
 
 if __name__ == "__main__":
 
-    log_name = "gfm"
+    log_name = "MO2"
 
     # Choose the sampler (e.g., TPESampler or RandomSampler)
     from deephyper.evaluator import Evaluator, ProcessPoolEvaluator, queued
@@ -129,9 +128,9 @@ if __name__ == "__main__":
     problem = HpProblem()
 
     # Define the search space for hyperparameters
-    problem.add_hyperparameter((2, 6), "num_conv_layers")  # discrete parameter
-    problem.add_hyperparameter((100, 2000), "hidden_dim")  # discrete parameter
-    problem.add_hyperparameter((2, 3), "num_headlayers")  # discrete parameter
+    problem.add_hyperparameter((1, 6), "num_conv_layers")  # discrete parameter
+    problem.add_hyperparameter((300, 2000), "hidden_dim")  # discrete parameter
+    problem.add_hyperparameter((1, 3), "num_headlayers")  # discrete parameter
     problem.add_hyperparameter((300, 1000), "dim_headlayers")  # discrete parameter
     problem.add_hyperparameter(
         ["EGNN", "SchNet", "PNA"], "model_type"
