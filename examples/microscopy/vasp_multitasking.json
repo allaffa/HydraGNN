@@ -4,7 +4,7 @@
     },
     "Dataset": {
         "name": "MOS2",
-        "path": {"total": "./dataset/aimd_baseline"},
+        "path": {"total": "./dataset/new_aggregated_data"},
         "format": "VASP",
         "compositional_stratified_splitting": false,
 	"rotational_invariance": true,
