@@ -30,6 +30,17 @@ DEEPHYPER_LOG_DIR = os.environ["DEEPHYPER_LOG_DIR"]
 DEEPHYPER_DB_HOST = os.environ["DEEPHYPER_DB_HOST"]
 SLURM_JOB_ID = os.environ["SLURM_JOB_ID"]
 
+def read_results_from_csv(file_path: str) -> pd.DataFrame:
+    """Read the results of a Hyperparameter Search from a CSV file.
+
+    Args:
+        file_path (str): the path to the CSV file.
+
+    Returns:
+        pd.DataFrame: the results of a Hyperparameter Search.
+    """
+    return pd.read_csv(file_path)
+
 
 def _parse_results(stdout):
     pattern = r"Val Loss: ([-+]?(\d+(\.\d*)?|\.\d+)([eE][-+]?\d+)?)"
@@ -126,6 +137,7 @@ if __name__ == "__main__":
     from deephyper.problem import HpProblem
     from deephyper.search.hps import CBO
     from hydragnn.utils.deephyper import read_node_list
+    #from deephyper.analysis.hps._hps import read_results_from_csv
 
     # define the variable you want to optimize
     problem = HpProblem()
@@ -162,7 +174,7 @@ if __name__ == "__main__":
 
     # Define the search method and scalarization
     # search = CBO(problem, parallel_evaluator, random_state=42, log_dir=log_name)
-    search = CBO(
+    search_tl = CBO(
         problem,
         evaluator,
         acq_func="UCB",
@@ -174,8 +186,15 @@ if __name__ == "__main__":
         n_jobs=OMP_NUM_THREADS,
     )
 
+    print("MASSI: about to read existing results from csv")
+    preloaded_results = read_results_from_csv("./preloaded_results.csv")
+
+    print("MASSI: about to fit surrogate model")
+    search_tl.fit_generative_model(preloaded_results)
+
     timeout = None
-    results = search.search(max_evals=10000, timeout=timeout)
+    print("MASSI: about to start HPO search")
+    results = search_tl.search(max_evals=10000, timeout=timeout)
     print(results)
 
     sys.exit(0)
