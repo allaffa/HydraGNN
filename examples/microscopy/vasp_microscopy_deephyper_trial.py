@@ -46,8 +46,11 @@ def main():
     parser.add_argument(
         "--num_conv_layers", type=int, help="num_conv_layers", default=6
     )
+    parser.add_argument("--num_sharedlayers", type=int, help="num_sharedlayers", default=2)
+    parser.add_argument("--dim_sharedlayers", type=int, help="dim_sharedlayers", default=10)
     parser.add_argument("--num_headlayers", type=int, help="num_headlayers", default=2)
-    parser.add_argument("--dim_headlayers", type=int, help="dim_headlayers", default=10)
+    parser.add_argument("--dim_headlayers_graph", type=int, help="dim_headlayers_graph", default=10)
+    parser.add_argument("--dim_headlayers_node", type=int, help="dim_headlayers_node", default=10)
 
     parser.add_argument("--ddstore", action="store_true", help="ddstore dataset")
     parser.add_argument("--ddstore_width", type=int, help="ddstore width", default=None)
@@ -123,8 +126,13 @@ def main():
         "num_conv_layers"
     ]
 
-    dim_headlayers = [
-        args.parameters["dim_headlayers"]
+    dim_sharedlayers = args.parameters["dim_sharedlayers"]
+    dim_headlayers_graph = [
+        args.parameters["dim_headlayers_graph"]
+        for i in range(args.parameters["num_headlayers"])
+    ]
+    dim_headlayers_node = [
+        args.parameters["dim_headlayers_node"]
         for i in range(args.parameters["num_headlayers"])
     ]
 
@@ -132,9 +140,20 @@ def main():
         config["NeuralNetwork"]["Architecture"]["output_heads"][head_type][
             "num_headlayers"
         ] = args.parameters["num_headlayers"]
-        config["NeuralNetwork"]["Architecture"]["output_heads"][head_type][
-            "dim_headlayers"
-        ] = dim_headlayers
+        if head_type == "graph":
+            config["NeuralNetwork"]["Architecture"]["output_heads"][head_type][
+                "num_sharedlayers"
+            ] = args.parameters["num_sharedlayers"]
+            config["NeuralNetwork"]["Architecture"]["output_heads"][head_type][
+                "dim_sharedlayers"
+            ] = dim_sharedlayers
+            config["NeuralNetwork"]["Architecture"]["output_heads"][head_type][
+                "dim_headlayers"
+            ] = dim_headlayers_graph
+        else:
+            config["NeuralNetwork"]["Architecture"]["output_heads"][head_type][
+                "dim_headlayers"
+            ] = dim_headlayers_node
 
     if args.parameters["model_type"] not in ["EGNN", "SchNet", "DimeNet"]:
         config["NeuralNetwork"]["Architecture"]["equivariance"] = False
@@ -238,6 +257,7 @@ def main():
         config=config["NeuralNetwork"],
         verbosity=verbosity,
     )
+    print("MASSI --- HELP")
     model = hydragnn.utils.get_distributed_model(model, verbosity)
 
     # Print details of neural network architecture
