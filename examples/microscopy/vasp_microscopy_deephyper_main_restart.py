@@ -39,7 +39,7 @@ def read_results_from_csv(file_path: str) -> pd.DataFrame:
     Returns:
         pd.DataFrame: the results of a Hyperparameter Search.
     """
-    return pd.read_csv(file_path)
+    return pd.read_csv(file_path, header=0)
 
 
 def _parse_results(stdout):
@@ -143,8 +143,12 @@ if __name__ == "__main__":
     problem = HpProblem()
 
     # Define the search space for hyperparameters
+    ## suggestion: add learning rate as additional hyperparameter, and use log-uniform sampling
+    ## add choice of optimizer as hyperparameter
+    ## choice of activation function (ReLy, LeakyReLU, sigmoid)
     problem.add_hyperparameter((1, 5), "num_conv_layers")  # discrete parameter
     problem.add_hyperparameter((300, 2000), "hidden_dim")  # discrete parameter
+    #problem.add_hyperparameter((300, 2000, "log-uniform"), "hidden_dim")  # discrete parameter, sample uniformly in log-scale
     problem.add_hyperparameter((1, 5), "num_sharedlayers")  # discrete parameter
     problem.add_hyperparameter((500, 2000), "dim_sharedlayers")  # discrete parameter
     problem.add_hyperparameter((1, 3), "num_headlayers")  # discrete parameter
@@ -174,27 +178,31 @@ if __name__ == "__main__":
 
     # Define the search method and scalarization
     # search = CBO(problem, parallel_evaluator, random_state=42, log_dir=log_name)
-    search_tl = CBO(
+    search = CBO(
         problem,
         evaluator,
-        acq_func="UCB",
-        multi_point_strategy="cl_min",  # Constant liar strategy
+        acq_func="UCBd", #UCB measures both aleatoric and epistemic uncertainty of performance, UCBd disregards aleatoric and works better than UCB
+        multi_point_strategy="cl_min",  # Constant liar strategy, cl_max can help weigh more on exploitation and explore less
         random_state=42,
         # Location where to store the results
         log_dir=log_name,
         # Number of threads used to update surrogate model of BO
         n_jobs=OMP_NUM_THREADS,
     )
+    #acq_optimizer="mixedga": decides how you optimize the funciton that selectes the next candidate. Default: random sampling of 10,000 candidate from your problem. When samples are fewer (expensive), use "mixedga"  
+    # acq_optimizer_freq=1, recommended!
+    # to force baseline to be evaluated by HPO, you can pass the baseline configuration to fit-surrogate, search.fit_surrogate("results.csv") - this i s NOT a bias, and you will continue samplign in a uniform way, to be used if the problem is the same
 
     print("MASSI: about to read existing results from csv")
     preloaded_results = read_results_from_csv("./preloaded_results.csv")
 
     print("MASSI: about to fit surrogate model")
-    search_tl.fit_generative_model(preloaded_results)
+    search.fit_surrogate(preloaded_results)
+    #search_tl.fit_generative_model(preloaded_results) # replaces uniform sampling with biased sampling to generate new trials in regions of best performance, CAVEAT: USE IT ONLY FOR TRANSFER LEARNING (if you change dataset and/or problem)  
 
     timeout = None
     print("MASSI: about to start HPO search")
-    results = search_tl.search(max_evals=10000, timeout=timeout)
+    results = search.search(max_evals=10000, timeout=timeout)
     print(results)
 
     sys.exit(0)
