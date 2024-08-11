@@ -118,7 +118,7 @@ class PyTorchCalculatorSelfConsistent(Calculator):
         grads_energy_rescaled = grad_energy_post_scaling_factor * grads_energy
 
         self.results['energy'] = energy.item()
-        self.results['forces'] = grads_energy_rescaled.detach().numpy()
+        self.results['forces'] = - grads_energy_rescaled.detach().numpy()
 
 import json, os
 import logging

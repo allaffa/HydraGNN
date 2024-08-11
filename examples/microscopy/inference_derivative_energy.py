@@ -177,20 +177,34 @@ if __name__ == "__main__":
         deriv_energy = []
         forces = []
 
+        subset = 100
+        counter = 0
+
         for data_id, data in enumerate(tqdm(testset)):
-            data.x.requires_grad = True
-            predicted = model(data.to(get_device()))
-            predicted = predicted[variable_index].flatten()
-            start = data.y_loc[0][variable_index].item()
-            end = data.y_loc[0][variable_index + 1].item()
-            true = data.y[start:end, 0]
-            test_MAE += torch.norm(predicted - true, p=1).item()/len(testset)
-            predicted.backward()
-            gradients = data.x.grad
-            predicted_values.extend(predicted.tolist())
-            true_values.extend(true.tolist())
-            deriv_energy.extend(gradients[:, 1:].flatten().tolist())
-            forces.extend(data.forces.flatten().tolist())
+            if torch.norm(data.forces) < 100.0:
+                data.pos.requires_grad = True
+                predicted = model(data.to(get_device()))
+                predicted = predicted[variable_index].flatten()
+                start = data.y_loc[0][variable_index].item()
+                end = data.y_loc[0][variable_index + 1].item()
+                true = data.y[start:end, 0]
+                test_MAE += torch.norm(predicted - true, p=1).item()/len(testset)
+                #predicted.backward()
+                #gradients = - data.x.grad
+                grads_energy = - torch.autograd.grad(outputs=predicted, inputs=data.pos,
+                                                   grad_outputs=data.num_nodes * torch.ones_like(predicted),
+                                                   retain_graph=False)[0]
+                predicted_values.extend(predicted.tolist())
+                true_values.extend(true.tolist())
+                deriv_energy.extend(grads_energy.flatten().tolist())
+                forces.extend(data.forces.flatten().tolist())
+
+            # Increment the counter
+            counter += 1
+
+            # Check if counter has reached 100
+            if counter >= subset:
+                break  # Exit the loop
 
         hist2d_norm = getcolordensity(true_values, predicted_values)
 
@@ -210,20 +224,20 @@ if __name__ == "__main__":
 
         print(f"Test MAE {output_name}: ", test_MAE)
 
+        hist2d_norm = getcolordensity(deriv_energy, forces)
+
         fig, ax = plt.subplots()
         plt.scatter(
-            deriv_energy, forces, vmin=0, vmax=1
+            deriv_energy, forces, s=8, c=hist2d_norm, vmin=0, vmax=1
         )
         plt.clim(0, 1)
         ax.plot(ax.get_xlim(), ax.get_xlim(), ls="--", color="red")
         plt.colorbar()
         plt.xlabel("Forces")
-        plt.ylabel("Derivatives of energy")
+        plt.ylabel("Negative Derivatives of energy")
         plt.title(f"{output_name}")
         plt.draw()
         plt.tight_layout()
         plt.savefig(f"./Forces_Scatterplot" + ".png", dpi=400)
-
-        print(f"Test MAE {output_name}: ", test_MAE)
 
         variable_index += 1
