@@ -175,6 +175,9 @@ if __name__ == "__main__":
         true_values = []
         predicted_values = []
 
+        subset = 100
+        counter = 0
+
         for data_id, data in enumerate(tqdm(testset)):
             predicted = model(data.to(get_device()))
             predicted = predicted[variable_index].flatten()
@@ -184,6 +187,13 @@ if __name__ == "__main__":
             test_MAE += torch.norm(predicted - true, p=1).item()/len(testset)
             predicted_values.extend(predicted.tolist())
             true_values.extend(true.tolist())
+
+            # Increment the counter
+            counter += 1
+
+            # Check if counter has reached 100
+            if counter >= subset:
+                break  # Exit the loop
 
         hist2d_norm = getcolordensity(true_values, predicted_values)
 
