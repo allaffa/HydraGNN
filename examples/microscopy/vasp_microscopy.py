@@ -398,6 +398,7 @@ if __name__ == "__main__":
     parser.add_argument("--log", help="log name")
     parser.add_argument("--batch_size", type=int, help="batch_size", default=None)
     parser.add_argument("--everyone", action="store_true", help="gptimer")
+    parser.add_argument("--compute_grad_energy", type=bool, help="use automatic differentiation to compute gradiens of energy", default=False)
 
     group = parser.add_mutually_exclusive_group()
     group.add_argument(
@@ -592,7 +593,7 @@ if __name__ == "__main__":
         log_name,
         verbosity,
         create_plots=False,
-        compute_forces=True
+        compute_forces=args.compute_grad_energy
     )
 
     hydragnn.utils.save_model(model, optimizer, log_name)
