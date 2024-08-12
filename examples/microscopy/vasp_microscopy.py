@@ -592,6 +592,7 @@ if __name__ == "__main__":
         log_name,
         verbosity,
         create_plots=False,
+        compute_forces=True
     )
 
     hydragnn.utils.save_model(model, optimizer, log_name)
