@@ -46,11 +46,19 @@ def main():
     parser.add_argument(
         "--num_conv_layers", type=int, help="num_conv_layers", default=6
     )
-    parser.add_argument("--num_sharedlayers", type=int, help="num_sharedlayers", default=2)
-    parser.add_argument("--dim_sharedlayers", type=int, help="dim_sharedlayers", default=10)
+    parser.add_argument(
+        "--num_sharedlayers", type=int, help="num_sharedlayers", default=2
+    )
+    parser.add_argument(
+        "--dim_sharedlayers", type=int, help="dim_sharedlayers", default=10
+    )
     parser.add_argument("--num_headlayers", type=int, help="num_headlayers", default=2)
-    parser.add_argument("--dim_headlayers_graph", type=int, help="dim_headlayers_graph", default=10)
-    parser.add_argument("--dim_headlayers_node", type=int, help="dim_headlayers_node", default=10)
+    parser.add_argument(
+        "--dim_headlayers_graph", type=int, help="dim_headlayers_graph", default=10
+    )
+    parser.add_argument(
+        "--dim_headlayers_node", type=int, help="dim_headlayers_node", default=10
+    )
 
     parser.add_argument("--ddstore", action="store_true", help="ddstore dataset")
     parser.add_argument("--ddstore_width", type=int, help="ddstore width", default=None)
