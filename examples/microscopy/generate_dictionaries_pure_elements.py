@@ -118,7 +118,7 @@ def generate_dictionary_bulk_energies():
         "Mc": 0.0,
         "Lv": 0.0,
         "Ts": 0.0,
-        "Og": 0.0
+        "Og": 0.0,
     }
 
     return energy_bulk_metal
@@ -244,7 +244,7 @@ def generate_dictionary_elements():
         115: "Mc",
         116: "Lv",
         117: "Ts",
-        118: "Og"
+        118: "Og",
     }
 
     return periodic_table_atomic_numbers
