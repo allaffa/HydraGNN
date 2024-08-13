@@ -651,7 +651,6 @@ def train_compute_forces(loader, model, opt, verbosity, profiler=None, use_deeps
             if use_deepspeed:
                 model.backward(loss)
             else:
-                print("MASSI: ", loss_pinn_term)
                 loss.backward(retain_graph=False)
             if trace_level > 0:
                 tr.start("backward_sync", **syncopt)
