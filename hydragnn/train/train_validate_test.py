@@ -626,12 +626,19 @@ def train_compute_forces(loader, model, opt, verbosity, profiler=None, use_deeps
             data.pos.requires_grad = True
             pred = model(data)
             assert hasattr(data, 'pos'), "The attribute 'pos' does not exist in the data object."
-            negative_grads_energy = - torch.autograd.grad(outputs=pred[0], inputs=data.pos,
-                                                 grad_outputs=data.num_nodes * torch.ones_like(pred[0]),
-                                                 retain_graph=True)[0]
+            negative_grads_energy = - torch.autograd.grad(
+                outputs=pred[0],  # [n_graphs, ]
+                inputs=data.pos,  # [n_nodes, 3]
+                grad_outputs=data.num_nodes * torch.ones_like(pred[0]),
+                retain_graph=True,  # Make sure the graph is not destroyed during training
+                create_graph=True,  # Create graph for second derivative
+                allow_unused=True,  # For complete dissociation turn to true
+            )[
+                0
+            ]  # [n_nodes, 3]
             assert hasattr(data, 'forces'), "The attribute 'forces' does not exist in the data object."
             assert negative_grads_energy.shape == data.forces.shape, f"gradients of energy predictions w.r.t. data.pos has shape {negative_grads_energy.shape} while data.forces has shape {data.forces.shape}"
-            loss_pinn_term = torch.nn.functional.l1_loss(negative_grads_energy, data.forces)
+            loss_pinn_term = torch.sum(torch.norm(negative_grads_energy - data.forces, dim=1))/data.pos.shape[0]
             loss, tasks_loss = model.module.loss(pred, data.y, head_index)
             loss += loss_pinn_term
             if trace_level > 0:
@@ -644,6 +651,7 @@ def train_compute_forces(loader, model, opt, verbosity, profiler=None, use_deeps
             if use_deepspeed:
                 model.backward(loss)
             else:
+                print("MASSI: ", loss_pinn_term)
                 loss.backward(retain_graph=False)
             if trace_level > 0:
                 tr.start("backward_sync", **syncopt)
