@@ -43,7 +43,9 @@ def _parse_results(stdout):
 def run(trial, dequed=None):
     f = open(f"output-{trial.id}.txt", "w")
     python_exe = sys.executable
-    python_script = os.path.join(os.path.dirname(__file__), "vasp_microscopy_deephyper_trial.py")
+    python_script = os.path.join(
+        os.path.dirname(__file__), "vasp_microscopy_deephyper_trial.py"
+    )
 
     # TODO: Launch a subprocess with `srun` to train neural networks
     params = trial.parameters
@@ -136,7 +138,9 @@ if __name__ == "__main__":
     problem.add_hyperparameter((1, 5), "num_sharedlayers")  # discrete parameter
     problem.add_hyperparameter((500, 2000), "dim_sharedlayers")  # discrete parameter
     problem.add_hyperparameter((1, 3), "num_headlayers")  # discrete parameter
-    problem.add_hyperparameter((500, 1000), "dim_headlayers_graph")  # discrete parameter
+    problem.add_hyperparameter(
+        (500, 1000), "dim_headlayers_graph"
+    )  # discrete parameter
     problem.add_hyperparameter((500, 3000), "dim_headlayers_node")  # discrete parameter
     problem.add_hyperparameter(
         ["EGNN", "SchNet", "PNA"], "model_type"
