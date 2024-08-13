@@ -43,7 +43,8 @@ except ImportError:
 def info(*args, logtype="info", sep=" "):
     getattr(logging, logtype)(sep.join(map(str, args)))
 
-#transform_coordinates = Spherical(norm=False, cat=False)
+
+# transform_coordinates = Spherical(norm=False, cat=False)
 transform_coordinates = LocalCartesian(norm=False, cat=False)
 
 
@@ -60,7 +61,10 @@ def extract_atom_species(outcar_path):
 def extract_supercell(section):
 
     # Define the pattern to match the direct lattice vectors
-    lattice_pattern = re.compile(r'\s*([-\d.]+\s+[-\d.]+\s+[-\d.]+)\s+([-\d.]+\s+[-\d.]+\s+[-\d.]+)', re.MULTILINE)
+    lattice_pattern = re.compile(
+        r"\s*([-\d.]+\s+[-\d.]+\s+[-\d.]+)\s+([-\d.]+\s+[-\d.]+\s+[-\d.]+)",
+        re.MULTILINE,
+    )
 
     direct_lattice_matrix = []
 
@@ -74,7 +78,9 @@ def extract_supercell(section):
             lattice_vectors = list(map(float, lattice_vectors))
 
             # Reshape the list into a 3x3 matrix
-            direct_lattice_matrix.extend([lattice_vectors[i:i + 3] for i in range(0, len(lattice_vectors), 3)])
+            direct_lattice_matrix.extend(
+                [lattice_vectors[i : i + 3] for i in range(0, len(lattice_vectors), 3)]
+            )
 
     # I need to exclude the length vector
     direct_lattice_matrix.pop()
@@ -84,8 +90,12 @@ def extract_supercell(section):
 
 def extract_positions_forces_energy(section):
     # Define regular expression patterns for POSITION and TOTAL-FORCE
-    pos_force_pattern = re.compile(r'\s*(-?\d+\.\d+)\s+(-?\d+\.\d+)\s+(-?\d+\.\d+)\s+(-?\d+\.\d+)\s+(-?\d+\.\d+)\s+(-?\d+\.\d+)')
-    energy_pattern = re.compile(r'\s+energy\s+without\s+entropy=\s+(-?\d+\.\d+)\s+energy\(sigma->0\) =\s+(-?\d+\.\d+)')
+    pos_force_pattern = re.compile(
+        r"\s*(-?\d+\.\d+)\s+(-?\d+\.\d+)\s+(-?\d+\.\d+)\s+(-?\d+\.\d+)\s+(-?\d+\.\d+)\s+(-?\d+\.\d+)"
+    )
+    energy_pattern = re.compile(
+        r"\s+energy\s+without\s+entropy=\s+(-?\d+\.\d+)\s+energy\(sigma->0\) =\s+(-?\d+\.\d+)"
+    )
 
     # Initialize lists to store POSITION and TOTAL-FORCE
     positions_list = []
@@ -108,7 +118,7 @@ def extract_positions_forces_energy(section):
         if match_energy:
             # Extract values and convert to float
             # Define the regular expression pattern to match floating-point numbers
-            pattern = re.compile(r'-?\d+\.\d+')
+            pattern = re.compile(r"-?\d+\.\d+")
 
             # Find all matches in the input string
             matches = pattern.findall(line)
@@ -123,7 +133,7 @@ def extract_positions_forces_energy(section):
     # Convert lists to PyTorch tensors
     positions_tensor = torch.tensor(positions_list)
     forces_tensor = torch.tensor(forces_list)
-    energy_tensor = torch.tensor([energy])/positions_tensor.shape[0]
+    energy_tensor = torch.tensor([energy]) / positions_tensor.shape[0]
 
     return positions_tensor, forces_tensor, energy_tensor
 
@@ -132,7 +142,7 @@ def read_sections_between(file_path, start_marker, end_marker):
     sections = []
 
     try:
-        with open(file_path, 'r') as file:
+        with open(file_path, "r") as file:
             lines = file.readlines()
             in_section = False
             current_section = []
@@ -162,11 +172,13 @@ def read_sections_between(file_path, start_marker, end_marker):
 
 def read_outcar(file_path, world_size, rank):
     # Replace these with your file path, start marker, and end marker
-    supercell_start_marker = 'VOLUME and BASIS-vectors are now :'
-    supercell_end_marker = 'FORCES acting on ions'
-    atomic_structure_start_marker = 'POSITION                                       TOTAL-FORCE (eV/Angst)'
-    #atomic_structure_end_marker = 'stress matrix after NEB project (eV)'
-    atomic_structure_end_marker = 'ENERGY OF THE ELECTRON-ION-THERMOSTAT SYSTEM (eV)'
+    supercell_start_marker = "VOLUME and BASIS-vectors are now :"
+    supercell_end_marker = "FORCES acting on ions"
+    atomic_structure_start_marker = (
+        "POSITION                                       TOTAL-FORCE (eV/Angst)"
+    )
+    # atomic_structure_end_marker = 'stress matrix after NEB project (eV)'
+    atomic_structure_end_marker = "ENERGY OF THE ELECTRON-ION-THERMOSTAT SYSTEM (eV)"
 
     dataset = []
 
@@ -174,21 +186,30 @@ def read_outcar(file_path, world_size, rank):
     filename = full_string.split("/")[-1]
 
     # Read sections between specified markers
-    result_supercell = read_sections_between(file_path, supercell_start_marker,
-                                                             supercell_end_marker)
+    result_supercell = read_sections_between(
+        file_path, supercell_start_marker, supercell_end_marker
+    )
 
     # Read sections between specified markers
-    result_atomic_structure_sections = read_sections_between(file_path, atomic_structure_start_marker, atomic_structure_end_marker)
+    result_atomic_structure_sections = read_sections_between(
+        file_path, atomic_structure_start_marker, atomic_structure_end_marker
+    )
 
     local_result_supercell = list(nsplit(result_supercell, world_size))[rank]
-    local_result_atomic_structure_sections = list(nsplit(result_atomic_structure_sections, world_size))[rank]
+    local_result_atomic_structure_sections = list(
+        nsplit(result_atomic_structure_sections, world_size)
+    )[rank]
 
     # Extract POSITION and TOTAL-FORCE from each section
-    for i, (supercell_section, atomic_structure_section) in enumerate(zip(local_result_supercell, local_result_atomic_structure_sections), start=1):
+    for i, (supercell_section, atomic_structure_section) in enumerate(
+        zip(local_result_supercell, local_result_atomic_structure_sections), start=1
+    ):
 
         # Extract POSITION and TOTAL-FORCE into PyTorch tensors
         supercell = extract_supercell(supercell_section)
-        positions, forces, energy = extract_positions_forces_energy(atomic_structure_section)
+        positions, forces, energy = extract_positions_forces_energy(
+            atomic_structure_section
+        )
 
         data_object = Data()
 
@@ -203,25 +224,19 @@ def read_outcar(file_path, world_size, rank):
 
         dataset.append(data_object)
 
-        #print("optimization step: i = ", i)
+        # print("optimization step: i = ", i)
 
-    #plot_forces(filename, dataset)
+    # plot_forces(filename, dataset)
 
     return dataset, atom_numbers.flatten().tolist()
 
 
-
 class VASPDataset(AbstractBaseDataset):
-
     def __init__(self, dirpath, var_config, dist=False):
         super().__init__()
 
         self.var_config = var_config
-        self.radius_graph = RadiusGraphPBC(
-            5.0,
-            loop=False,
-            max_num_neighbors=20
-        )
+        self.radius_graph = RadiusGraphPBC(5.0, loop=False, max_num_neighbors=20)
         self.dist = dist
         if self.dist:
             assert torch.distributed.is_initialized()
@@ -229,8 +244,8 @@ class VASPDataset(AbstractBaseDataset):
             self.rank = torch.distributed.get_rank()
 
         global_files_list = os.listdir(dirpath)
-        #local_files_list = list(nsplit(global_files_list, self.world_size))[self.rank]
-        #local_dir_list = list(nsplit(global_files_list, self.world_size))[self.rank]
+        # local_files_list = list(nsplit(global_files_list, self.world_size))[self.rank]
+        # local_dir_list = list(nsplit(global_files_list, self.world_size))[self.rank]
         local_dir_list = global_files_list
 
         # Iterate over the files
@@ -263,7 +278,6 @@ class VASPDataset(AbstractBaseDataset):
                             data_object = transform_coordinates(data_object)
                             self.dataset.append(data_object)
 
-
         random.shuffle(self.dataset)
 
     def len(self):
@@ -271,6 +285,7 @@ class VASPDataset(AbstractBaseDataset):
 
     def get(self, idx):
         return self.dataset[idx]
+
 
 def objective(trial):
 
@@ -280,7 +295,7 @@ def objective(trial):
     trial_id = trial.number  # or trial_id = trial.trial_id
 
     log_name = "MO2" if args.log is None else args.log
-    log_name = log_name + '_' + str(trial_id)
+    log_name = log_name + "_" + str(trial_id)
     hydragnn.utils.setup_log(log_name)
     writer = hydragnn.utils.get_summary_writer(log_name)
 
@@ -294,24 +309,29 @@ def objective(trial):
     # log("Command: {0}\n".format(" ".join([x for x in sys.argv])), rank=0)
 
     # Define the search space for hyperparameters
-    model_type = trial.suggest_categorical('model_type', ['EGNN', 'PNA', 'SchNet'])
-    hidden_dim = trial.suggest_int('hidden_dim', 50, 300)
-    num_conv_layers = trial.suggest_int('num_conv_layers', 1, 5)
-    num_headlayers = trial.suggest_int('num_headlayers', 1, 3)
-    dim_headlayers = [trial.suggest_int(f'dim_headlayer_{i}', 50, 300) for i in range(num_headlayers)]
+    model_type = trial.suggest_categorical("model_type", ["EGNN", "PNA", "SchNet"])
+    hidden_dim = trial.suggest_int("hidden_dim", 50, 300)
+    num_conv_layers = trial.suggest_int("num_conv_layers", 1, 5)
+    num_headlayers = trial.suggest_int("num_headlayers", 1, 3)
+    dim_headlayers = [
+        trial.suggest_int(f"dim_headlayer_{i}", 50, 300) for i in range(num_headlayers)
+    ]
 
     # Update the config dictionary with the suggested hyperparameters
     config["NeuralNetwork"]["Architecture"]["model_type"] = model_type
     config["NeuralNetwork"]["Architecture"]["hidden_dim"] = hidden_dim
     config["NeuralNetwork"]["Architecture"]["num_conv_layers"] = num_conv_layers
-    #config["NeuralNetwork"]["Architecture"]["output_heads"]["node"]["num_headlayers"] = num_headlayers
-    #config["NeuralNetwork"]["Architecture"]["output_heads"]["node"]["dim_headlayers"] = dim_headlayers
-    config["NeuralNetwork"]["Architecture"]["output_heads"]["graph"]["num_headlayers"] = num_headlayers
-    config["NeuralNetwork"]["Architecture"]["output_heads"]["graph"]["dim_headlayers"] = dim_headlayers
+    # config["NeuralNetwork"]["Architecture"]["output_heads"]["node"]["num_headlayers"] = num_headlayers
+    # config["NeuralNetwork"]["Architecture"]["output_heads"]["node"]["dim_headlayers"] = dim_headlayers
+    config["NeuralNetwork"]["Architecture"]["output_heads"]["graph"][
+        "num_headlayers"
+    ] = num_headlayers
+    config["NeuralNetwork"]["Architecture"]["output_heads"]["graph"][
+        "dim_headlayers"
+    ] = dim_headlayers
 
-    if model_type not in ['EGNN', 'SchNet', 'DimeNet']:
+    if model_type not in ["EGNN", "SchNet", "DimeNet"]:
         config["NeuralNetwork"]["Architecture"]["equivariance"] = False
-
 
     (train_loader, val_loader, test_loader,) = hydragnn.preprocess.create_dataloaders(
         trainset, valset, testset, config["NeuralNetwork"]["Training"]["batch_size"]
@@ -370,13 +390,23 @@ def objective(trial):
     """
 
     # Return the metric to minimize (e.g., validation loss)
-    validation_loss, tasks_loss = hydragnn.train.validate(val_loader, model, verbosity, reduce_ranks=True)
+    validation_loss, tasks_loss = hydragnn.train.validate(
+        val_loader, model, verbosity, reduce_ranks=True
+    )
 
     # Move validation_loss to the CPU and convert to NumPy object
     validation_loss = validation_loss.cpu().detach().numpy()
 
     # Append trial results to the DataFrame
-    trial_results.loc[trial_id] = [trial_id, hidden_dim, num_conv_layers, num_headlayers, dim_headlayers, model_type, validation_loss]
+    trial_results.loc[trial_id] = [
+        trial_id,
+        hidden_dim,
+        num_conv_layers,
+        num_headlayers,
+        dim_headlayers,
+        model_type,
+        validation_loss,
+    ]
 
     # Update information about the best trial
     if validation_loss < best_validation_loss:
@@ -397,9 +427,7 @@ if __name__ == "__main__":
         action="store_true",
         help="preprocess only (no training)",
     )
-    parser.add_argument(
-        "--inputfile", help="input file", type=str, default="vasp.json"
-    )
+    parser.add_argument("--inputfile", help="input file", type=str, default="vasp.json")
     parser.add_argument("--mae", action="store_true", help="do mae calculation")
     parser.add_argument("--ddstore", action="store_true", help="ddstore dataset")
     parser.add_argument("--ddstore_width", type=int, help="ddstore width", default=None)
@@ -454,7 +482,6 @@ if __name__ == "__main__":
     ##################################################################################################################
 
     comm = MPI.COMM_WORLD
-
 
     modelname = "MO2"
     if args.preonly:
@@ -521,9 +548,15 @@ if __name__ == "__main__":
         basedir = os.path.join(
             os.path.dirname(__file__), "dataset", "%s.pickle" % modelname
         )
-        trainset = SimplePickleDataset(basedir=basedir, label="trainset", var_config=var_config)
-        valset = SimplePickleDataset(basedir=basedir, label="valset", var_config=var_config)
-        testset = SimplePickleDataset(basedir=basedir, label="testset", var_config=var_config)
+        trainset = SimplePickleDataset(
+            basedir=basedir, label="trainset", var_config=var_config
+        )
+        valset = SimplePickleDataset(
+            basedir=basedir, label="valset", var_config=var_config
+        )
+        testset = SimplePickleDataset(
+            basedir=basedir, label="testset", var_config=var_config
+        )
         # minmax_node_feature = trainset.minmax_node_feature
         # minmax_graph_feature = trainset.minmax_graph_feature
         pna_deg = trainset.pna_deg
@@ -557,33 +590,45 @@ if __name__ == "__main__":
     # sampler = optuna.samplers.NSGAIISampler(pop_size=100, crossover_prob=0.9, mutation_prob=0.1)
 
     # Create an empty DataFrame to store trial results
-    trial_results = pd.DataFrame(columns=['Trial_ID', 'Hidden_Dim', 'Num_Conv_Layers', 'Num_Headlayers', 'Dim_Headlayers', 'Model_Type', 'Validation_Loss'])
+    trial_results = pd.DataFrame(
+        columns=[
+            "Trial_ID",
+            "Hidden_Dim",
+            "Num_Conv_Layers",
+            "Num_Headlayers",
+            "Dim_Headlayers",
+            "Model_Type",
+            "Validation_Loss",
+        ]
+    )
 
     # Variables to store information about the best trial
     best_trial_id = None
-    best_validation_loss = float('inf')
+    best_validation_loss = float("inf")
 
     # Create a study object and optimize the objective function
-    study = optuna.create_study(direction='minimize')
+    study = optuna.create_study(direction="minimize")
     study.optimize(objective, n_trials=5)
 
     # Update the best trial information directly within the DataFrame
-    best_trial_info = pd.Series({'Trial_ID': best_trial_id, 'Best_Validation_Loss': best_validation_loss})
+    best_trial_info = pd.Series(
+        {"Trial_ID": best_trial_id, "Best_Validation_Loss": best_validation_loss}
+    )
     trial_results = trial_results.append(best_trial_info, ignore_index=True)
 
     # Save the trial results to a CSV file
-    trial_results.to_csv('hpo_results.csv', index=False)
+    trial_results.to_csv("hpo_results.csv", index=False)
 
     # Get the best hyperparameters and corresponding trial ID
     best_params = study.best_params
     print("Best Hyperparameters:", best_params)
 
-    best_trial_id = study.best_trial.number  # or best_trial_id = study.best_trial.trial_id
+    best_trial_id = (
+        study.best_trial.number
+    )  # or best_trial_id = study.best_trial.trial_id
 
     # Print information about the best trial
     print("Best Trial ID:", best_trial_id)
     print("Best Validation Loss:", best_validation_loss)
 
     sys.exit(0)
-
-
