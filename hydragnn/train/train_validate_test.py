@@ -762,6 +762,7 @@ def validate_compute_forces(loader, model, verbosity, reduce_ranks=True):
             loader.dataset.ddstore.epoch_end()
         head_index = get_head_indices(model, data)
         data = data.to(get_device())
+        data.pos.requires_grad = True
         pred = model(data)
         num_graphs = data["ptr"].numel() - 1
         node_energies = pred[0].squeeze(-1)
@@ -945,6 +946,7 @@ def test_compute_forces(loader, model, verbosity, reduce_ranks=True):
             loader.dataset.ddstore.epoch_end()
         head_index = get_head_indices(model, data)
         data = data.to(get_device())
+        data.pos.requires_grad = True
         pred = model(data)
         num_graphs = data["ptr"].numel() - 1
         node_energies = pred[0].squeeze(-1)
