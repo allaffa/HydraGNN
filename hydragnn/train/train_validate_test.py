@@ -558,7 +558,7 @@ def train_compute_forces(loader, model, opt, verbosity, profiler=None, use_deeps
         profiler = Profiler()
 
     total_error = torch.tensor(0.0, device=get_device())
-    tasks_error = torch.zeros(model.module.num_heads, device=get_device())
+    energy_forces_error = torch.zeros(2, device=get_device())
     num_samples_local = 0
     model.train()
 
@@ -632,8 +632,8 @@ def train_compute_forces(loader, model, opt, verbosity, profiler=None, use_deeps
             assert hasattr(data, 'forces'), "The attribute 'forces' does not exist in the data object."
             assert negative_grads_energy.shape == data.forces.shape, f"gradients of energy predictions w.r.t. data.pos has shape {negative_grads_energy.shape} while data.forces has shape {data.forces.shape}"
             loss_pinn_term = torch.sum(torch.norm(negative_grads_energy - data.forces, dim=1))/data.pos.shape[0]
-            loss, tasks_loss = model.module.loss(pred, data.y, head_index)
-            loss += loss_pinn_term
+            energy_loss = torch.nn.functional.l1_loss(tot_energy_pred, data.energy)
+            loss = energy_loss + loss_pinn_term
             if trace_level > 0:
                 tr.start("forward_sync", **syncopt)
                 MPI.COMM_WORLD.Barrier()
@@ -644,6 +644,7 @@ def train_compute_forces(loader, model, opt, verbosity, profiler=None, use_deeps
             if use_deepspeed:
                 model.backward(loss)
             else:
+                print("MASSI: ", loss_pinn_term)
                 loss.backward(retain_graph=False)
             if trace_level > 0:
                 tr.start("backward_sync", **syncopt)
@@ -662,8 +663,8 @@ def train_compute_forces(loader, model, opt, verbosity, profiler=None, use_deeps
         with torch.no_grad():
             total_error += loss * data.num_graphs
             num_samples_local += data.num_graphs
-            for itask in range(len(tasks_loss)):
-                tasks_error[itask] += tasks_loss[itask] * data.num_graphs
+            energy_forces_error[0] += energy_loss * data.num_graphs
+            energy_forces_error[1] += loss_pinn_term * data.num_graphs
         if ibatch < (nbatch - 1):
             tr.start("dataload", **syncopt)
         if use_ddstore:
@@ -676,8 +677,9 @@ def train_compute_forces(loader, model, opt, verbosity, profiler=None, use_deeps
         loader.dataset.ddstore.epoch_end()
 
     train_error = total_error / num_samples_local
-    tasks_error = tasks_error / num_samples_local
-    return train_error, tasks_error, loss_pinn_term
+    tasks_error = energy_forces_error / num_samples_local
+    print(f"Energy Loss {energy_forces_error[0]} - Forces Loss: {energy_forces_error[1]}")
+    return train_error, tasks_error
 
 @torch.no_grad()
 def validate(loader, model, verbosity, reduce_ranks=True):
