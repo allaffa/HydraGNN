@@ -644,7 +644,7 @@ def train_compute_forces(loader, model, opt, verbosity, profiler=None, use_deeps
             ]  # [n_nodes, 3]
             assert hasattr(data, 'forces'), "The attribute 'forces' does not exist in the data object."
             assert negative_grads_energy.shape == data.forces.shape, f"gradients of energy predictions w.r.t. data.pos has shape {negative_grads_energy.shape} while data.forces has shape {data.forces.shape}"
-            loss_pinn_term = torch.sum(torch.norm(negative_grads_energy - data.forces, dim=1))/data.pos.shape[0]
+            loss_pinn_term = torch.sum(torch.norm(negative_grads_energy - data.forces, dim=1))#/data.pos.shape[0]
             energy_loss = torch.nn.functional.l1_loss(tot_energy_pred, data.energy)
             loss = energy_loss + loss_pinn_term
             if trace_level > 0:
@@ -657,7 +657,6 @@ def train_compute_forces(loader, model, opt, verbosity, profiler=None, use_deeps
             if use_deepspeed:
                 model.backward(loss)
             else:
-                print("MASSI: ", loss_pinn_term)
                 loss.backward(retain_graph=False)
             if trace_level > 0:
                 tr.start("backward_sync", **syncopt)
@@ -691,7 +690,7 @@ def train_compute_forces(loader, model, opt, verbosity, profiler=None, use_deeps
 
     train_error = total_error / num_samples_local
     tasks_error = energy_forces_error / num_samples_local
-    print(f"Energy Loss {energy_forces_error[0]} - Forces Loss: {energy_forces_error[1]}")
+    print(f"Training Energy Loss {energy_forces_error[0]} - Training Forces Loss: {energy_forces_error[1]}")
     return train_error, tasks_error
 
 
@@ -782,7 +781,7 @@ def validate_compute_forces(loader, model, verbosity, reduce_ranks=True):
         ]  # [n_nodes, 3]
         assert hasattr(data, 'forces'), "The attribute 'forces' does not exist in the data object."
         assert negative_grads_energy.shape == data.forces.shape, f"gradients of energy predictions w.r.t. data.pos has shape {negative_grads_energy.shape} while data.forces has shape {data.forces.shape}"
-        loss_pinn_term = torch.sum(torch.norm(negative_grads_energy - data.forces, dim=1)) / data.pos.shape[0]
+        loss_pinn_term = torch.sum(torch.norm(negative_grads_energy - data.forces, dim=1))# / data.pos.shape[0]
         energy_loss = torch.nn.functional.l1_loss(tot_energy_pred, data.energy)
 
         total_error += loss * data.num_graphs
@@ -798,7 +797,7 @@ def validate_compute_forces(loader, model, verbosity, reduce_ranks=True):
 
     val_error = total_error / num_samples_local
     tasks_error = energy_forces_error / num_samples_local
-    print(f"Energy Loss {energy_forces_error[0]} - Forces Loss: {energy_forces_error[1]}")
+    print(f"Validation Energy Loss {energy_forces_error[0]} - Validation Forces Loss: {energy_forces_error[1]}")
     return val_error, tasks_error
 
 
@@ -965,7 +964,7 @@ def test_compute_forces(loader, model, verbosity, reduce_ranks=True):
         ]  # [n_nodes, 3]
         assert hasattr(data, 'forces'), "The attribute 'forces' does not exist in the data object."
         assert negative_grads_energy.shape == data.forces.shape, f"gradients of energy predictions w.r.t. data.pos has shape {negative_grads_energy.shape} while data.forces has shape {data.forces.shape}"
-        loss_pinn_term = torch.sum(torch.norm(negative_grads_energy - data.forces, dim=1)) / data.pos.shape[0]
+        loss_pinn_term = torch.sum(torch.norm(negative_grads_energy - data.forces, dim=1))# / data.pos.shape[0]
         energy_loss = torch.nn.functional.l1_loss(tot_energy_pred, data.energy)
 
         total_error += loss * data.num_graphs
@@ -981,5 +980,5 @@ def test_compute_forces(loader, model, verbosity, reduce_ranks=True):
 
     test_error = total_error / num_samples_local
     tasks_error = energy_forces_error / num_samples_local
-    print(f"Energy Loss {energy_forces_error[0]} - Forces Loss: {energy_forces_error[1]}")
+    print(f"Testing Energy Loss {energy_forces_error[0]} - Testing Forces Loss: {energy_forces_error[1]}")
     return test_error, tasks_error
