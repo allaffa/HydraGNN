@@ -64,15 +64,6 @@
             "hidden_dim": 200,
             "num_conv_layers": 3,
             "output_heads": {
-                "graph": {
-                    "num_sharedlayers": 2,
-                    "dim_sharedlayers": 50,
-                    "num_headlayers": 2,
-                    "dim_headlayers": [
-                        50,
-                        25
-                    ]
-                },
                 "node": {
                     "num_headlayers": 2,
                     "dim_headlayers": [
@@ -91,7 +82,7 @@
                 3
             ],
             "output_type": [
-                "graph",
+                "node",
                 "node"
             ],
             "num_nodes": 48,
@@ -123,7 +114,7 @@
                 3
             ],
             "type": [
-                "graph",
+                "node",
                 "node"
             ],
             "graph_feature_names": [
@@ -153,7 +144,7 @@
             "perc_train": 0.9,
             "loss_function_type": "mae",
             "batch_size": 32,
-            "continue": 1,
+            "continue": 0,
             "startfrom": "MO2",
             "Optimizer": {
                 "type": "AdamW",

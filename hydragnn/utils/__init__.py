@@ -38,3 +38,10 @@ from .deephyper import (
 
 from .optimizer import select_optimizer
 from .atomicdescriptors import atomicdescriptors
+
+from .mace_tools import (
+    _broadcast,
+    scatter_sum,
+    scatter_std,
+    scatter_mean
+)

@@ -31,6 +31,8 @@ import contextlib
 from unittest.mock import MagicMock
 from hydragnn.utils.distributed import get_comm_size_and_rank
 import torch.distributed as dist
+from hydragnn.utils.mace_tools import scatter_sum
+
 import pickle
 
 import hydragnn.utils.tracer as tr
@@ -611,11 +613,16 @@ def train_compute_forces(loader, model, opt, verbosity, profiler=None, use_deeps
                 tr.stop("h2d", **syncopt)
             data.pos.requires_grad = True
             pred = model(data)
+            num_graphs = data["ptr"].numel() - 1
+            node_energies=pred[0].squeeze(-1)
+            tot_energy_pred = scatter_sum(
+                src=node_energies, index=data["batch"], dim=-1, dim_size=num_graphs
+            )  # [n_graphs,]
             assert hasattr(data, 'pos'), "The attribute 'pos' does not exist in the data object."
             negative_grads_energy = - torch.autograd.grad(
-                outputs=pred[0],  # [n_graphs, ]
+                outputs=tot_energy_pred,  # [n_graphs, ]
                 inputs=data.pos,  # [n_nodes, 3]
-                grad_outputs=data.num_nodes * torch.ones_like(pred[0]),
+                grad_outputs=torch.ones_like(tot_energy_pred),
                 retain_graph=True,  # Make sure the graph is not destroyed during training
                 create_graph=True,  # Create graph for second derivative
                 allow_unused=True,  # For complete dissociation turn to true
