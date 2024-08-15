@@ -139,8 +139,8 @@ def extract_positions_forces_energy(section):
     positions_tensor = torch.tensor(positions_list)
     forces_tensor = torch.tensor(forces_list)
 
-    #Since we are going to compute the forces as the gradient of the energy, we are not normalizing by the number of atoms
-    energy_tensor = torch.tensor([energy]) #/ positions_tensor.shape[0]
+    # Since we are going to compute the forces as the gradient of the energy, we are not normalizing by the number of atoms
+    energy_tensor = torch.tensor([energy])  # / positions_tensor.shape[0]
 
     return positions_tensor, forces_tensor, energy_tensor
 

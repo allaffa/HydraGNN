@@ -68,7 +68,7 @@ def train_validate_test(
     plot_hist_solution=False,
     create_plots=False,
     use_deepspeed=False,
-    compute_forces=False
+    compute_forces=False,
 ):
     num_epoch = config["Training"]["num_epoch"]
     EarlyStop = (
@@ -89,9 +89,14 @@ def train_validate_test(
     total_loss_val = torch.zeros(num_epoch, device=device)
     total_loss_test = torch.zeros(num_epoch, device=device)
     # loss tracking for each head/task
-    task_loss_train = torch.zeros((num_epoch, model.module.num_heads), device=device)
-    task_loss_test = torch.zeros((num_epoch, model.module.num_heads), device=device)
-    task_loss_val = torch.zeros((num_epoch, model.module.num_heads), device=device)
+    if compute_forces:
+        task_loss_train = torch.zeros((num_epoch, 2), device=device)
+        task_loss_test = torch.zeros((num_epoch, 2), device=device)
+        task_loss_val = torch.zeros((num_epoch, 2), device=device)
+    else:
+        task_loss_train = torch.zeros((num_epoch, model.module.num_heads), device=device)
+        task_loss_test = torch.zeros((num_epoch, model.module.num_heads), device=device)
+        task_loss_val = torch.zeros((num_epoch, model.module.num_heads), device=device)
 
     # preparing for results visualization
     ## collecting node feature
@@ -188,18 +193,13 @@ def train_validate_test(
             val_loss, val_taskserr = validate_compute_forces(
                 val_loader, model, verbosity, reduce_ranks=True
             )
+            test_loss, test_taskserr = test_compute_forces(
+                test_loader, model, verbosity, reduce_ranks=True
+            )
         else:
             val_loss, val_taskserr = validate(
                 val_loader, model, verbosity, reduce_ranks=True
             )
-        if compute_forces:
-            test_loss, test_taskserr, true_values, predicted_values = test_compute_forces(
-                test_loader,
-                model,
-                verbosity,
-                reduce_ranks=True
-            )
-        else:
             test_loss, test_taskserr, true_values, predicted_values = test(
                 test_loader,
                 model,
@@ -566,7 +566,9 @@ def train(loader, model, opt, verbosity, profiler=None, use_deepspeed=False):
     return train_error, tasks_error
 
 
-def train_compute_forces(loader, model, opt, verbosity, profiler=None, use_deepspeed=False):
+def train_compute_forces(
+    loader, model, opt, verbosity, profiler=None, use_deepspeed=False
+):
     if profiler is None:
         profiler = Profiler()
 
@@ -626,13 +628,14 @@ def train_compute_forces(loader, model, opt, verbosity, profiler=None, use_deeps
                 tr.stop("h2d", **syncopt)
             data.pos.requires_grad = True
             pred = model(data)
-            num_graphs = data["ptr"].numel() - 1
-            node_energies=pred[0].squeeze(-1)
+            node_energies = pred[0].squeeze(-1)
             tot_energy_pred = scatter_sum(
-                src=node_energies, index=data["batch"], dim=-1, dim_size=num_graphs
+                src=node_energies, index=data["batch"], dim=-1, dim_size=data.num_graphs
             )  # [n_graphs,]
-            assert hasattr(data, 'pos'), "The attribute 'pos' does not exist in the data object."
-            negative_grads_energy = - torch.autograd.grad(
+            assert hasattr(
+                data, "pos"
+            ), "The attribute 'pos' does not exist in the data object."
+            negative_grads_energy = -torch.autograd.grad(
                 outputs=tot_energy_pred,  # [n_graphs, ]
                 inputs=data.pos,  # [n_nodes, 3]
                 grad_outputs=torch.ones_like(tot_energy_pred),
@@ -642,9 +645,15 @@ def train_compute_forces(loader, model, opt, verbosity, profiler=None, use_deeps
             )[
                 0
             ]  # [n_nodes, 3]
-            assert hasattr(data, 'forces'), "The attribute 'forces' does not exist in the data object."
-            assert negative_grads_energy.shape == data.forces.shape, f"gradients of energy predictions w.r.t. data.pos has shape {negative_grads_energy.shape} while data.forces has shape {data.forces.shape}"
-            loss_pinn_term = torch.sum(torch.norm(negative_grads_energy - data.forces, dim=1))#/data.pos.shape[0]
+            assert hasattr(
+                data, "forces"
+            ), "The attribute 'forces' does not exist in the data object."
+            assert (
+                negative_grads_energy.shape == data.forces.shape
+            ), f"gradients of energy predictions w.r.t. data.pos has shape {negative_grads_energy.shape} while data.forces has shape {data.forces.shape}"
+            loss_pinn_term = torch.sum(
+                torch.norm(negative_grads_energy - data.forces, dim=1)
+            )  # /data.pos.shape[0]
             energy_loss = torch.nn.functional.l1_loss(tot_energy_pred, data.energy)
             loss = energy_loss + loss_pinn_term
             if trace_level > 0:
@@ -690,7 +699,6 @@ def train_compute_forces(loader, model, opt, verbosity, profiler=None, use_deeps
 
     train_error = total_error / num_samples_local
     tasks_error = energy_forces_error / num_samples_local
-    print(f"Training Energy Loss {energy_forces_error[0]} - Training Forces Loss: {energy_forces_error[1]}")
     return train_error, tasks_error
 
 
@@ -738,7 +746,7 @@ def validate(loader, model, verbosity, reduce_ranks=True):
     return val_error, tasks_error
 
 
-@torch.no_grad()
+# we cannot use @torch.no_grad() because we need the gradients for the calculation of the forces
 def validate_compute_forces(loader, model, verbosity, reduce_ranks=True):
     total_error = torch.tensor(0.0, device=get_device())
     energy_forces_error = torch.zeros(2, device=get_device())
@@ -764,33 +772,38 @@ def validate_compute_forces(loader, model, verbosity, reduce_ranks=True):
         data = data.to(get_device())
         data.pos.requires_grad = True
         pred = model(data)
-        num_graphs = data["ptr"].numel() - 1
         node_energies = pred[0].squeeze(-1)
         tot_energy_pred = scatter_sum(
-            src=node_energies, index=data["batch"], dim=-1, dim_size=num_graphs
+            src=node_energies, index=data["batch"], dim=-1, dim_size=data.num_graphs
         )  # [n_graphs,]
-        tot_energy_pred.requires_grad = True
-        assert hasattr(data, 'pos'), "The attribute 'pos' does not exist in the data object."
-        negative_grads_energy = - torch.autograd.grad(
+        assert hasattr(
+            data, "pos"
+        ), "The attribute 'pos' does not exist in the data object."
+        negative_grads_energy = -torch.autograd.grad(
             outputs=tot_energy_pred,  # [n_graphs, ]
             inputs=data.pos,  # [n_nodes, 3]
             grad_outputs=torch.ones_like(tot_energy_pred),
             retain_graph=False,  # Make sure the graph is not destroyed during training
             create_graph=False,  # Create graph for second derivative
-            allow_unused=True,  # For complete dissociation turn to true
+            allow_unused=False,  # For complete dissociation turn to true
         )[
             0
         ]  # [n_nodes, 3]
-        assert hasattr(data, 'forces'), "The attribute 'forces' does not exist in the data object."
-        assert negative_grads_energy.shape == data.forces.shape, f"gradients of energy predictions w.r.t. data.pos has shape {negative_grads_energy.shape} while data.forces has shape {data.forces.shape}"
-        loss_pinn_term = torch.sum(torch.norm(negative_grads_energy - data.forces, dim=1))# / data.pos.shape[0]
+        assert hasattr(
+            data, "forces"
+        ), "The attribute 'forces' does not exist in the data object."
+        assert (
+            negative_grads_energy.shape == data.forces.shape
+        ), f"gradients of energy predictions w.r.t. data.pos has shape {negative_grads_energy.shape} while data.forces has shape {data.forces.shape}"
+        loss_pinn_term = torch.sum(
+            torch.norm(negative_grads_energy - data.forces, dim=1)
+        )  # / data.pos.shape[0]
         energy_loss = torch.nn.functional.l1_loss(tot_energy_pred, data.energy)
-
+        loss = energy_loss + loss_pinn_term
         total_error += loss * data.num_graphs
         num_samples_local += data.num_graphs
         energy_forces_error[0] += energy_loss * data.num_graphs
         energy_forces_error[1] += loss_pinn_term * data.num_graphs
-        loss = energy_loss + loss_pinn_term
 
         if use_ddstore:
             loader.dataset.ddstore.epoch_begin()
@@ -799,9 +812,7 @@ def validate_compute_forces(loader, model, verbosity, reduce_ranks=True):
 
     val_error = total_error / num_samples_local
     tasks_error = energy_forces_error / num_samples_local
-    print(f"Validation Energy Loss {energy_forces_error[0]} - Validation Forces Loss: {energy_forces_error[1]}")
     return val_error, tasks_error
-
 
 
 @torch.no_grad()
@@ -922,8 +933,7 @@ def test(loader, model, verbosity, reduce_ranks=True, return_samples=True):
     return test_error, tasks_error, true_values, predicted_values
 
 
-
-@torch.no_grad()
+# we cannot use @torch.no_grad() because we need the gradients for the calculation of the forces
 def test_compute_forces(loader, model, verbosity, reduce_ranks=True):
     total_error = torch.tensor(0.0, device=get_device())
     energy_forces_error = torch.zeros(2, device=get_device())
@@ -949,14 +959,14 @@ def test_compute_forces(loader, model, verbosity, reduce_ranks=True):
         data = data.to(get_device())
         data.pos.requires_grad = True
         pred = model(data)
-        num_graphs = data["ptr"].numel() - 1
         node_energies = pred[0].squeeze(-1)
         tot_energy_pred = scatter_sum(
-            src=node_energies, index=data["batch"], dim=-1, dim_size=num_graphs
+            src=node_energies, index=data["batch"], dim=-1, dim_size=data.num_graphs
         )  # [n_graphs,]
-        tot_energy_pred.requires_grad = True
-        assert hasattr(data, 'pos'), "The attribute 'pos' does not exist in the data object."
-        negative_grads_energy = - torch.autograd.grad(
+        assert hasattr(
+            data, "pos"
+        ), "The attribute 'pos' does not exist in the data object."
+        negative_grads_energy = -torch.autograd.grad(
             outputs=tot_energy_pred,  # [n_graphs, ]
             inputs=data.pos,  # [n_nodes, 3]
             grad_outputs=torch.ones_like(tot_energy_pred),
@@ -966,16 +976,21 @@ def test_compute_forces(loader, model, verbosity, reduce_ranks=True):
         )[
             0
         ]  # [n_nodes, 3]
-        assert hasattr(data, 'forces'), "The attribute 'forces' does not exist in the data object."
-        assert negative_grads_energy.shape == data.forces.shape, f"gradients of energy predictions w.r.t. data.pos has shape {negative_grads_energy.shape} while data.forces has shape {data.forces.shape}"
-        loss_pinn_term = torch.sum(torch.norm(negative_grads_energy - data.forces, dim=1))# / data.pos.shape[0]
+        assert hasattr(
+            data, "forces"
+        ), "The attribute 'forces' does not exist in the data object."
+        assert (
+            negative_grads_energy.shape == data.forces.shape
+        ), f"gradients of energy predictions w.r.t. data.pos has shape {negative_grads_energy.shape} while data.forces has shape {data.forces.shape}"
+        loss_pinn_term = torch.sum(
+            torch.norm(negative_grads_energy - data.forces, dim=1)
+        )  # / data.pos.shape[0]
         energy_loss = torch.nn.functional.l1_loss(tot_energy_pred, data.energy)
-
+        loss = energy_loss + loss_pinn_term
         total_error += loss * data.num_graphs
         num_samples_local += data.num_graphs
         energy_forces_error[0] += energy_loss * data.num_graphs
         energy_forces_error[1] += loss_pinn_term * data.num_graphs
-        loss = energy_loss + loss_pinn_term
 
         if use_ddstore:
             loader.dataset.ddstore.epoch_begin()
@@ -984,5 +999,4 @@ def test_compute_forces(loader, model, verbosity, reduce_ranks=True):
 
     test_error = total_error / num_samples_local
     tasks_error = energy_forces_error / num_samples_local
-    print(f"Testing Energy Loss {energy_forces_error[0]} - Testing Forces Loss: {energy_forces_error[1]}")
     return test_error, tasks_error
