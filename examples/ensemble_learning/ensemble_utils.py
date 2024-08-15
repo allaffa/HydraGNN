@@ -41,10 +41,10 @@ class model_ensemble(torch.nn.Module):
             head_pred_mean = []
             head_pred_std = []
             for ihead in range(self.num_heads):
-                head_pred = []*len(model_ens.module)
+                head_pred = []
                 for imodel in range(self.model_size):
-                    head_pred[imodel]=y_ens[imodel][ihead]
-                head_pred_ens = np.asarray(head_pred).squeeze()
+                    head_pred.append(y_ens[imodel][ihead])
+                head_pred_ens = torch.stack(head_pred, dim=0).squeeze()
                 head_pred_mean.append(head_pred_ens.mean(axis=0))
                 head_pred_std.append(head_pred_ens.std(axis=0))
             return head_pred_mean, head_pred_std
