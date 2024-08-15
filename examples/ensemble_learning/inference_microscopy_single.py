@@ -141,63 +141,28 @@ if __name__ == "__main__":
         pna_deg = trainset.pna_deg
     else:
         raise NotImplementedError("No supported format: %s" % (args.format))
-
-    ##################################################################################################################
-    (train_loader, val_loader, test_loader,) = hydragnn.preprocess.create_dataloaders(
-        trainset,
-        valset,
-        testset,
-        config["NeuralNetwork"]["Training"]["batch_size"],
-        test_sampler_shuffle=False,
-    )
     ##################################################################################################################
     model_ens = model_ensemble(modeldirlist)
     model_ens = hydragnn.utils.get_distributed_model(model_ens, verbosity)
     model_ens.eval()
     ##################################################################################################################
-    fig, axs = plt.subplots(2, 3, figsize=(18, 10))
-    for icol, (loader, setname) in enumerate(zip([train_loader, val_loader, test_loader], ["train", "val", "test"])):
-        error, rmse_task, true_values, predicted_mean, predicted_std = test_ens(model_ens, loader, verbosity, num_samples=1000)
-        print_distributed(verbosity,"number of heads %d"%len(true_values))
-        print_distributed(verbosity,"number of samples %d"%len(true_values[0]))
-        if hydragnn.utils.get_comm_size_and_rank()[1]==0:
-            print("loss=", error, rmse_task)
-        assert len(true_values)==len(predicted_mean), "inconsistent number of heads, %d!=%d"%(len(true_values),len(len(predicted_mean)))
-        for  ihead, (output_name, output_type, output_dim) in enumerate(zip(
-        config["NeuralNetwork"]["Variables_of_interest"]["output_names"],
-        config["NeuralNetwork"]["Variables_of_interest"]["type"],
-        config["NeuralNetwork"]["Variables_of_interest"]["output_dim"],
-        )):
-            head_true = true_values[ihead].cpu().squeeze().numpy() 
-            head_pred = predicted_mean[ihead].cpu().squeeze().numpy() 
-            head_pred_std = predicted_std[ihead].cpu().squeeze().numpy() 
-            ifeat = var_config["output_index"][ihead]
-            outtype = var_config["type"][ihead]
-            varname = var_config["output_names"][ihead]
-
-            ax = axs[ihead, icol]
-            error_mae = np.mean(np.abs(head_pred - head_true))
-            error_rmse = np.sqrt(np.mean(np.abs(head_pred - head_true) ** 2))
-            if hydragnn.utils.get_comm_size_and_rank()[1]==0:
-                print(varname, ": mae=", error_mae, ", rmse= ", error_rmse)
-            hist2d_norm = getcolordensity(head_true, head_pred)
-            #ax.errorbar(head_true, head_pred, yerr=head_pred_std, fmt = '', linewidth=0.5, ecolor="b", markerfacecolor="none", ls='none')
-            sc=ax.scatter(head_true, head_pred, s=12, c=hist2d_norm, vmin=0, vmax=1)
-            minv = np.minimum(np.amin(head_pred), np.amin(head_true))
-            maxv = np.maximum(np.amax(head_pred), np.amax(head_true))
-            ax.plot([minv, maxv], [minv, maxv], "r--")
-            ax.set_title(setname + "; " + varname, fontsize=24)
-            ax.text(
-                minv + 0.1 * (maxv - minv),
-                maxv - 0.1 * (maxv - minv),
-                "MAE: {:.2e}".format(error_mae),
-            )
-            if icol==0:
-                ax.set_ylabel("Predicted")
-            if ihead==1:
-                ax.set_xlabel("True")
-            plt.colorbar(sc)
-    fig.savefig("./logs/" + log_name + "/parity_plot_all.png")
-    plt.close()
+    #model inference for a single graph
+    device = next(model_ens.parameters()).device
+    graphdata=testset[0].to(device)
+    ytrue = graphdata.y
+    with torch.no_grad():
+        pred_mean, pred_std=model_ens(graphdata, meanstd=True) 
+    ind = 0
+    print("For graph:", graphdata)
+    print("Energy, True VS Pred at Uncertainty: ", ytrue[0].item(), pred_mean[0].item(), pred_std[0].item())
+    num_nodes=graphdata.x.size()[0]
+    yforce=ytrue[1:].reshape(-1,3)
+    yforce_pred=pred_mean[1].squeeze() #.reshape(-1,3)
+    yforce_std=pred_std[1].squeeze() #.reshape(-1,3)
+    print(yforce.size(), yforce_pred.size())
+    for inode in range(num_nodes):
+        for icomp in range(3):
+         print("Forces, node %d, component, %d True VS Pred at Uncertainty: %.2e, %.2e, %.3e"%(inode, icomp, 
+         yforce[inode, icomp].item(), yforce_pred[inode, icomp].item(), yforce_std[inode, icomp].item()))
     ##################################################################################################################
     sys.exit(0)
