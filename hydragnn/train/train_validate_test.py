@@ -769,6 +769,7 @@ def validate_compute_forces(loader, model, verbosity, reduce_ranks=True):
         tot_energy_pred = scatter_sum(
             src=node_energies, index=data["batch"], dim=-1, dim_size=num_graphs
         )  # [n_graphs,]
+        tot_energy_pred.requires_grad = True
         assert hasattr(data, 'pos'), "The attribute 'pos' does not exist in the data object."
         negative_grads_energy = - torch.autograd.grad(
             outputs=tot_energy_pred,  # [n_graphs, ]
@@ -953,6 +954,7 @@ def test_compute_forces(loader, model, verbosity, reduce_ranks=True):
         tot_energy_pred = scatter_sum(
             src=node_energies, index=data["batch"], dim=-1, dim_size=num_graphs
         )  # [n_graphs,]
+        tot_energy_pred.requires_grad = True
         assert hasattr(data, 'pos'), "The attribute 'pos' does not exist in the data object."
         negative_grads_energy = - torch.autograd.grad(
             outputs=tot_energy_pred,  # [n_graphs, ]
