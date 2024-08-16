@@ -22,7 +22,7 @@
     "Architecture": {
       "periodic_boundary_conditions": true,
       "model_type": "EGNN",
-      "equivariance": true,
+      "equivariance": false,
       "edge_features": ["bond_length", "polar_angle", "azimutal_angle"],
       "max_neighbours": 20,
       "hidden_dim": 20,
@@ -33,13 +33,13 @@
           "dim_sharedlayers": 50,
           "num_headlayers": 2,
           "dim_headlayers": [
-            20,
-            20
+            260,
+            93
           ]
         },
         "node": {
-          "num_headlayers": 2,
-          "dim_headlayers": [20,20],
+          "num_headlayers": 1,
+          "dim_headlayers": [177],
           "type": "mlp"
         }
       },
@@ -59,8 +59,8 @@
       "output_names": ["total_energy", "atomic_forces"]
     },
     "Training": {
-      "num_epoch": 50,
-      "batch_size": 3,
+      "num_epoch": 1,
+      "batch_size": 64,
       "continue": 0,
       "EarlyStopping": true,
       "patience": 100,
@@ -71,5 +71,10 @@
         "learning_rate": 0.001
       }
     }
+  },
+  "Visualization": {
+     "plot_init_solution": true,
+     "plot_hist_solution": true,
+     "create_plots": true
   }
 }
