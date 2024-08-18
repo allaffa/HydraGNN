@@ -31,7 +31,10 @@ from hydragnn.utils.print_utils import iterate_tqdm, log
 
 from ase.io import read
 
-from generate_dictionaries_pure_elements import generate_dictionary_bulk_energies, generate_dictionary_elements
+from generate_dictionaries_pure_elements import (
+    generate_dictionary_bulk_energies,
+    generate_dictionary_elements,
+)
 
 try:
     from hydragnn.utils.adiosdataset import AdiosWriter, AdiosDataset
@@ -53,7 +56,9 @@ atom_number_dict = {23: 0, 41: 1, 73: 2}  # Dictionary mapping atom numbers to c
 
 def create_one_hot(atom_numbers, atom_number_dict):
     num_classes = len(atom_number_dict)
-    one_hot = torch.zeros(atom_numbers.size(0), num_classes)  # Initialize one-hot tensor
+    one_hot = torch.zeros(
+        atom_numbers.size(0), num_classes
+    )  # Initialize one-hot tensor
 
     # Convert atom_numbers to class indices using the dictionary
     class_indices = [atom_number_dict[atom.item()] for atom in atom_numbers]
@@ -79,7 +84,7 @@ def read_initial_geometry_energy_rmsd_deformation(file_path):
     data_object = Data()
 
     # Read the POSCAR file using ASE
-    ase_object = read(os.path.join(file_path,'0.POSCAR'), format='vasp')
+    ase_object = read(os.path.join(file_path, "0.POSCAR"), format="vasp")
 
     data_object.supercell_size = tensor(ase_object.cell.array).float()
     data_object.pos = tensor(ase_object.arrays["positions"]).float()
@@ -87,7 +92,9 @@ def read_initial_geometry_energy_rmsd_deformation(file_path):
     data_object.x = tensor(proton_numbers).float()
 
     # Read information about deformation tensor
-    deformation_lattice_vectors_file = open(os.path.join(file_path,'deformation_lattice_vectors.txt'), 'r')
+    deformation_lattice_vectors_file = open(
+        os.path.join(file_path, "deformation_lattice_vectors.txt"), "r"
+    )
     Lines = deformation_lattice_vectors_file.readlines()
 
     # Strips the newline character
@@ -98,7 +105,9 @@ def read_initial_geometry_energy_rmsd_deformation(file_path):
     data_object.deformation_vectors_tensor = deformation_vectors_tensor
 
     # Read information about root mean squared displacement
-    root_mean_squared_displacement_file = open(os.path.join(file_path, 'root_mean_squared_displacement.txt'), 'r')
+    root_mean_squared_displacement_file = open(
+        os.path.join(file_path, "root_mean_squared_displacement.txt"), "r"
+    )
     Lines = root_mean_squared_displacement_file.readlines()
     # Strips the newline character
     for line in Lines:
@@ -106,21 +115,25 @@ def read_initial_geometry_energy_rmsd_deformation(file_path):
     data_object.rmsd = rmsd
 
     # Read information about formation energy
-    formation_energy_file = open(os.path.join(file_path, 'formation_energy.txt'), 'r')
+    formation_energy_file = open(os.path.join(file_path, "formation_energy.txt"), "r")
     Lines = formation_energy_file.readlines()
     # Strips the newline character
     for line in Lines:
         formation_energy = tensor([float(line.strip())])
     data_object.formation_energy = formation_energy
 
-    data_object.y = torch.cat([data_object.formation_energy, data_object.rmsd, data_object.deformation_vectors_tensor.flatten()])
+    data_object.y = torch.cat(
+        [
+            data_object.formation_energy,
+            data_object.rmsd,
+            data_object.deformation_vectors_tensor.flatten(),
+        ]
+    )
 
     return data_object
 
 
-
 class VASPDataset(AbstractBaseDataset):
-
     def __init__(self, dirpath, var_config, dist=False):
         super().__init__()
 
@@ -128,7 +141,9 @@ class VASPDataset(AbstractBaseDataset):
         self.radius_graph = RadiusGraphPBC(
             self.var_config["NeuralNetwork"]["Architecture"]["radius"],
             loop=False,
-            max_num_neighbors=self.var_config["NeuralNetwork"]["Architecture"]["max_neighbours"]
+            max_num_neighbors=self.var_config["NeuralNetwork"]["Architecture"][
+                "max_neighbours"
+            ],
         )
         self.dist = dist
 
@@ -138,12 +153,17 @@ class VASPDataset(AbstractBaseDataset):
             self.rank = torch.distributed.get_rank()
 
         # Extract information about pure elements
-        for name in iterate_tqdm(os.listdir(os.path.join(dirpath, "../", "pure_elements")), verbosity_level=2,
-                                 desc="Load"):
+        for name in iterate_tqdm(
+            os.listdir(os.path.join(dirpath, "../", "pure_elements")),
+            verbosity_level=2,
+            desc="Load",
+        ):
             if name == ".DS_Store":
                 continue
             # If you want to work with the full path, you can join the directory path and file name
-            file_path = os.path.join(dirpath, "../", "pure_elements", name, name + '128', 'case-1')
+            file_path = os.path.join(
+                dirpath, "../", "pure_elements", name, name + "128", "case-1"
+            )
 
             data_object = read_initial_geometry_energy_rmsd_deformation(file_path)
             data_object = self.radius_graph(data_object)
@@ -156,11 +176,15 @@ class VASPDataset(AbstractBaseDataset):
             if name == ".DS_Store":
                 continue
             dir_name = os.path.join(dirpath, name)
-            for subdir_name in iterate_tqdm(os.listdir(dir_name), verbosity_level=2, desc="Load"):
+            for subdir_name in iterate_tqdm(
+                os.listdir(dir_name), verbosity_level=2, desc="Load"
+            ):
                 if subdir_name == ".DS_Store":
                     continue
                 subdir_global_list = os.listdir(os.path.join(dir_name, subdir_name))
-                subdir_local_list = list(nsplit(subdir_global_list, self.world_size))[self.rank]
+                subdir_local_list = list(nsplit(subdir_global_list, self.world_size))[
+                    self.rank
+                ]
 
                 # print("MASSI - ", str(self.rank), " - total list: ", len(subdir_global_list))
                 # print("MASSI - ", str(self.rank), " - about to read: ", subdir_name)
@@ -179,7 +203,9 @@ class VASPDataset(AbstractBaseDataset):
                     # print("MASSI - ", str(self.rank), " - about to read: ", os.path.join(dir_name, subdir_name, subsubdir_name))
 
                     try:
-                        data_object = read_initial_geometry_energy_rmsd_deformation(file_path)
+                        data_object = read_initial_geometry_energy_rmsd_deformation(
+                            file_path
+                        )
                         if data_object is not None:
                             data_object = self.radius_graph(data_object)
                             data_object = transform_coordinates(data_object)
@@ -188,8 +214,7 @@ class VASPDataset(AbstractBaseDataset):
                     except ValueError as e:
                         pass
                     except Exception as e:
-                        print(self.rank, "Exception:", file_path , e,
-                              file=sys.stderr)
+                        print(self.rank, "Exception:", file_path, e, file=sys.stderr)
                         # traceback.print_exc()
                         pass
 
@@ -357,9 +382,15 @@ if __name__ == "__main__":
         basedir = os.path.join(
             os.path.dirname(__file__), "dataset", "%s.pickle" % modelname
         )
-        trainset = SimplePickleDataset(basedir=basedir, label="trainset", var_config=var_config)
-        valset = SimplePickleDataset(basedir=basedir, label="valset", var_config=var_config)
-        testset = SimplePickleDataset(basedir=basedir, label="testset", var_config=var_config)
+        trainset = SimplePickleDataset(
+            basedir=basedir, label="trainset", var_config=var_config
+        )
+        valset = SimplePickleDataset(
+            basedir=basedir, label="valset", var_config=var_config
+        )
+        testset = SimplePickleDataset(
+            basedir=basedir, label="testset", var_config=var_config
+        )
         # minmax_node_feature = trainset.minmax_node_feature
         # minmax_graph_feature = trainset.minmax_graph_feature
         pna_deg = trainset.pna_deg

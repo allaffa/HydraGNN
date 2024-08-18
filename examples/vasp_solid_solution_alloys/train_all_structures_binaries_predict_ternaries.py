@@ -31,7 +31,10 @@ from hydragnn.utils.print_utils import iterate_tqdm, log
 
 from ase.io.vasp import read_vasp_out
 
-from generate_dictionaries_pure_elements import generate_dictionary_bulk_energies, generate_dictionary_elements
+from generate_dictionaries_pure_elements import (
+    generate_dictionary_bulk_energies,
+    generate_dictionary_elements,
+)
 
 try:
     from hydragnn.utils.adiosdataset import AdiosWriter, AdiosDataset
@@ -53,7 +56,9 @@ atom_number_dict = {23: 0, 41: 1, 73: 2}  # Dictionary mapping atom numbers to c
 
 def create_one_hot(atom_numbers, atom_number_dict):
     num_classes = len(atom_number_dict)
-    one_hot = torch.zeros(atom_numbers.size(0), num_classes)  # Initialize one-hot tensor
+    one_hot = torch.zeros(
+        atom_numbers.size(0), num_classes
+    )  # Initialize one-hot tensor
 
     # Convert atom_numbers to class indices using the dictionary
     class_indices = [atom_number_dict[atom.item()] for atom in atom_numbers]
@@ -76,7 +81,10 @@ def extract_atom_species(outcar_path):
 
 def extract_supercell(section):
     # Define the pattern to match the direct lattice vectors
-    lattice_pattern = re.compile(r'\s*([-\d.]+\s+[-\d.]+\s+[-\d.]+)\s+([-\d.]+\s+[-\d.]+\s+[-\d.]+)', re.MULTILINE)
+    lattice_pattern = re.compile(
+        r"\s*([-\d.]+\s+[-\d.]+\s+[-\d.]+)\s+([-\d.]+\s+[-\d.]+\s+[-\d.]+)",
+        re.MULTILINE,
+    )
 
     direct_lattice_matrix = []
 
@@ -90,7 +98,9 @@ def extract_supercell(section):
             lattice_vectors = list(map(float, lattice_vectors))
 
             # Reshape the list into a 3x3 matrix
-            direct_lattice_matrix.extend([lattice_vectors[i:i + 3] for i in range(0, len(lattice_vectors), 3)])
+            direct_lattice_matrix.extend(
+                [lattice_vectors[i : i + 3] for i in range(0, len(lattice_vectors), 3)]
+            )
 
     # I need to exclude the length vector
     direct_lattice_matrix.pop()
@@ -101,8 +111,11 @@ def extract_supercell(section):
 def extract_positions_forces_energy(section):
     # Define regular expression patterns for POSITION and TOTAL-FORCE
     pos_force_pattern = re.compile(
-        r'\s*(-?\d+\.\d+)\s+(-?\d+\.\d+)\s+(-?\d+\.\d+)\s+(-?\d+\.\d+)\s+(-?\d+\.\d+)\s+(-?\d+\.\d+)')
-    energy_pattern = re.compile(r'\s+energy\s+without\s+entropy=\s+(-?\d+\.\d+)\s+energy\(sigma->0\) =\s+(-?\d+\.\d+)')
+        r"\s*(-?\d+\.\d+)\s+(-?\d+\.\d+)\s+(-?\d+\.\d+)\s+(-?\d+\.\d+)\s+(-?\d+\.\d+)\s+(-?\d+\.\d+)"
+    )
+    energy_pattern = re.compile(
+        r"\s+energy\s+without\s+entropy=\s+(-?\d+\.\d+)\s+energy\(sigma->0\) =\s+(-?\d+\.\d+)"
+    )
 
     # Initialize lists to store POSITION and TOTAL-FORCE
     positions_list = []
@@ -125,7 +138,7 @@ def extract_positions_forces_energy(section):
         if match_energy:
             # Extract values and convert to float
             # Define the regular expression pattern to match floating-point numbers
-            pattern = re.compile(r'-?\d+\.\d+')
+            pattern = re.compile(r"-?\d+\.\d+")
 
             # Find all matches in the input string
             matches = pattern.findall(line)
@@ -140,11 +153,11 @@ def extract_positions_forces_energy(section):
     # Convert lists to PyTorch tensors
     positions_tensor = torch.tensor(positions_list)
 
-    # Convert formation energy in meV 
-    forces_tensor = torch.tensor(forces_list)*1000
+    # Convert formation energy in meV
+    forces_tensor = torch.tensor(forces_list) * 1000
 
     # Convert forces in meV/angstrom
-    energy_tensor = torch.tensor([energy])*1000 / positions_tensor.shape[0]
+    energy_tensor = torch.tensor([energy]) * 1000 / positions_tensor.shape[0]
 
     return positions_tensor, forces_tensor, energy_tensor
 
@@ -153,7 +166,7 @@ def read_sections_between(file_path, start_marker, end_marker):
     sections = []
 
     try:
-        with open(file_path, 'r') as file:
+        with open(file_path, "r") as file:
             lines = file.readlines()
             in_section = False
             current_section = []
@@ -183,12 +196,14 @@ def read_sections_between(file_path, start_marker, end_marker):
 
 def read_outcar_pure_elements_ground_state(file_path):
     # Replace these with your file path, start marker, and end marker
-    supercell_start_marker = 'VOLUME and BASIS-vectors are now :'
-    supercell_end_marker = 'FORCES acting on ions'
-    atomic_structure_start_marker = 'POSITION                                       TOTAL-FORCE (eV/Angst)'
+    supercell_start_marker = "VOLUME and BASIS-vectors are now :"
+    supercell_end_marker = "FORCES acting on ions"
+    atomic_structure_start_marker = (
+        "POSITION                                       TOTAL-FORCE (eV/Angst)"
+    )
     # atomic_structure_end_marker = 'stress matrix after NEB project (eV)'
     # atomic_structure_end_marker = 'ENERGY OF THE ELECTRON-ION-THERMOSTAT SYSTEM (eV)'
-    atomic_structure_end_marker = 'POTLOK'
+    atomic_structure_end_marker = "POTLOK"
 
     dataset = []
 
@@ -196,19 +211,23 @@ def read_outcar_pure_elements_ground_state(file_path):
     filename = full_string.split("/")[-1]
 
     # Read sections between specified markers
-    result_supercell = read_sections_between(file_path, supercell_start_marker,
-                                             supercell_end_marker)
+    result_supercell = read_sections_between(
+        file_path, supercell_start_marker, supercell_end_marker
+    )
 
     # Read sections between specified markers
-    result_atomic_structure_sections = read_sections_between(file_path, atomic_structure_start_marker,
-                                                             atomic_structure_end_marker)
+    result_atomic_structure_sections = read_sections_between(
+        file_path, atomic_structure_start_marker, atomic_structure_end_marker
+    )
 
     supercell_section = result_supercell[-1]
     atomic_structure_section = result_atomic_structure_sections[-1]
 
     # Extract POSITION and TOTAL-FORCE into PyTorch tensors
     supercell = extract_supercell(supercell_section)
-    positions, forces, energy = extract_positions_forces_energy(atomic_structure_section)
+    positions, forces, energy = extract_positions_forces_energy(
+        atomic_structure_section
+    )
 
     data_object = Data()
 
@@ -229,12 +248,14 @@ def read_outcar_pure_elements_ground_state(file_path):
 
 def read_outcar(file_path):
     # Replace these with your file path, start marker, and end marker
-    supercell_start_marker = 'VOLUME and BASIS-vectors are now :'
-    supercell_end_marker = 'FORCES acting on ions'
-    atomic_structure_start_marker = 'POSITION                                       TOTAL-FORCE (eV/Angst)'
+    supercell_start_marker = "VOLUME and BASIS-vectors are now :"
+    supercell_end_marker = "FORCES acting on ions"
+    atomic_structure_start_marker = (
+        "POSITION                                       TOTAL-FORCE (eV/Angst)"
+    )
     # atomic_structure_end_marker = 'stress matrix after NEB project (eV)'
     # atomic_structure_end_marker = 'ENERGY OF THE ELECTRON-ION-THERMOSTAT SYSTEM (eV)'
-    atomic_structure_end_marker = 'POTLOK'
+    atomic_structure_end_marker = "POTLOK"
 
     dataset = []
 
@@ -242,23 +263,33 @@ def read_outcar(file_path):
     filename = full_string.split("/")[-1]
 
     # Read sections between specified markers
-    result_supercell = read_sections_between(file_path, supercell_start_marker,
-                                             supercell_end_marker)
+    result_supercell = read_sections_between(
+        file_path, supercell_start_marker, supercell_end_marker
+    )
 
     # Read sections between specified markers
-    result_atomic_structure_sections = read_sections_between(file_path, atomic_structure_start_marker,
-                                                             atomic_structure_end_marker)
+    result_atomic_structure_sections = read_sections_between(
+        file_path, atomic_structure_start_marker, atomic_structure_end_marker
+    )
 
     atom_numbers = extract_atom_species(file_path)
 
-    assert len(result_supercell)==len(result_atomic_structure_sections), "The length of the list of supercells "+str(len(result_supercell))+" differs from the length of the list of atomistic structures "+str(len(result_atomic_structure_sections))
+    assert len(result_supercell) == len(result_atomic_structure_sections), (
+        "The length of the list of supercells "
+        + str(len(result_supercell))
+        + " differs from the length of the list of atomistic structures "
+        + str(len(result_atomic_structure_sections))
+    )
 
     # Extract POSITION and TOTAL-FORCE from each section
     for i, (supercell_section, atomic_structure_section) in enumerate(
-            zip(result_supercell, result_atomic_structure_sections), start=1):
+        zip(result_supercell, result_atomic_structure_sections), start=1
+    ):
         # Extract POSITION and TOTAL-FORCE into PyTorch tensors
         supercell = extract_supercell(supercell_section)
-        positions, forces, energy = extract_positions_forces_energy(atomic_structure_section)
+        positions, forces, energy = extract_positions_forces_energy(
+            atomic_structure_section
+        )
 
         data_object = Data()
 
@@ -280,7 +311,9 @@ def read_outcar(file_path):
         total_atoms = data_object.pos.shape[0]
 
         # Calculate ratio for each element
-        element_ratios = {element: count / total_atoms for element, count in element_counts.items()}
+        element_ratios = {
+            element: count / total_atoms for element, count in element_counts.items()
+        }
 
         for item in element_ratios.keys():
             energy -= element_ratios[item] * energy_bulk_metals[periodic_table[item]]
@@ -298,7 +331,6 @@ def read_outcar(file_path):
 
 
 class VASPDataset(AbstractBaseDataset):
-
     def __init__(self, dirpath, var_config, dist=False, cases_filter=None):
         super().__init__()
 
@@ -306,7 +338,9 @@ class VASPDataset(AbstractBaseDataset):
         self.radius_graph = RadiusGraphPBC(
             self.var_config["NeuralNetwork"]["Architecture"]["radius"],
             loop=False,
-            max_num_neighbors=self.var_config["NeuralNetwork"]["Architecture"]["max_neighbours"]
+            max_num_neighbors=self.var_config["NeuralNetwork"]["Architecture"][
+                "max_neighbours"
+            ],
         )
         self.dist = dist
 
@@ -318,17 +352,37 @@ class VASPDataset(AbstractBaseDataset):
             self.rank = torch.distributed.get_rank()
 
         # Extract information about pure elements
-        for name in iterate_tqdm(os.listdir(os.path.join(dirpath, "../", "pure_elements")), verbosity_level=2, desc="Load"):
-            files = os.listdir(os.path.join(dirpath, "../", "pure_elements", name, name+'128', 'case-1'))
+        for name in iterate_tqdm(
+            os.listdir(os.path.join(dirpath, "../", "pure_elements")),
+            verbosity_level=2,
+            desc="Load",
+        ):
+            files = os.listdir(
+                os.path.join(
+                    dirpath, "../", "pure_elements", name, name + "128", "case-1"
+                )
+            )
             outcar_files = [file for file in files if file.startswith("OUTCAR")]
             for file_name in outcar_files:
                 # If you want to work with the full path, you can join the directory path and file name
-                file_path = os.path.join(os.path.join(dirpath, "../", "pure_elements", name, name+'128', 'case-1', file_name))
+                file_path = os.path.join(
+                    os.path.join(
+                        dirpath,
+                        "../",
+                        "pure_elements",
+                        name,
+                        name + "128",
+                        "case-1",
+                        file_name,
+                    )
+                )
 
                 element = name
                 dataset, _ = read_outcar_pure_elements_ground_state(file_path)
 
-                assert len(dataset) == 1, 'bulk metal calculation not imported correctly'
+                assert (
+                    len(dataset) == 1
+                ), "bulk metal calculation not imported correctly"
 
                 energy_bulk_metals[element] = dataset[0].y.item()
 
@@ -339,24 +393,38 @@ class VASPDataset(AbstractBaseDataset):
             if name == ".DS_Store":
                 continue
             dir_name = os.path.join(dirpath, name)
-            for subdir_name in iterate_tqdm(os.listdir(dir_name), verbosity_level=2, desc="Load"):
+            for subdir_name in iterate_tqdm(
+                os.listdir(dir_name), verbosity_level=2, desc="Load"
+            ):
                 if subdir_name == ".DS_Store":
                     continue
                 subdir_global_list = os.listdir(os.path.join(dir_name, subdir_name))
-                subdir_local_list = list(nsplit(subdir_global_list, self.world_size))[self.rank]
+                subdir_local_list = list(nsplit(subdir_global_list, self.world_size))[
+                    self.rank
+                ]
 
                 if self.cases_filter is not None:
-                    assert isinstance(self.cases_filter, list), "cases_filter is not a list"
-                    assert len(self.cases_filter)==2, "cases_filter does not have two entries"
+                    assert isinstance(
+                        self.cases_filter, list
+                    ), "cases_filter is not a list"
+                    assert (
+                        len(self.cases_filter) == 2
+                    ), "cases_filter does not have two entries"
                     N1 = self.cases_filter[0]
                     N2 = self.cases_filter[1]
-                    assert N1<=N2, f"lower bound {N1} of cases_filter is not smaller than upper bound {N2}" 
-                    filtered_cases = [case for case in subdir_local_list if N1 <= int(case.split('-')[1]) <= N2]
+                    assert (
+                        N1 <= N2
+                    ), f"lower bound {N1} of cases_filter is not smaller than upper bound {N2}"
+                    filtered_cases = [
+                        case
+                        for case in subdir_local_list
+                        if N1 <= int(case.split("-")[1]) <= N2
+                    ]
                     subdir_local_list = filtered_cases
 
-                #print("MASSI - ", str(self.rank), " - total list: ", len(subdir_global_list))
-                #print("MASSI - ", str(self.rank), " - about to read: ", subdir_name)
-                #print("MASSI - ", str(self.rank), " - about to read: ", subdir_local_list)
+                # print("MASSI - ", str(self.rank), " - total list: ", len(subdir_global_list))
+                # print("MASSI - ", str(self.rank), " - about to read: ", subdir_name)
+                # print("MASSI - ", str(self.rank), " - about to read: ", subdir_local_list)
 
                 count = 0
 
@@ -364,16 +432,22 @@ class VASPDataset(AbstractBaseDataset):
 
                     count = count + 1
 
-                    files_list = os.listdir(os.path.join(dir_name, subdir_name, subsubdir_name))
-                    #print("MASSI - ", str(self.rank), " - about to read: ", os.path.join(dir_name, subdir_name, subsubdir_name))
+                    files_list = os.listdir(
+                        os.path.join(dir_name, subdir_name, subsubdir_name)
+                    )
+                    # print("MASSI - ", str(self.rank), " - about to read: ", os.path.join(dir_name, subdir_name, subsubdir_name))
 
                     for filename in files_list:
 
                         if filename == "OUTCAR" or filename == "OUTCAR-bis":
 
                             try:
-                                #print(self.rank, "read_outcar:", os.path.join(subdir_name, subsubdir_name, filename), file=sys.stderr)
-                                temp_dataset, _ = read_outcar(os.path.join(dir_name, subdir_name, subsubdir_name) + '/' + filename)
+                                # print(self.rank, "read_outcar:", os.path.join(subdir_name, subsubdir_name, filename), file=sys.stderr)
+                                temp_dataset, _ = read_outcar(
+                                    os.path.join(dir_name, subdir_name, subsubdir_name)
+                                    + "/"
+                                    + filename
+                                )
 
                                 for data_object in temp_dataset:
                                     if data_object is not None:
@@ -384,17 +458,22 @@ class VASPDataset(AbstractBaseDataset):
                             except ValueError as e:
                                 pass
                             except Exception as e:
-                                print(self.rank, "Exception:", os.path.join(subdir_name, subsubdir_name, filename), e, file=sys.stderr)
+                                print(
+                                    self.rank,
+                                    "Exception:",
+                                    os.path.join(subdir_name, subsubdir_name, filename),
+                                    e,
+                                    file=sys.stderr,
+                                )
                                 # traceback.print_exc()
                                 pass
-            
+
                 torch.distributed.barrier()
-                    #print("MASSI - ", str(self.rank), " - finished reading: ", count, " of ", len(subdir_local_list), " - ", os.path.join(dir_name, subdir_name, subsubdir_name))
+                # print("MASSI - ", str(self.rank), " - finished reading: ", count, " of ", len(subdir_local_list), " - ", os.path.join(dir_name, subdir_name, subsubdir_name))
 
-                #print("MASSI - before barrier ", str(self.rank), " - finished reading: ", subdir_name)
+                # print("MASSI - before barrier ", str(self.rank), " - finished reading: ", subdir_name)
 
-
-                #print("MASSI - after barrier ", str(self.rank), " - finished reading: ", subdir_name)
+                # print("MASSI - after barrier ", str(self.rank), " - finished reading: ", subdir_name)
 
         random.shuffle(self.dataset)
 
@@ -490,21 +569,15 @@ if __name__ == "__main__":
     if args.preonly:
         ## local data
         binaries_dataset = VASPDataset(
-            os.path.join(datadir, 'binaries'),
+            os.path.join(datadir, "binaries"),
             config,
             dist=True,
         )
         ternaries_train_validate_dataset = VASPDataset(
-            os.path.join(datadir, 'ternaries'),
-            config,
-            dist=True,
-            cases_filter=[1,2]
+            os.path.join(datadir, "ternaries"), config, dist=True, cases_filter=[1, 2]
         )
         ternaries_test_dataset = VASPDataset(
-            os.path.join(datadir, 'ternaries'),
-            config,
-            dist=True,
-            cases_filter=[3,100]
+            os.path.join(datadir, "ternaries"), config, dist=True, cases_filter=[3, 100]
         )
         ## This is a local split
         binaries_trainset, binaries_valset, binaries_testset = split_dataset(
@@ -572,9 +645,15 @@ if __name__ == "__main__":
         basedir = os.path.join(
             os.path.dirname(__file__), "dataset", "%s.pickle" % modelname
         )
-        trainset = SimplePickleDataset(basedir=basedir, label="trainset", var_config=var_config)
-        valset = SimplePickleDataset(basedir=basedir, label="valset", var_config=var_config)
-        testset = SimplePickleDataset(basedir=basedir, label="testset", var_config=var_config)
+        trainset = SimplePickleDataset(
+            basedir=basedir, label="trainset", var_config=var_config
+        )
+        valset = SimplePickleDataset(
+            basedir=basedir, label="valset", var_config=var_config
+        )
+        testset = SimplePickleDataset(
+            basedir=basedir, label="testset", var_config=var_config
+        )
         # minmax_node_feature = trainset.minmax_node_feature
         # minmax_graph_feature = trainset.minmax_graph_feature
         pna_deg = trainset.pna_deg
