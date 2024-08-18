@@ -44,7 +44,7 @@ def run(trial, dequed=None):
     f = open(f"output-{trial.id}.txt", "w")
     python_exe = sys.executable
     python_script = os.path.join(
-        os.path.dirname(__file__), "train_trial.py"
+        os.path.dirname(__file__), "train_all_structures_hpo_trial.py"
     )
 
     # TODO: Launch a subprocess with `srun` to train neural networks
