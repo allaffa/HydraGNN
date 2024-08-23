@@ -6,6 +6,7 @@ import adios2 as ad2
 from tqdm import tqdm
 from matplotlib.colors import ListedColormap
 import matplotlib.patches as patches
+from mpl_toolkits.axes_grid1 import make_axes_locatable
 plt.rcParams.update({'font.size': 22})
 
 data_list = list() 
@@ -13,28 +14,23 @@ for fn in ["ANI1x-v2", "MPTrj-v2", "qm7x-v2", "OC2022-v2", "OC2020-v2"]:
     dirname = "examples/multidataset/dataset"
     with ad2.open(os.path.join(dirname, fn+".bp"), "r") as f:
         f.__next__()
-        x = f.read("trainset/x")
-        vcount = f.read("trainset/x/variable_count")
-        voffset = f.read("trainset/x/variable_offset")
-    print("Adios reading done:", fn)
-
-    for i in tqdm(range(len(vcount))):
-        cnt = vcount[i]
-        off = voffset[i]
-        sample = x[off:off+cnt,]
-        data_list.append(sample)
+        x = f.read("trainset/x")[:,0].astype(dtype=np.int32)
+    data_list.append(x)
+    print("Adios reading done:", fn, "num. of atoms:", len(x))
 
 # Initialize a dictionary to store frequencies of each element
 element_frequencies = {}
 
 # Iterate over each data object and count atomic numbers
-for data in data_list:
-    atomic_numbers = data[:, 0].tolist()  # Extract atomic numbers
+for data in tqdm(data_list, desc="counting"):
+    values, counts = np.unique(data, return_counts=True)
+    atomic_numbers = dict(map(lambda i,j : (i,j), values, counts))
+
     for atomic_number in atomic_numbers:
         if atomic_number in element_frequencies:
-            element_frequencies[atomic_number] += 1
+            element_frequencies[atomic_number] += atomic_numbers[atomic_number]
         else:
-            element_frequencies[atomic_number] = 1
+            element_frequencies[atomic_number] = atomic_numbers[atomic_number]
 
 # Periodic Table Element Symbols
 element_symbols = [
@@ -78,7 +74,7 @@ max_col = max([pos[1] for pos in periodic_table_layout.values()]) + 1
 heatmap = np.zeros((max_row, max_col))
 
 # Fill in the heatmap grid with element frequencies
-for atomic_number, freq in element_frequencies.items():
+for atomic_number, freq in tqdm(element_frequencies.items(), desc="element"):
     if atomic_number in periodic_table_layout:
         row, col = periodic_table_layout[atomic_number]
         heatmap[row, col] = freq
@@ -89,8 +85,7 @@ cmap = ListedColormap(['white'] + plt.cm.YlGnBu(np.linspace(0, 1, 256)).tolist()
 
 # Plotting the heatmap
 plt.figure(figsize=(18, 10))
-plt.imshow(heatmap, cmap=cmap, interpolation='nearest')
-plt.colorbar(label='Frequency')
+im = plt.imshow(heatmap, cmap=cmap, interpolation='nearest')
 plt.xticks([])  # Remove x-axis ticks for a cleaner look
 plt.yticks([])  # Remove y-axis ticks for a cleaner look
 
@@ -101,7 +96,7 @@ for atomic_number, (row, col) in periodic_table_layout.items():
     ax.add_patch(rect)
                                                                                                         
 # Annotating elements in the heatmap
-for atomic_number, (row, col) in tqdm(periodic_table_layout.items()):
+for atomic_number, (row, col) in tqdm(periodic_table_layout.items(), desc="periodic_table"):
     freq = heatmap[row, col]
     element_symbol = element_symbols[atomic_number - 1]
     annotation = f"{atomic_number}\n{element_symbol}"
@@ -109,5 +104,10 @@ for atomic_number, (row, col) in tqdm(periodic_table_layout.items()):
              color='black' if freq < heatmap.max()//2 else 'white', fontsize=10)
 
 plt.title('Periodic Table Heatmap of Element Frequencies')
+
+divider = make_axes_locatable(ax)
+cax = divider.append_axes("right", size="5%", pad=0.1)
+plt.colorbar(im, label='Frequency', cax=cax)
+
 plt.show()
 plt.savefig('periodic_table_heatmap.png', dpi=300, bbox_inches='tight')
