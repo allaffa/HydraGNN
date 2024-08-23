@@ -1,16 +1,35 @@
+import os
 import torch
 import matplotlib.pyplot as plt
 import numpy as np
+import adios2 as ad2
+from tqdm import tqdm
+from matplotlib.colors import ListedColormap
+import matplotlib.patches as patches
+plt.rcParams.update({'font.size': 22})
 
-# Assuming `data_list` is a list of PyTorch geometric data objects
-data_list = [...]  # replace with your actual data objects
+data_list = list() 
+for fn in ["ANI1x-v2", "MPTrj-v2", "qm7x-v2", "OC2022-v2", "OC2020-v2"]:
+    dirname = "examples/multidataset/dataset"
+    with ad2.open(os.path.join(dirname, fn+".bp"), "r") as f:
+        f.__next__()
+        x = f.read("trainset/x")
+        vcount = f.read("trainset/x/variable_count")
+        voffset = f.read("trainset/x/variable_offset")
+    print("Adios reading done:", fn)
+
+    for i in tqdm(range(len(vcount))):
+        cnt = vcount[i]
+        off = voffset[i]
+        sample = x[off:off+cnt,]
+        data_list.append(sample)
 
 # Initialize a dictionary to store frequencies of each element
 element_frequencies = {}
 
 # Iterate over each data object and count atomic numbers
 for data in data_list:
-    atomic_numbers = data.x[:, 0].tolist()  # Extract atomic numbers
+    atomic_numbers = data[:, 0].tolist()  # Extract atomic numbers
     for atomic_number in atomic_numbers:
         if atomic_number in element_frequencies:
             element_frequencies[atomic_number] += 1
@@ -64,21 +83,31 @@ for atomic_number, freq in element_frequencies.items():
         row, col = periodic_table_layout[atomic_number]
         heatmap[row, col] = freq
 
+# Create a custom colormap that includes white for the background 
+cmap = ListedColormap(['white'] + plt.cm.YlGnBu(np.linspace(0, 1, 256)).tolist())
+
+
 # Plotting the heatmap
 plt.figure(figsize=(18, 10))
-plt.imshow(heatmap, cmap='hot', interpolation='nearest')
+plt.imshow(heatmap, cmap=cmap, interpolation='nearest')
 plt.colorbar(label='Frequency')
 plt.xticks([])  # Remove x-axis ticks for a cleaner look
 plt.yticks([])  # Remove y-axis ticks for a cleaner look
 
+# Adding borders around each element 
+ax = plt.gca() 
+for atomic_number, (row, col) in periodic_table_layout.items(): 
+    rect = patches.Rectangle((col - 0.5, row - 0.5), 1, 1, linewidth=1, edgecolor='black', facecolor='none')
+    ax.add_patch(rect)
+                                                                                                        
 # Annotating elements in the heatmap
-for atomic_number, (row, col) in periodic_table_layout.items():
+for atomic_number, (row, col) in tqdm(periodic_table_layout.items()):
     freq = heatmap[row, col]
     element_symbol = element_symbols[atomic_number - 1]
     annotation = f"{atomic_number}\n{element_symbol}"
     plt.text(col, row, annotation, ha='center', va='center', 
-             color='white' if freq > 0 else 'black', fontsize=10)
+             color='black' if freq < heatmap.max()//2 else 'white', fontsize=10)
 
 plt.title('Periodic Table Heatmap of Element Frequencies')
 plt.show()
-
+plt.savefig('periodic_table_heatmap.png', dpi=300, bbox_inches='tight')
