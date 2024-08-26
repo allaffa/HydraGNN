@@ -13,9 +13,9 @@ from ase.optimize.bfgslinesearch import BFGSLineSearch
 from ase.io import read, write
 import hydragnn
 from hydragnn.utils.time_utils import Timer
-from hydragnn.utils.model import load_existing_model
-from hydragnn.models.create import create_model_config
 from copy import deepcopy
+
+from ensemble_utils import model_ensemble
 
 transform_coordinates = LocalCartesian(norm=False, cat=False)
 
@@ -88,85 +88,46 @@ class PyTorchCalculator(Calculator):
 
         data_object = transform_coordinates(data_object)
 
-        energy, forces = self.model(data_object)
+        pred_mean, pred_std = self.model(data_object, meanstd=True)
 
-        self.results["energy"] = energy.item()
-        self.results["forces"] = forces.detach().numpy()
-
-class PyTorchCalculatorSelfConsistent(Calculator):
-    implemented_properties = ["energy", "forces"]
-
-    def __init__(self, hydragnn_model):
-        Calculator.__init__(self)
-        self.model = hydragnn_model
-
-    def calculate(self, atoms=None, properties=["energy"], system_changes=all_changes):
-        Calculator.calculate(self, atoms, properties, system_changes)
-
-        positions = atoms.get_positions()
-        positions_tensor = torch.tensor(
-            positions, requires_grad=False, dtype=torch.float
-        )
-
-        # Extract atomic numbers
-        atomic_numbers = atoms.get_atomic_numbers()
-        atomic_numbers_torch = torch.tensor(atomic_numbers, dtype=torch.long).unsqueeze(
-            1
-        )
-
-        x = torch.cat((atomic_numbers_torch, positions_tensor), dim=1)
-
-        # Create the torch_geometric data object
-        data_object = Data(
-            pos=positions_tensor,
-            x=x,
-            supercell_size=torch.tensor(atoms.cell.array).float(),
-        )
-
-        add_edges_pbc = get_radius_graph_pbc(
-            radius=config["NeuralNetwork"]["Architecture"]["radius"], max_neighbours=20
-        )
-        data_object = add_edges_pbc(data_object)
-
-        data_object = transform_coordinates(data_object)
-
-        data_object.pos.requires_grad = True
-
-        energy, _ = self.model(data_object)
-        grads_energy = torch.autograd.grad(
-            outputs=energy,
-            inputs=data_object.pos,
-            grad_outputs=torch.ones_like(energy),
-            retain_graph=False,
-        )[0]
-
-        grad_energy_post_scaling_factor = positions_tensor.shape[0] * torch.ones(
-            positions_tensor.shape[0], 1
-        )
-
-        grads_energy_rescaled = grad_energy_post_scaling_factor * grads_energy
-
-        self.results["energy"] = energy.item()
-        self.results["forces"] = -grads_energy_rescaled.detach().numpy()
-
+        self.results["energy"] = pred_mean[0].item()
+        self.results["forces"] = pred_mean[1].detach().numpy()
 
 if __name__ == "__main__":
 
     modelname = "MO2"
 
     parser = argparse.ArgumentParser()
-    parser.add_argument(
-        "--inputfile", help="input file", type=str, default="./logs/MO2/config.json"
-    )
+    parser.add_argument("--models_dir_folder", help="folder of trained models", type=str, default=None)
+    parser.add_argument("--log", help="log name", default=None)
     group = parser.add_mutually_exclusive_group()
+    group.add_argument(
+        "--pickle",
+        help="Pickle gan_dataset",
+        action="store_const",
+        dest="format",
+        const="pickle",
+    )
 
     args = parser.parse_args()
 
-    dirpwd = os.path.dirname(os.path.abspath(__file__))
-    input_filename = os.path.join(dirpwd, args.inputfile)
-    with open(input_filename, "r") as f:
-        config = json.load(f)
-    hydragnn.utils.setup_log(get_log_name_config(config))
+    modeldirlist = [os.path.join(args.models_dir_folder, name) for name in os.listdir(args.models_dir_folder) if
+                    os.path.isdir(os.path.join(args.models_dir_folder, name))]
+
+    var_config = None
+    for modeldir in modeldirlist:
+        input_filename = os.path.join(modeldir, "config.json")
+        with open(input_filename, "r") as f:
+            config = json.load(f)
+        if var_config is not None:
+            assert var_config == config["NeuralNetwork"][
+                "Variables_of_interest"], "Inconsistent variable config in %s" % input_filename
+        else:
+            var_config = config["NeuralNetwork"]["Variables_of_interest"]
+    verbosity = config["Verbosity"]["level"]
+    log_name = "GFM_EnsembleInference" if args.log is None else args.log
+    hydragnn.utils.setup_log(log_name)
+    writer = hydragnn.utils.get_summary_writer(log_name)
     ##################################################################################################################
     # Always initialize for multi-rank training.
     comm_size, rank = hydragnn.utils.setup_ddp()
@@ -178,18 +139,12 @@ if __name__ == "__main__":
     timer = Timer("load_data")
     timer.start()
 
-    hydragnn_model = create_model_config(
-        config=config["NeuralNetwork"],
-        verbosity=config["Verbosity"]["level"],
-    )
-
-    hydragnn_model = torch.nn.parallel.DistributedDataParallel(hydragnn_model)
-    load_existing_model(hydragnn_model, modelname, path="./logs/")
-    hydragnn_model.eval()
+    hydragnn_model_ens = model_ensemble(modeldirlist)
+    hydragnn_model = hydragnn.utils.get_distributed_model(hydragnn_model_ens, verbosity)
+    hydragnn_model_ens.eval()
 
     # Create an instance of your custom ASE calculator
-    # calculator = PyTorchCalculatorSelfConsistent(hydragnn_model)
-    calculator = PyTorchCalculator(hydragnn_model)
+    calculator = PyTorchCalculator(hydragnn_model_ens)
 
     # Read the POSCAR file
     poscar_filename = "structures/mos2-B_Defect-Free_PBE"
@@ -210,8 +165,8 @@ if __name__ == "__main__":
     if add_random_displacement:
         print("ADDING RANDOM PERTURBATIONS TO INITIAL STRUCTURE")
         random_displacement = numpy.random.uniform(-0.1, 0.1, atoms.get_positions().shape)
-        atoms.set_positions(atoms.get_positions() + random_displacement)
-        write(poscar_filename + "_randomly_perturbed_structure" + ".vasp", atoms)
+        atoms.set_positions(atoms.get_positions()+random_displacement)
+        write(poscar_filename + "_randomly_perturbed_structure"+".vasp", atoms)
 
     # Perform structure optimization with a custom stopping and reverting criterion
     optimizer = FIRE(atoms, maxstep=maxstep)
@@ -222,7 +177,7 @@ if __name__ == "__main__":
         # Calculate energy and forces
         energy = atoms.get_potential_energy()
         forces = atoms.get_forces()
-        max_force = (forces ** 2).sum(axis=1).max() ** 0.5
+        max_force = (forces**2).sum(axis=1).max()**0.5
 
         # Print energy and maximum force
         print(f"Step {step + 1}: Energy = {energy:.6f} eV, Max Force = {max_force:.6f} eV/Å")
@@ -230,8 +185,7 @@ if __name__ == "__main__":
         if prev_max_force is not None:
             relative_increase = (max_force - prev_max_force) / prev_max_force
             if relative_increase > relative_increase_threshold:
-                print(
-                    f"Reverting to previous step at step {step + 1} due to a relative force increase of {relative_increase:.2%}.")
+                print(f"Reverting to previous step at step {step + 1} due to a relative force increase of {relative_increase:.2%}.")
                 atoms.set_positions(prev_positions)  # Revert to previous positions
                 break
 
