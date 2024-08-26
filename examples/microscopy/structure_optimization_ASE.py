@@ -19,6 +19,7 @@ from copy import deepcopy
 
 transform_coordinates = LocalCartesian(norm=False, cat=False)
 
+
 def get_log_name_config(config):
     return (
         config["NeuralNetwork"]["Architecture"]["model_type"]
@@ -48,8 +49,10 @@ def get_log_name_config(config):
         )
     )
 
+
 def info(*args, logtype="info", sep=" "):
     getattr(logging, logtype)(sep.join(map(str, args)))
+
 
 class PyTorchCalculator(Calculator):
     implemented_properties = ["energy", "forces"]
@@ -92,6 +95,7 @@ class PyTorchCalculator(Calculator):
 
         self.results["energy"] = energy.item()
         self.results["forces"] = forces.detach().numpy()
+
 
 class PyTorchCalculatorSelfConsistent(Calculator):
     implemented_properties = ["energy", "forces"]
@@ -194,7 +198,7 @@ if __name__ == "__main__":
     # Read the POSCAR file
     poscar_filename = "structures/mos2-B_Defect-Free_PBE"
 
-    atoms = read(poscar_filename+".vasp", format="vasp")
+    atoms = read(poscar_filename + ".vasp", format="vasp")
 
     # Attach the calculator to the ASE atoms object
     atoms.set_calculator(calculator)
@@ -209,7 +213,9 @@ if __name__ == "__main__":
 
     if add_random_displacement:
         print("ADDING RANDOM PERTURBATIONS TO INITIAL STRUCTURE")
-        random_displacement = numpy.random.uniform(-0.1, 0.1, atoms.get_positions().shape)
+        random_displacement = numpy.random.uniform(
+            -0.1, 0.1, atoms.get_positions().shape
+        )
         atoms.set_positions(atoms.get_positions() + random_displacement)
         write(poscar_filename + "_randomly_perturbed_structure" + ".vasp", atoms)
 
@@ -225,13 +231,16 @@ if __name__ == "__main__":
         max_force = (forces ** 2).sum(axis=1).max() ** 0.5
 
         # Print energy and maximum force
-        print(f"Step {step + 1}: Energy = {energy:.6f} eV, Max Force = {max_force:.6f} eV/Å")
+        print(
+            f"Step {step + 1}: Energy = {energy:.6f} eV, Max Force = {max_force:.6f} eV/Å"
+        )
 
         if prev_max_force is not None:
             relative_increase = (max_force - prev_max_force) / prev_max_force
             if relative_increase > relative_increase_threshold:
                 print(
-                    f"Reverting to previous step at step {step + 1} due to a relative force increase of {relative_increase:.2%}.")
+                    f"Reverting to previous step at step {step + 1} due to a relative force increase of {relative_increase:.2%}."
+                )
                 atoms.set_positions(prev_positions)  # Revert to previous positions
                 break
 
@@ -241,7 +250,10 @@ if __name__ == "__main__":
 
     # Write the optimized geometry to a file
     if add_random_displacement:
-        optimized_filename = poscar_filename + "_optimized_structure_from_initial_randomly_perturbed_structure.vasp"
+        optimized_filename = (
+            poscar_filename
+            + "_optimized_structure_from_initial_randomly_perturbed_structure.vasp"
+        )
     else:
         optimized_filename = poscar_filename + "_optimized_structure.vasp"
     write(optimized_filename, atoms)
