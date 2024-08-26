@@ -19,6 +19,7 @@ from ensemble_utils import model_ensemble
 
 transform_coordinates = LocalCartesian(norm=False, cat=False)
 
+
 def get_log_name_config(config):
     return (
         config["NeuralNetwork"]["Architecture"]["model_type"]
@@ -48,8 +49,10 @@ def get_log_name_config(config):
         )
     )
 
+
 def info(*args, logtype="info", sep=" "):
     getattr(logging, logtype)(sep.join(map(str, args)))
+
 
 class PyTorchCalculator(Calculator):
     implemented_properties = ["energy", "forces"]
@@ -93,12 +96,15 @@ class PyTorchCalculator(Calculator):
         self.results["energy"] = pred_mean[0].item()
         self.results["forces"] = pred_mean[1].detach().numpy()
 
+
 if __name__ == "__main__":
 
     modelname = "MO2"
 
     parser = argparse.ArgumentParser()
-    parser.add_argument("--models_dir_folder", help="folder of trained models", type=str, default=None)
+    parser.add_argument(
+        "--models_dir_folder", help="folder of trained models", type=str, default=None
+    )
     parser.add_argument("--log", help="log name", default=None)
     group = parser.add_mutually_exclusive_group()
     group.add_argument(
@@ -111,8 +117,11 @@ if __name__ == "__main__":
 
     args = parser.parse_args()
 
-    modeldirlist = [os.path.join(args.models_dir_folder, name) for name in os.listdir(args.models_dir_folder) if
-                    os.path.isdir(os.path.join(args.models_dir_folder, name))]
+    modeldirlist = [
+        os.path.join(args.models_dir_folder, name)
+        for name in os.listdir(args.models_dir_folder)
+        if os.path.isdir(os.path.join(args.models_dir_folder, name))
+    ]
 
     var_config = None
     for modeldir in modeldirlist:
@@ -120,8 +129,9 @@ if __name__ == "__main__":
         with open(input_filename, "r") as f:
             config = json.load(f)
         if var_config is not None:
-            assert var_config == config["NeuralNetwork"][
-                "Variables_of_interest"], "Inconsistent variable config in %s" % input_filename
+            assert var_config == config["NeuralNetwork"]["Variables_of_interest"], (
+                "Inconsistent variable config in %s" % input_filename
+            )
         else:
             var_config = config["NeuralNetwork"]["Variables_of_interest"]
     verbosity = config["Verbosity"]["level"]
@@ -149,7 +159,7 @@ if __name__ == "__main__":
     # Read the POSCAR file
     poscar_filename = "structures/mos2-B_Defect-Free_PBE"
 
-    atoms = read(poscar_filename+".vasp", format="vasp")
+    atoms = read(poscar_filename + ".vasp", format="vasp")
 
     # Attach the calculator to the ASE atoms object
     atoms.set_calculator(calculator)
@@ -164,9 +174,11 @@ if __name__ == "__main__":
 
     if add_random_displacement:
         print("ADDING RANDOM PERTURBATIONS TO INITIAL STRUCTURE")
-        random_displacement = numpy.random.uniform(-0.1, 0.1, atoms.get_positions().shape)
-        atoms.set_positions(atoms.get_positions()+random_displacement)
-        write(poscar_filename + "_randomly_perturbed_structure"+".vasp", atoms)
+        random_displacement = numpy.random.uniform(
+            -0.1, 0.1, atoms.get_positions().shape
+        )
+        atoms.set_positions(atoms.get_positions() + random_displacement)
+        write(poscar_filename + "_randomly_perturbed_structure" + ".vasp", atoms)
 
     # Perform structure optimization with a custom stopping and reverting criterion
     optimizer = FIRE(atoms, maxstep=maxstep)
@@ -177,15 +189,19 @@ if __name__ == "__main__":
         # Calculate energy and forces
         energy = atoms.get_potential_energy()
         forces = atoms.get_forces()
-        max_force = (forces**2).sum(axis=1).max()**0.5
+        max_force = (forces ** 2).sum(axis=1).max() ** 0.5
 
         # Print energy and maximum force
-        print(f"Step {step + 1}: Energy = {energy:.6f} eV, Max Force = {max_force:.6f} eV/Å")
+        print(
+            f"Step {step + 1}: Energy = {energy:.6f} eV, Max Force = {max_force:.6f} eV/Å"
+        )
 
         if prev_max_force is not None:
             relative_increase = (max_force - prev_max_force) / prev_max_force
             if relative_increase > relative_increase_threshold:
-                print(f"Reverting to previous step at step {step + 1} due to a relative force increase of {relative_increase:.2%}.")
+                print(
+                    f"Reverting to previous step at step {step + 1} due to a relative force increase of {relative_increase:.2%}."
+                )
                 atoms.set_positions(prev_positions)  # Revert to previous positions
                 break
 
@@ -195,7 +211,10 @@ if __name__ == "__main__":
 
     # Write the optimized geometry to a file
     if add_random_displacement:
-        optimized_filename = poscar_filename + "_optimized_structure_from_initial_randomly_perturbed_structure.vasp"
+        optimized_filename = (
+            poscar_filename
+            + "_optimized_structure_from_initial_randomly_perturbed_structure.vasp"
+        )
     else:
         optimized_filename = poscar_filename + "_optimized_structure.vasp"
     write(optimized_filename, atoms)
