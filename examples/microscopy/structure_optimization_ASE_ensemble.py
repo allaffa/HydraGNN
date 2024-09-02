@@ -157,7 +157,7 @@ if __name__ == "__main__":
     calculator = PyTorchCalculator(hydragnn_model_ens)
 
     # Read the POSCAR file
-    poscar_filename = "structures/mos2-B_Defect-Free_PBE"
+    poscar_filename = "structures/mos2-B_Vacancy-Anion-03_PBE"
 
     atoms = read(poscar_filename + ".vasp", format="vasp")
 
@@ -166,11 +166,17 @@ if __name__ == "__main__":
 
     maxstep = 1e-2
     maxiter = 200
-    relative_increase_threshold = 0.05
+    relative_increase_threshold = 0.2
+    minimum_value_max_force = None  # To store the maximum force from the previous step
+    minimum_value_mean_force = None  # To store the maximum force from the previous step
     prev_max_force = None  # To store the maximum force from the previous step
+    prev_mean_force = None  # To store the maximum force from the previous step
     prev_positions = None  # To store the positions from the previous step
 
-    add_random_displacement = True
+    check_1 = False
+    check_2 = False
+
+    add_random_displacement = False
 
     if add_random_displacement:
         print("ADDING RANDOM PERTURBATIONS TO INITIAL STRUCTURE")
@@ -190,14 +196,33 @@ if __name__ == "__main__":
         energy = atoms.get_potential_energy()
         forces = atoms.get_forces()
         max_force = (forces ** 2).sum(axis=1).max() ** 0.5
+        mean_force = (forces ** 2).sum(axis=1).mean() ** 0.5
 
         # Print energy and maximum force
         print(
-            f"Step {step + 1}: Energy = {energy:.6f} eV, Max Force = {max_force:.6f} eV/Å"
+            f"Step {step + 1}: Energy = {energy:.6f} eV, Max Force = {max_force:.6f} eV/Å, Mean Force = {mean_force:.6f} eV/Å"
         )
 
-        if prev_max_force is not None:
-            relative_increase = (max_force - prev_max_force) / prev_max_force
+        check_1 = (minimum_value_mean_force is None) and (minimum_value_max_force is None)
+        if not check_1:
+            check_2 = (mean_force < minimum_value_mean_force) and (max_force < minimum_value_max_force)
+
+        # Write the optimized geometry to a file
+        if check_1 or check_2:
+            minimum_value_mean_force = mean_force
+            minimum_value_max_force = max_force
+            print("Overwriting updated optimized geometry")
+            if add_random_displacement:
+                optimized_filename = (
+                        poscar_filename
+                        + "_optimized_structure_from_initial_randomly_perturbed_structure.vasp"
+                )
+            else:
+                optimized_filename = poscar_filename + "_optimized_structure.vasp"
+            write(optimized_filename, atoms)
+
+        if (prev_max_force is not None) and (prev_mean_force is not None):
+            relative_increase = (mean_force - prev_mean_force) / prev_mean_force
             if relative_increase > relative_increase_threshold:
                 print(
                     f"Reverting to previous step at step {step + 1} due to a relative force increase of {relative_increase:.2%}."
@@ -207,14 +232,5 @@ if __name__ == "__main__":
 
         # Save current positions and force for the next iteration
         prev_max_force = max_force
+        prev_mean_force = mean_force
         prev_positions = deepcopy(atoms.get_positions())
-
-    # Write the optimized geometry to a file
-    if add_random_displacement:
-        optimized_filename = (
-            poscar_filename
-            + "_optimized_structure_from_initial_randomly_perturbed_structure.vasp"
-        )
-    else:
-        optimized_filename = poscar_filename + "_optimized_structure.vasp"
-    write(optimized_filename, atoms)
