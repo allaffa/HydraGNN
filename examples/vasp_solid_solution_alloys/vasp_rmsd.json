@@ -13,17 +13,27 @@
             "column_index": [0,1]
         },
         "graph_features":{
-            "name": [ "rmsd"],
-            "dim": [1],
-            "column_index": [1]
+            "name": ["energy", "rmsd", "deformation_lattice_vectors"],
+            "dim": [1,1,9],
+            "column_index": [0,1,2,3,4,5,6,7,8,9,10]
         }
     },
     "NeuralNetwork": {
         "Architecture": {
             "model_type": "PNA",
-	    "equivariance": false,
+	    "equivariance": true, 
             "radius": 5.0,
-            "max_neighbours": 100000,
+            "max_neighbours": 20,
+            "num_gaussians": 50,
+            "envelope_exponent": 5,
+            "int_emb_size": 64,
+            "basis_emb_size": 8,
+            "out_emb_size": 128,
+            "num_after_skip": 2,
+            "num_before_skip": 1,
+            "num_radial": 6,
+            "num_spherical": 7,
+            "num_filters": 126,
 	    "edge_features": ["bond_length", "local_x", "local_y", "local_z"],
 	    "periodic_boundary_conditions": true,
             "hidden_dim": 500,
@@ -41,7 +51,7 @@
         "Variables_of_interest": {
             "input_node_features": [0],
             "output_names": ["rmsd"],
-            "output_index": [0],
+            "output_index": [1],
             "output_dim": [1],
             "type": ["graph"]
         },
