@@ -13,9 +13,9 @@
             "column_index": [0,1]
         },
         "graph_features":{
-            "name": [ "deformation_lattice_vectors"],
-            "dim": [9],
-            "column_index": [2,3,4,5,6,7,8,9,10]
+            "name": ["energy", "rmsd", "deformation_lattice_vectors"],
+            "dim": [1,1,9],
+            "column_index": [0,1,2,3,4,5,6,7,8,9,10]
         }
     },
     "NeuralNetwork": {
@@ -51,7 +51,7 @@
         "Variables_of_interest": {
             "input_node_features": [0],
             "output_names": ["deformation_lattice_vectors"],
-            "output_index": [0],
+            "output_index": [2],
             "output_dim": [9],
             "type": ["graph"]
         },
