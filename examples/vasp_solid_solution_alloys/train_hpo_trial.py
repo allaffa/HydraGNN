@@ -101,8 +101,8 @@ def main():
     args = parser.parse_args()
     args.parameters = vars(args)
 
-    graph_feature_names = ["energy"]
-    graph_feature_dims = [1]
+    graph_feature_names = ["energy", "rmsd", "deformation_lattice_vectors"]
+    graph_feature_dims = [1, 1, 9]
     node_feature_names = ["atomic_number", "cartesian_coordinates", "forces"]
     node_feature_dims = [1, 3, 3]
     dirpwd = os.path.dirname(os.path.abspath(__file__))
