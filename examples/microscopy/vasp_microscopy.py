@@ -621,6 +621,9 @@ if __name__ == "__main__":
     )
     model = hydragnn.utils.get_distributed_model(model, verbosity)
 
+    # Print details of neural network architecture
+    print_model(model)
+
     learning_rate = config["NeuralNetwork"]["Training"]["Optimizer"]["learning_rate"]
     optimizer = torch.optim.AdamW(model.parameters(), lr=learning_rate)
     scheduler = torch.optim.lr_scheduler.ReduceLROnPlateau(
