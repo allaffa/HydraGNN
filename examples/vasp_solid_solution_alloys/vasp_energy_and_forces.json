@@ -41,20 +41,26 @@
             "hidden_dim": 500,
             "num_conv_layers": 3,
             "output_heads": {
+                "graph":{
+                    "num_sharedlayers": 2,
+                    "dim_sharedlayers": 500,
+                    "num_headlayers": 2,
+                    "dim_headlayers": [500,500]
+                },
                 "node":{
                     "num_headlayers": 2,
                     "dim_headlayers": [500,500],
 		    "type": "mlp"
                 }
             },
-            "task_weights": [1.0]
+            "task_weights": [1.0, 100]
         },
         "Variables_of_interest": {
             "input_node_features": [0],
-            "output_names": ["atomic_forces"],
-            "output_index": [2],
-            "output_dim": [3],
-            "type": ["node"]
+            "output_names": ["formation_enthalpy", "atomic_forces"],
+            "output_index": [0, 2],
+            "output_dim": [1, 3],
+            "type": ["graph", "node"]
         },
         "Training": {
             "num_epoch": 40,
