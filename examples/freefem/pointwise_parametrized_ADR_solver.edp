@@ -1,0 +1,84 @@
+// Define the mesh and grid for sampling the parameter values
+real Dx = 0.01, Dy = 0.01;
+mesh Th = square(floor(1./Dx), floor(1./Dy));   // Square mesh [0,1] x [0,1]
+
+// Finite element space
+fespace Vh(Th, P1);
+
+// Sampled values at the grid points for each parameter
+real[int] alpha0Grid(Th.nv), alphaxGrid(Th.nv), alphayGrid(Th.nv), alphaxyGrid(Th.nv);
+real[int] beta0Grid(Th.nv), betaxGrid(Th.nv), betayGrid(Th.nv), betaxyGrid(Th.nv);
+real[int] gamma0Grid(Th.nv), gammaxGrid(Th.nv), gammayGrid(Th.nv), gammaxyGrid(Th.nv);
+real[int] f0Grid(Th.nv), fxGrid(Th.nv), fyGrid(Th.nv), fxyGrid(Th.nv);
+
+int Nproblems = 10;
+
+// Iterate over different problems
+for (int problemIndex = 0; problemIndex < Nproblems; ++problemIndex) {
+	// Fill the grid with random values between 0 and 1 using randreal1()
+	for (int i = 0; i < Th.nv; ++i) {
+	    alpha0Grid[i] = randreal1() * 0.1;  // Diffusion coefficient
+	    alphaxGrid[i] = randreal1() * 0.1 ; // Diffusion coefficient x-component
+	    alphayGrid[i] = randreal1() * 0.1; // Diffusion coefficient y-component
+	    alphaxyGrid[i] = randreal1() * 0.1; // Diffusion coefficient xy-component
+	    beta0Grid[i] = (randreal1()-0.5)*10;  // Constant component of advection velocity
+	    betaxGrid[i] = (randreal1()-0.5)*10;  // x-component of advection velocity
+	    betayGrid[i] = (randreal1()-0.5)*10;  // y-component of advection velocity
+	    betaxyGrid[i] = (randreal1()-0.5)*10;  // xy-component of advection velocity
+	    gamma0Grid[i] = randreal1();  // Reaction coefficient
+	    gammaxGrid[i] = randreal1(); // Reaction coefficient x-component
+	    gammayGrid[i] = randreal1(); // Reaction coefficient y-component
+	    gammaxyGrid[i] = randreal1(); // Reaction coefficient xy-component
+	    f0Grid[i] = randreal1();      // Source term
+	    fxGrid[i] = randreal1();     // Source term x-component
+	    fyGrid[i] = randreal1();     // Source term y-component
+	    fxyGrid[i] = randreal1();     // Source term xy-component
+	}
+
+	// Project the grid values into the finite element space by assigning them
+	Vh alpha0, alphax, alphay, alphaxy, beta0value, betaxvalue, betayvalue, betaxyvalue, gamma0, gammax, gammay, gammaxy, f0, fx, fy, fxy;
+
+	alpha0[] = alpha0Grid;
+	alphax[] = alphaxGrid;
+	alphay[] = alphayGrid;
+	alphaxy[] = alphaxyGrid;
+	beta0value[] = beta0Grid;
+	betaxvalue[] = betaxGrid;
+	betayvalue[] = betayGrid;
+	betaxyvalue[] = betaxyGrid;
+	gamma0[] = gamma0Grid;
+	gammax[] = gammaxGrid;
+	gammay[] = gammayGrid;
+	gammaxy[] = gammaxyGrid;
+	f0[] = f0Grid;
+	fx[] = fxGrid;
+	fy[] = fyGrid;
+	fxy[] = fxyGrid;
+
+	func g = 0.;      // Dirichlet boundary condition (uh = g on boundary)
+
+	// Define uh and vh for the solution
+	Vh uh, vh;  // uh is the solution, vh is the test function
+
+	// Macro for gradient operator
+	macro Grad(u)[dx(u), dy(u)]//
+
+	// Weak formulation of the advection-diffusion-reaction equation:
+	solve AdvectionDiffusionReaction(uh, vh) = 
+	    int2d(Th)(
+		(alpha0 + alphax + alphay + alphaxy) * (Grad(uh)' * Grad(vh))                    // Diffusion term
+		+ beta0value * (dx(uh) + dy(uh)) * vh             // Advection term
+		+ (betaxvalue * dx(uh) + betayvalue * dy(uh)) * vh  // Advection term
+		+ betaxyvalue * (dx(uh) + dy(uh)) * vh  // Advection term
+		+ (gamma0 + gammax + gammay + gammaxy) * uh * vh                                 // Reaction term
+	    ) 
+	    - int2d(Th)((f0+fx+fy+fxy) * vh)                          // Source term
+	    + on(1, 2, 3, 4, uh = g);                    // Dirichlet boundary conditions
+
+	// Plot the solution
+	plot(uh, dim=2, fill=true, value=true, boundary=false, cmm="Advection-Diffusion-Reaction Solution");
+
+	// Output L2 norm of the solution
+	real L2Norm = sqrt(int2d(Th)(uh * uh));
+	cout << "L2 Norm of the solution: " << L2Norm << endl;
+}

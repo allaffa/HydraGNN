@@ -1,0 +1,149 @@
+int Nproblems = 100;
+
+// Parameters for diffusion, advection, reaction, and source terms
+
+for (int problemIndex = 0; problemIndex < Nproblems; ++problemIndex) {
+
+	// Diffusion parameters
+	real alpha0  = 0.01 * randreal1(); // Constant diffusion coefficient
+	real alphax  = 0.05 * randreal1(); // Diffusion coefficient that depends on x
+	real alphay  = 0.05 * randreal1(); // Diffusion coefficient that depends on y
+	real alphaxy = 0.05 * randreal1(); // Diffusion coefficient that depends on x and y
+
+	// Advection parameters
+	real beta0value  = 1.0 * (randreal1()-0.5);
+	real betaxvalue  = 0.2 * (randreal1()-0.5);
+	real betayvalue  = 0.2 * (randreal1()-0.5);
+	real betaxyvalue = 0.2 * (randreal1()-0.5);
+
+	// Reaction parameters
+	real gamma0  = 1.0 * (randreal1()-0.5); // Constant reaction coefficient
+	real gammax  = 0.2 * (randreal1()-0.5); // Reaction coefficient that depends on x
+	real gammay  = 0.2 * (randreal1()-0.5); // Reaction coefficient that depends on y
+	real gammaxy = 0.2 * (randreal1()-0.5); // Reaction coefficient that depends on x and y
+
+	// Right-hand-side parameters
+	real f0  = 1.0 * (randreal1()-0.5); // Constant forcing term
+	real fx  = 0.2 * (randreal1()-0.5); // Forcing term that depends on x
+	real fy  = 0.2 * (randreal1()-0.5); // Forcing term that depends on y
+	real fxy = 0.2 * (randreal1()-0.5); // Forcing term that depends on x and y
+
+	// Definition of the parameter functions
+	func alpha        = alpha0 + alphax * x + alphay * y + alphaxy * x * y;                      
+	func beta0        = beta0value + 0 * x + 0 * y;                 // Constant component of advection velocity (depends on x)
+	func betax        = betaxvalue * x;             // x-component of advection velocity (depends on x)
+	func betay        = betayvalue * y;             // y-component of advection velocity (depends on y)
+	func betaxy       = betaxyvalue * x * y;        // Component of advection velocity that couples x and y
+	func gamma        = gamma0 + gammax * x + gammay * y + gammaxy * x * y;
+	func f            = f0 + fx * x + fy * y + fxy * x * y;
+	func g = 0.;      // Dirichlet boundary condition (uh = g on boundary)
+
+	// Mesh definition
+	real Dx = 0.01, Dy = 0.01;
+	mesh Th = square(floor(1./Dx), floor(1./Dy));   // Square mesh [0,1] x [0,1]
+
+	// Finite element space
+	fespace Vh(Th, P1);
+	Vh uh, vh;  // uh is the solution, vh is the test function
+
+	// Macro for gradient operator
+	macro Grad(u)[dx(u), dy(u)]//
+
+	// Weak formulation of the advection-diffusion-reaction equation:
+	solve AdvectionDiffusionReaction(uh, vh) = 
+	    int2d(Th)(
+		alpha * (Grad(uh)' * Grad(vh))                    // Diffusion term
+		+ beta0 * (dx(uh) + dy(uh)) * vh                  // Advection term
+		+ (betax * dx(uh) + betay * dy(uh)) * vh          // Advection term
+		+ (betaxy * dx(uh) + betaxy * dy(uh)) * vh        // Advection term
+		+ gamma * uh * vh                                 // Reaction term
+	    ) 
+	    - int2d(Th)(f * vh)                          // Source term
+	    + on(1, 2, 3, 4, uh = g);                    // Dirichlet boundary conditions
+
+	// Sampled values at the grid points for each parameter
+	real[int] alphaGrid(Th.nv);
+	real[int] beta0Grid(Th.nv), betaXGrid(Th.nv), betaYGrid(Th.nv), betaXYGrid(Th.nv);
+	real[int] gammaGrid(Th.nv);
+	real[int] fGrid(Th.nv);
+        real[int] uGrid(Th.nv);
+        uGrid = uh[];
+
+	// Fill the grid with random values between 0 and 1 using randreal1()
+	for (int i = 0; i < Th.nv; ++i) {
+	    alphaGrid[i] = alpha(Th(i).x, Th(i).y);  // Diffusion coefficient
+	    beta0Grid[i] = beta0(Th(i).x, Th(i).y);  // Constant component of advection velocity
+	    betaXGrid[i] = betax(Th(i).x, Th(i).y);  // x-component of advection velocity
+	    betaYGrid[i] = betay(Th(i).x, Th(i).y);  // y-component of advection velocity
+	    betaXYGrid[i] = betaxy(Th(i).x, Th(i).y);  // xy-component of advection velocity
+	    gammaGrid[i] = gamma(Th(i).x, Th(i).y);  // Reaction coefficient
+	    fGrid[i] = f(Th(i).x, Th(i).y);      // Source term
+	}
+
+        // Open a text file to save the vertex coordinates and function values
+	// Convert a number to string (for example, a timestamp or parameter value)
+	string paramStr = problemIndex;  // Convert integer to string using string conversion
+
+	// Dynamically generate the filename using the string
+	string filename = "problem_" + paramStr + ".txt";
+
+	// Open the text file with the dynamically generated filename
+	ofstream file(filename);
+
+	// Plot the solution
+	plot(uh, dim=2, fill=true, value=true, boundary=false, cmm="Advection-Diffusion-Reaction Solution");
+
+	// Output L2 norm of the solution
+	real L2Norm = sqrt(int2d(Th)(uh * uh));
+	cout << "L2 Norm of the solution: " << L2Norm << endl;
+
+        // Build characteristic function on the boundary
+	Vh charh;  // uh is the solution, vh is the test function
+	// To enforce that f is 1 only on the boundary and 0 inside,
+	// apply the boundary condition using 'on' in FreeFem++
+	problem boundaryProblem(charh, vh) = int2d(Th)(0*vh) + on(1, 2, 3, 4, charh = 1);
+        
+        // Solve the problem
+        boundaryProblem;
+
+        real[int] charGrid(Th.nv);
+        charGrid = charh[];
+        
+	// Set the precision for printing to the file
+	file.precision(5);  // Set precision to 5 decimal places
+        cout.precision(5);
+
+	// Write the header for the file
+	file << "Vertex_X\tVertex_Y\tBoundary\tAlpha_Value\tBeta0_value\tBetaX_value\tBetaY_value\tBetaXY_value\tGamma\tF\tSolution\n";
+
+	// Loop over all triangles and their edges once to mark boundary vertices
+
+	for (int i = 0; i < Th.nv; ++i) {
+
+		int isBoundary = 0;
+
+		if (charGrid[i]==1)
+                   isBoundary = 1;
+
+		// Write the vertex data into the file, including the boundary info
+		file << Th(i).x << "\t"
+			<< Th(i).y << "\t"
+			<< isBoundary << "\t"  // Include boundary info (1 if boundary, 0 if not)
+			<< alphaGrid[i] << "\t"
+			<< beta0Grid[i] << "\t"
+			<< betaXGrid[i] << "\t"
+			<< betaYGrid[i] << "\t"
+			<< betaXYGrid[i] << "\t"
+			<< gammaGrid[i] << "\t"
+			<< fGrid[i] << "\t"
+			<< uGrid[i] << "\n";
+
+	}
+
+        //Save finite element space connectivity
+        savemesh(Th,"mesh_"+ paramStr +".msh");
+
+	// Confirmation message
+	cout << "Data saved to " << filename << endl;
+
+}

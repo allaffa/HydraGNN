@@ -1,0 +1,65 @@
+// Parameters for diffusion, advection, reaction, and source terms
+
+// Diffusion parameters
+real alpha0  = 0.01; // Constant diffusion coefficient
+real alphax  = 0.05; // Diffusion coefficient that depends on x
+real alphay  = 0.05; // Diffusion coefficient that depends on y
+real alphaxy = 0.05; // Diffusion coefficient that depends on x and y
+
+// Advection parameters
+real beta0value  = 1.0;
+real betaxvalue  = 0.2;
+real betayvalue  = 0.2;
+real betaxyvalue = 0.2;
+
+// Reaction parameters
+real gamma0  = 1.0; // Constant reaction coefficient
+real gammax  = 0.2; // Reaction coefficient that depends on x
+real gammay  = 0.2; // Reaction coefficient that depends on y
+real gammaxy = 0.2; // Reaction coefficient that depends on x and y
+
+// Right-hand-side parameters
+real f0  = 1.0; // Constant forcing term
+real fx  = 0.2; // Forcing term that depends on x
+real fy  = 0.2; // Forcing term that depends on y
+real fxy = 0.2; // Forcing term that depends on x and y
+
+// Definition of the parameter functions
+func alpha        = alpha0 + alphax * x + alphay * y + alphaxy * x * y;                      
+func beta0        = beta0value;                 // Constant component of advection velocity (depends on x)
+func betax        = betaxvalue * x;             // x-component of advection velocity (depends on x)
+func betay        = betayvalue * y;             // y-component of advection velocity (depends on y)
+func betaxy       = betaxyvalue * x * y;        // Component of advection velocity that couples x and y
+func gamma        = gamma0 + gammax * x + gammay * y + gammaxy * x * y;
+func f            = f0 + fx * x + fy * y + fxy * x * y;
+func g = 0.;      // Dirichlet boundary condition (uh = g on boundary)
+
+// Mesh definition
+real Dx = 0.01, Dy = 0.01;
+mesh Th = square(floor(1./Dx), floor(1./Dy));   // Square mesh [0,1] x [0,1]
+
+// Finite element space
+fespace Vh(Th, P1);
+Vh uh, vh;  // uh is the solution, vh is the test function
+
+// Macro for gradient operator
+macro Grad(u)[dx(u), dy(u)]//
+
+// Weak formulation of the advection-diffusion-reaction equation:
+solve AdvectionDiffusionReaction(uh, vh) = 
+    int2d(Th)(
+        alpha * (Grad(uh)' * Grad(vh))                    // Diffusion term
+        + beta0 * (dx(uh) + dy(uh)) * vh                  // Advection term
+        + (betax * dx(uh) + betay * dy(uh)) * vh          // Advection term
+        + (betaxy * dx(uh) + betaxy * dy(uh)) * vh        // Advection term
+        + gamma * uh * vh                                 // Reaction term
+    ) 
+    - int2d(Th)(f * vh)                          // Source term
+    + on(1, 2, 3, 4, uh = g);                    // Dirichlet boundary conditions
+
+// Plot the solution
+plot(uh, dim=2, fill=true, value=true, boundary=false, cmm="Advection-Diffusion-Reaction Solution");
+
+// Output L2 norm of the solution
+real L2Norm = sqrt(int2d(Th)(uh * uh));
+cout << "L2 Norm of the solution: " << L2Norm << endl;
