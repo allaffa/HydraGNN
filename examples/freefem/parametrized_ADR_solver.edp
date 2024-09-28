@@ -1,4 +1,10 @@
-int Nproblems = 100;
+// Delete directory if it already exists
+system("rm -rf dataset/freefem");  // -p flag ensures that the directory is only created if it doesn't exist
+
+// Creating a directory named "results"
+system("mkdir -p dataset/freefem");  // -p flag ensures that the directory is only created if it doesn't exist
+
+int Nproblems = 1000;
 
 // Parameters for diffusion, advection, reaction, and source terms
 
@@ -85,7 +91,7 @@ for (int problemIndex = 0; problemIndex < Nproblems; ++problemIndex) {
 	string paramStr = problemIndex;  // Convert integer to string using string conversion
 
 	// Dynamically generate the filename using the string
-	string filename = "problem_" + paramStr + ".txt";
+	string filename = "./dataset/freefem/problem_" + paramStr + ".txt";
 
 	// Open the text file with the dynamically generated filename
 	ofstream file(filename);
@@ -141,7 +147,7 @@ for (int problemIndex = 0; problemIndex < Nproblems; ++problemIndex) {
 	}
 
         //Save finite element space connectivity
-        savemesh(Th,"mesh_"+ paramStr +".msh");
+        savemesh(Th,"./dataset/freefem/mesh_"+ paramStr +".msh");
 
 	// Confirmation message
 	cout << "Data saved to " << filename << endl;
