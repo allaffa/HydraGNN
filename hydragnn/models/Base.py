@@ -410,6 +410,45 @@ class Base(Module):
 
         return tot_loss, tasks_loss
 
+    def pinn_residual_loss(self, pred, data):
+        """
+        Compute the residual loss for the advection-diffusion-reaction equation.
+
+        Parameters:
+        pred  -- Predicted solution (tensor)
+        data  -- solution available from data
+
+        Returns:
+        loss  -- Residual loss (scalar)
+        """
+        alpha = data.x[:, 1]
+        beta0 = data.x[:, 2]
+        betax = data.x[:, 3]
+        betay = data.x[:, 4]
+        betaxy = data.x[:, 5]
+        gamma = data.x[:, 6]
+        f = data.x[:, 7]
+        # Compute gradients of uh with respect to x and y
+        du_dx = torch.autograd.grad(pred, data.pos[:,0], grad_outputs=torch.ones_like(pred), create_graph=True)[0]
+        du_dy = torch.autograd.grad(pred, data.pos[:,1], grad_outputs=torch.ones_like(pred), create_graph=True)[0]
+        d2u_dx2 = torch.autograd.grad(du_dx, data.pos[:,0], grad_outputs=torch.ones_like(pred), create_graph=True)[0]
+        d2u_dy2 = torch.autograd.grad(du_dy, data.pos[:,1], grad_outputs=torch.ones_like(pred), create_graph=True)[0]
+
+        # Compute the residual R(uh)
+        residual = (
+                alpha * (d2u_dx2 + d2u_dy2)  # Diffusion term (Laplacian of uh)
+                + beta0 * (du_dx + du_dy)  # Advection term
+                + (betax * du_dx + betay * du_dy)  # Advection term
+                + betaxy * (du_dx + du_dy)  # Advection term
+                + gamma * pred  # Reaction term
+                - f  # Source term
+        )
+
+        # Square the residual and sum over all vertices to get the loss
+        loss = torch.sum(residual ** 2)
+
+        return loss
+
     def loss_nll(self, pred, value, head_index, var=None):
         # negative log likelihood loss
         # uncertainty to weigh losses in https://openaccess.thecvf.com/content_cvpr_2018/papers/Kendall_Multi-Task_Learning_Using_CVPR_2018_paper.pdf

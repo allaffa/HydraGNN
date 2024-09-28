@@ -67,6 +67,7 @@ def train_validate_test(
     create_plots=False,
     use_deepspeed=False,
     compute_grad_energy=False,
+    compute_pde_pinn=False,
 ):
     num_epoch = config["Training"]["num_epoch"]
     EarlyStop = (
@@ -170,6 +171,7 @@ def train_validate_test(
                 profiler=prof,
                 use_deepspeed=use_deepspeed,
                 compute_grad_energy=compute_grad_energy,
+                compute_pde_pinn=compute_pde_pinn,
             )
             tr.stop("train")
             tr.disable()
@@ -185,6 +187,7 @@ def train_validate_test(
             verbosity,
             reduce_ranks=True,
             compute_grad_energy=compute_grad_energy,
+            compute_pde_pinn=compute_pde_pinn,
         )
         test_loss, test_taskserr, true_values, predicted_values = test(
             test_loader,
@@ -193,6 +196,7 @@ def train_validate_test(
             reduce_ranks=True,
             return_samples=plot_hist_solution,
             compute_grad_energy=compute_grad_energy,
+            compute_pde_pinn=compute_pde_pinn,
         )
         scheduler.step(val_loss)
         if writer is not None:
@@ -456,6 +460,7 @@ def train(
     profiler=None,
     use_deepspeed=False,
     compute_grad_energy=False,
+    compute_pde_pinn=False,
 ):
     if profiler is None:
         profiler = Profiler()
@@ -518,6 +523,11 @@ def train(
                 data.pos.requires_grad = True
                 pred = model(data)
                 loss, tasks_loss = model.module.energy_force_loss(pred, data)
+            elif compute_pde_pinn:
+                data.pos.requires_grad = True
+                pred = model(data)
+                pred_u = pred[0]
+                loss, tasks_loss = model.module.pinn_residual_loss(pred_u, data) + model.module.loss(pred, data.y, head_index)
             else:
                 pred = model(data)
                 loss, tasks_loss = model.module.loss(pred, data.y, head_index)
@@ -568,7 +578,7 @@ def train(
 
 
 @torch.no_grad()
-def validate(loader, model, verbosity, reduce_ranks=True, compute_grad_energy=False):
+def validate(loader, model, verbosity, reduce_ranks=True, compute_grad_energy=False, compute_pde_pinn=False):
 
     total_error = torch.tensor(0.0, device=get_device())
     tasks_error = torch.zeros(model.module.num_heads, device=get_device())
@@ -597,6 +607,12 @@ def validate(loader, model, verbosity, reduce_ranks=True, compute_grad_energy=Fa
                 data.pos.requires_grad = True
                 pred = model(data)
                 error, tasks_loss = model.module.energy_force_loss(pred, data)
+        elif compute_pde_pinn:
+            with torch.enable_grad():
+                data.pos.requires_grad = True
+                pred = model(data)
+                pred_u = pred[0]
+                loss, tasks_loss = model.module.pinn_residual_loss(pred_u, data) + model.module.loss(pred, data.y, head_index)
         else:
             pred = model(data)
             error, tasks_loss = model.module.loss(pred, data.y, head_index)
@@ -625,6 +641,7 @@ def test(
     reduce_ranks=True,
     return_samples=True,
     compute_grad_energy=False,
+    compute_pde_pinn=False
 ):
 
     total_error = torch.tensor(0.0, device=get_device())
@@ -657,6 +674,12 @@ def test(
                 data.pos.requires_grad = True
                 pred = model(data)
                 error, tasks_loss = model.module.energy_force_loss(pred, data)
+        elif compute_pde_pinn:
+            with torch.enable_grad():
+                data.pos.requires_grad = True
+                pred = model(data)
+                pred_u = pred[0]
+                loss, tasks_loss = model.module.pinn_residual_loss(pred_u, data) + model.module.loss(pred, data.y, head_index)
         else:
             pred = model(data)
             error, tasks_loss = model.module.loss(pred, data.y, head_index)
