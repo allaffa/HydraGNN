@@ -4,7 +4,7 @@ import torch
 import numpy as np
 import hydragnn
 from hydragnn.utils.model import print_model
-from hydragnn.utils.print_utils import log, iterate_tqdm
+from hydragnn.utils.print.print_utils import log, iterate_tqdm
 from hydragnn.train import get_head_indices, reduce_values_ranks, gather_tensor_ranks
 
 
@@ -21,18 +21,18 @@ class model_ensemble(torch.nn.Module):
                 config=config["NeuralNetwork"],
                 verbosity=verbosity,
             )
-            model = hydragnn.utils.get_distributed_model(model, verbosity)
+            model = hydragnn.utils.distributed.get_distributed_model(model, verbosity)
             # Print details of neural network architecture
             print("Loading model %s" % modeldir)
             print_model(model)
             if modelname is None:
-                hydragnn.utils.load_existing_model(
+                hydragnn.utils.model.load_existing_model(
                     model,
                     os.path.basename(os.path.normpath(modeldir)),
                     path=modeldir + "/../" + dir_extra,
                 )
             else:
-                hydragnn.utils.load_existing_model(
+                hydragnn.utils.model.load_existing_model(
                     model, modelname, path=modeldir + dir_extra
                 )
             self.model_ens.append(model)
