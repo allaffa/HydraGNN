@@ -21,15 +21,11 @@ import torch
 import numpy as np
 
 import hydragnn
-from hydragnn.utils.time_utils import Timer
+from hydragnn.utils.profiling_and_tracing.time_utils import Timer
 from hydragnn.utils.distributed import get_device
 from hydragnn.utils.model import load_existing_model
-from hydragnn.utils.pickledataset import SimplePickleDataset
-from hydragnn.utils.config_utils import (
-    update_config,
-)
+from hydragnn.utils.datasets.pickledataset import SimplePickleDataset
 from hydragnn.models.create import create_model_config
-from hydragnn.preprocess import create_dataloaders
 
 from scipy.interpolate import griddata
 
@@ -133,10 +129,10 @@ if __name__ == "__main__":
     input_filename = os.path.join(dirpwd, args.inputfile)
     with open(input_filename, "r") as f:
         config = json.load(f)
-    hydragnn.utils.setup_log(get_log_name_config(config))
+    hydragnn.utils.print.print_utils.setup_log(get_log_name_config(config))
     ##################################################################################################################
     # Always initialize for multi-rank training.
-    comm_size, rank = hydragnn.utils.setup_ddp()
+    comm_size, rank = hydragnn.utils.distributed.setup_ddp()
     ##################################################################################################################
     comm = MPI.COMM_WORLD
 

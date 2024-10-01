@@ -2,7 +2,7 @@ import numpy
 import torch
 from torch_geometric.data import Data
 from ase.calculators.calculator import Calculator, all_changes
-from hydragnn.preprocess.utils import get_radius_graph_pbc
+from hydragnn.preprocess.graph_samples_checks_and_updates import get_radius_graph_pbc
 from torch_geometric.transforms import LocalCartesian
 import json, os
 import logging
@@ -12,7 +12,7 @@ from ase.optimize import BFGS, FIRE  # or any other optimizer
 from ase.optimize.bfgslinesearch import BFGSLineSearch
 from ase.io import read, write
 import hydragnn
-from hydragnn.utils.time_utils import Timer
+from hydragnn.utils.profiling_and_tracing.time_utils import Timer
 from hydragnn.utils.model import load_existing_model
 from hydragnn.models.create import create_model_config
 from copy import deepcopy
@@ -170,10 +170,10 @@ if __name__ == "__main__":
     input_filename = os.path.join(dirpwd, args.inputfile)
     with open(input_filename, "r") as f:
         config = json.load(f)
-    hydragnn.utils.setup_log(get_log_name_config(config))
+    hydragnn.utils.print.print_utils.setup_log(get_log_name_config(config))
     ##################################################################################################################
     # Always initialize for multi-rank training.
-    comm_size, rank = hydragnn.utils.setup_ddp()
+    comm_size, rank = hydragnn.utils.distributed.setup_ddp()
     ##################################################################################################################
     comm = MPI.COMM_WORLD
 
