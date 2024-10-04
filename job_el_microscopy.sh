@@ -5,7 +5,7 @@
 #SBATCH -e job-%j.out
 #SBATCH -t 01:00:00
 #SBATCH -p batch
-##SBATCH -q debug
+#SBATCH -q debug
 #SBATCH -N 512
 #SBATCH -S 1
 #SBATCH --exclude=frontier01252,frontier00444

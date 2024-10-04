@@ -40,7 +40,7 @@ except ImportError:
     pass
 
 import matplotlib.pyplot as plt
-from ensemble_utils import model_ensemble, test_ens
+from ensemble_utils import model_ensemble, test_ens, debug_nan
 
 plt.rcParams.update({"font.size": 20})
 
@@ -76,10 +76,9 @@ def info(*args, logtype="info", sep=" "):
 
 if __name__ == "__main__":
 
-    modelname = "MO2"
-
     parser = argparse.ArgumentParser()
     parser.add_argument("--models_dir_folder", help="folder of trained models", type=str, default=None)
+    parser.add_argument("--dataname", help="name of dataset pickle file", type=str, default="alloy_binary_energy")
     parser.add_argument("--log", help="log name", default=None)
     group = parser.add_mutually_exclusive_group()
     group.add_argument(
@@ -93,7 +92,16 @@ if __name__ == "__main__":
 
     args = parser.parse_args()
 
-    modeldirlist = [os.path.join(args.models_dir_folder, name) for name in os.listdir(args.models_dir_folder) if os.path.isdir(os.path.join(args.models_dir_folder, name))]
+    modeldirlists = args.models_dir_folder.split(",")
+    assert len(modeldirlists)==1 or len(modeldirlists)==2
+    if len(modeldirlists)==1:
+        modeldirlist = [os.path.join(args.models_dir_folder, name) for name in os.listdir(args.models_dir_folder) if os.path.isdir(os.path.join(args.models_dir_folder, name))]
+    else:
+        modeldirlist = []
+        for models_dir_folder in modeldirlists:
+            modeldirlist.extend([os.path.join(models_dir_folder, name) for name in os.listdir(models_dir_folder) if os.path.isdir(os.path.join(models_dir_folder, name))])
+
+    modelname=args.dataname
 
     var_config = None
     for modeldir in modeldirlist:
@@ -147,6 +155,7 @@ if __name__ == "__main__":
         trainset,
         valset,
         testset,
+        #32,
         config["NeuralNetwork"]["Training"]["batch_size"],
         test_sampler_shuffle=False,
     )
@@ -155,31 +164,37 @@ if __name__ == "__main__":
     model_ens = hydragnn.utils.get_distributed_model(model_ens, verbosity)
     model_ens.eval()
     ##################################################################################################################
-    fig, axs = plt.subplots(2, 3, figsize=(18, 10))
+    nheads = len(config["NeuralNetwork"]["Variables_of_interest"]["output_names"])
+    fig, axs = plt.subplots(nheads, 3, figsize=(18, 6*nheads))
     for icol, (loader, setname) in enumerate(zip([train_loader, val_loader, test_loader], ["train", "val", "test"])):
         error, rmse_task, true_values, predicted_mean, predicted_std = test_ens(model_ens, loader, verbosity, num_samples=1000)
         print_distributed(verbosity,"number of heads %d"%len(true_values))
         print_distributed(verbosity,"number of samples %d"%len(true_values[0]))
         if hydragnn.utils.get_comm_size_and_rank()[1]==0:
-            print("loss=", error, rmse_task)
+            print(setname, "loss=", error, rmse_task)
         assert len(true_values)==len(predicted_mean), "inconsistent number of heads, %d!=%d"%(len(true_values),len(len(predicted_mean)))
         for  ihead, (output_name, output_type, output_dim) in enumerate(zip(
         config["NeuralNetwork"]["Variables_of_interest"]["output_names"],
         config["NeuralNetwork"]["Variables_of_interest"]["type"],
         config["NeuralNetwork"]["Variables_of_interest"]["output_dim"],
-        )):
+        )): 
+            _ = debug_nan(true_values[ihead], message="checking on true for %s"%output_name)
+            _ = debug_nan(predicted_mean[ihead], message="checking on predicted mean for %s"%output_name)
             head_true = true_values[ihead].cpu().squeeze().numpy() 
             head_pred = predicted_mean[ihead].cpu().squeeze().numpy() 
-            head_pred_std = predicted_std[ihead].cpu().squeeze().numpy() 
+            head_pred_std = predicted_std[ihead].cpu().squeeze().numpy()
             ifeat = var_config["output_index"][ihead]
             outtype = var_config["type"][ihead]
             varname = var_config["output_names"][ihead]
 
-            ax = axs[ihead, icol]
+            try:
+                ax = axs[ihead, icol]
+            except:
+                ax = axs[icol]
             error_mae = np.mean(np.abs(head_pred - head_true))
             error_rmse = np.sqrt(np.mean(np.abs(head_pred - head_true) ** 2))
             if hydragnn.utils.get_comm_size_and_rank()[1]==0:
-                print(varname, ": mae=", error_mae, ", rmse= ", error_rmse)
+                print(setname, varname, ": mae=", error_mae, ", rmse= ", error_rmse)
             hist2d_norm = getcolordensity(head_true, head_pred)
             #ax.errorbar(head_true, head_pred, yerr=head_pred_std, fmt = '', linewidth=0.5, ecolor="b", markerfacecolor="none", ls='none')
             sc=ax.scatter(head_true, head_pred, s=12, c=hist2d_norm, vmin=0, vmax=1)
@@ -202,19 +217,21 @@ if __name__ == "__main__":
     fig.savefig("./logs/" + log_name + "/parity_plot_all.pdf")
     plt.close()
     
-    fig, axs = plt.subplots(2, 3, figsize=(18, 10))
+    fig, axs = plt.subplots(nheads, 3, figsize=(18, 6*nheads))
     for icol, (loader, setname) in enumerate(zip([train_loader, val_loader, test_loader], ["train", "val", "test"])):
         error, rmse_task, true_values, predicted_mean, predicted_std = test_ens(model_ens, loader, verbosity, num_samples=1000)
         print_distributed(verbosity,"number of heads %d"%len(true_values))
         print_distributed(verbosity,"number of samples %d"%len(true_values[0]))
         if hydragnn.utils.get_comm_size_and_rank()[1]==0:
-            print("loss=", error, rmse_task)
+            print(setname, "loss=", error, rmse_task)
         assert len(true_values)==len(predicted_mean), "inconsistent number of heads, %d!=%d"%(len(true_values),len(len(predicted_mean)))
         for  ihead, (output_name, output_type, output_dim) in enumerate(zip(
         config["NeuralNetwork"]["Variables_of_interest"]["output_names"],
         config["NeuralNetwork"]["Variables_of_interest"]["type"],
         config["NeuralNetwork"]["Variables_of_interest"]["output_dim"],
         )):
+            _ = debug_nan(true_values[ihead], message="checking on true for %s"%output_name)
+            _ = debug_nan(predicted_mean[ihead], message="checking on predicted mean for %s"%output_name)
             head_true = true_values[ihead].cpu().squeeze().numpy() 
             head_pred = predicted_mean[ihead].cpu().squeeze().numpy() 
             head_pred_std = predicted_std[ihead].cpu().squeeze().numpy() 
@@ -222,11 +239,14 @@ if __name__ == "__main__":
             outtype = var_config["type"][ihead]
             varname = var_config["output_names"][ihead]
 
-            ax = axs[ihead, icol]
+            try:
+                ax = axs[ihead, icol]
+            except:
+                ax = axs[icol]
             error_mae = np.mean(np.abs(head_pred - head_true))
             error_rmse = np.sqrt(np.mean(np.abs(head_pred - head_true) ** 2))
             if hydragnn.utils.get_comm_size_and_rank()[1]==0:
-                print(varname, ": mae=", error_mae, ", rmse= ", error_rmse)
+                print(setname, varname, ": mae=", error_mae, ", rmse= ", error_rmse)
             hist2d_norm = getcolordensity(head_true, head_pred)
             ax.errorbar(head_true, head_pred, yerr=head_pred_std, fmt = '', linewidth=0.5, ecolor="b", markerfacecolor="none", ls='none')
             sc=ax.scatter(head_true, head_pred, s=12, c=hist2d_norm, vmin=0, vmax=1)
@@ -248,20 +268,22 @@ if __name__ == "__main__":
     fig.savefig("./logs/" + log_name + "/parity_plot_all_errorbar.pdf")
     plt.close()
     ##################################################################################################################
-    fig, axs = plt.subplots(2, 3, figsize=(18, 12))
+    fig, axs = plt.subplots(nheads, 3, figsize=(18, 6*nheads))
     for icol, (loader, setname) in enumerate(zip([train_loader, val_loader, test_loader], ["train", "val", "test"])):
         #error, rmse_task, true_values, predicted_mean, predicted_std = test_ens(model_ens, loader, verbosity, num_samples=1000, saveresultsto=f"./logs/{log_name}/{setname}_")
         error, rmse_task, true_values, predicted_mean, predicted_std = test_ens(model_ens, loader, verbosity,saveresultsto=f"./logs/{log_name}/{setname}_")
         print_distributed(verbosity,"number of heads %d"%len(true_values))
         print_distributed(verbosity,"number of samples %d"%len(true_values[0]))
         if hydragnn.utils.get_comm_size_and_rank()[1]==0:
-            print("loss=", error, rmse_task)
+            print(setname, "loss=", error, rmse_task)
         assert len(true_values)==len(predicted_mean), "inconsistent number of heads, %d!=%d"%(len(true_values),len(len(predicted_mean)))
         for  ihead, (output_name, output_type, output_dim) in enumerate(zip(
         config["NeuralNetwork"]["Variables_of_interest"]["output_names"],
         config["NeuralNetwork"]["Variables_of_interest"]["type"],
         config["NeuralNetwork"]["Variables_of_interest"]["output_dim"],
         )):
+            _ = debug_nan(true_values[ihead], message="checking on true for %s"%output_name)
+            _ = debug_nan(predicted_mean[ihead], message="checking on predicted mean for %s"%output_name)
             head_true = true_values[ihead].cpu().squeeze().numpy() 
             head_pred = predicted_mean[ihead].cpu().squeeze().numpy() 
             head_pred_std = predicted_std[ihead].cpu().squeeze().numpy() 
@@ -269,11 +291,15 @@ if __name__ == "__main__":
             outtype = var_config["type"][ihead]
             varname = var_config["output_names"][ihead]
 
-            ax = axs[ihead, icol]
+            np.savez("./logs/" + log_name + "/"+setname+varname+".npz", head_true, head_pred, head_pred_std)
+            try:
+                ax = axs[ihead, icol]
+            except:
+                ax = axs[icol]
             error_mae = np.mean(np.abs(head_pred - head_true))
             error_rmse = np.sqrt(np.mean(np.abs(head_pred - head_true) ** 2))
             if hydragnn.utils.get_comm_size_and_rank()[1]==0:
-                print(varname, ": mae=", error_mae, ", rmse= ", error_rmse)
+                print(setname, varname, ": mae=", error_mae, ", rmse= ", error_rmse)
             hist1d, bin_edges = np.histogram(head_pred - head_true, bins=50)
             ax.plot(0.5 * (bin_edges[:-1] + bin_edges[1:]), hist1d, "-")
             ax.set_title(setname + "; " + varname+" MAE: {:.2e}".format(error_mae), fontsize=24)
