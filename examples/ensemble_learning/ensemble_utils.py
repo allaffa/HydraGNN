@@ -13,7 +13,7 @@ class model_ensemble(torch.nn.Module):
         super(model_ensemble, self).__init__()
         self.model_dir_list = model_dir_list 
         self.model_ens = torch.nn.ModuleList()
-        for modeldir in self.model_dir_list:
+        for imodel, modeldir in enumerate(self.model_dir_list):
             input_filename = os.path.join(modeldir, "config.json")
             with open(input_filename, "r") as f:
                 config = json.load(f)
@@ -23,7 +23,7 @@ class model_ensemble(torch.nn.Module):
             )
             model = hydragnn.utils.get_distributed_model(model, verbosity)
             # Print details of neural network architecture
-            print("Loading model %s"%modeldir)
+            print("Loading model %d, %s"%(imodel, modeldir))
             print_model(model)
             if modelname is None:
                 hydragnn.utils.load_existing_model(model, os.path.basename(os.path.normpath(modeldir)), path=modeldir+"/../"+dir_extra)
@@ -54,11 +54,21 @@ class model_ensemble(torch.nn.Module):
         return self.model_size
 
     ##################################################################################################################
-def test_ens(model_ens, loader, verbosity, num_samples=None):
+def debug_nan(x, message=""):
+    try:
+        if torch.isnan(x).any():
+            print(f"NAN detected in prediction, after {message}: ",x)
+            return True
+    except:
+        if torch.isnan(torch.tensor(x)).any():
+            print(f"NAN detected in prediction, after {message}: ",x)
+            return True
+
+    return False
+def test_ens(model_ens, loader, verbosity, num_samples=None, saveresultsto=None):
     n_ens=len(model_ens.module)
     num_heads=model_ens.module.num_heads
 
-    
     num_samples_total = 0
     device = next(model_ens.parameters()).device
 
@@ -77,6 +87,7 @@ def test_ens(model_ens, loader, verbosity, num_samples=None):
         for ihead in range(num_heads):
             head_val = ytrue[head_index[ihead]]
             true_values[ihead].extend(head_val)
+            _ = debug_nan(true_values[ihead], message="true_values %d"%ihead)
         ###########################
         for imodel, pred in enumerate(pred_ens):
             error, tasks_rmse = model_ens.module.loss(pred, data.y, head_index)
@@ -101,14 +112,23 @@ def test_ens(model_ens, loader, verbosity, num_samples=None):
     for ihead in range(num_heads):
         head_pred = []
         for imodel in range(len(model_ens.module)):
-            head_pred.append(predicted_values[imodel][ihead])
+            head_all = torch.tensor(predicted_values[imodel][ihead])
+            head_all = gather_tensor_ranks(head_all)
+            if debug_nan(head_all, message="pred from model %d"%imodel):
+                print("Warning: NAN detected in model %d; prediction skipped"%imodel)
+                continue
+            head_pred.append(head_all)
         true_values[ihead] = torch.cat(true_values[ihead], dim=0)
-        head_pred_ens = torch.tensor(head_pred).squeeze()
+        head_pred_ens = torch.stack(head_pred, dim=0).squeeze()
         head_pred_mean = head_pred_ens.mean(axis=0)
         head_pred_std = head_pred_ens.std(axis=0)
         true_values[ihead] = gather_tensor_ranks(true_values[ihead])
-        predicted_mean[ihead] = gather_tensor_ranks(head_pred_mean)
-        predicted_std[ihead] = gather_tensor_ranks(head_pred_std)
+        predicted_mean[ihead] = head_pred_mean 
+        predicted_std[ihead] = head_pred_std
+        print(head_pred_ens.size(), true_values[ihead].size())
+        if saveresultsto is not None:
+            m = {'true': true_values[ihead], 'pred_ens': head_pred_ens}
+            torch.save(m, saveresultsto +"head%d.db"%ihead)
 
     return (
         [tot_err.item() / num_samples_total for tot_err  in total_error],
