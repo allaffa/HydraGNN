@@ -6,7 +6,7 @@
 #SBATCH -t 01:00:00
 #SBATCH -p batch
 #SBATCH -q debug
-#SBATCH -N 256 
+#SBATCH -N 8 #16 
 ##SBATCH -S 1
 
 module reset

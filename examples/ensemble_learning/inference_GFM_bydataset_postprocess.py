@@ -20,7 +20,7 @@ from scipy.interpolate import griddata
 import matplotlib.pyplot as plt
 
 
-plt.rcParams.update({"font.size": 20})
+plt.rcParams.update({"font.size": 24})
 
 
 def getcolordensity(xdata, ydata):
@@ -156,8 +156,82 @@ if __name__ == "__main__":
         plt.close()
     """
     ##################################################################################################################
+    ##################################################################################################################
     linestyle=["-","--","-.",":","-","--","-.",":"]
-    """
+    fig, axs = plt.subplots(nheads, 1, figsize=(7, 10))
+    for icol, setname in enumerate(["test"]):
+        for idataset, dataset in enumerate(modellist):
+            saveresultsto=f"./logs/{log_name}/{dataset}_{setname}_"
+            for  ihead, (output_name, output_type, output_dim) in enumerate(zip(
+            config["NeuralNetwork"]["Variables_of_interest"]["output_names"],
+            config["NeuralNetwork"]["Variables_of_interest"]["type"],
+            config["NeuralNetwork"]["Variables_of_interest"]["output_dim"],
+            )):
+                file_name= saveresultsto +"head%d_atomnum_batch_0.db"%ihead
+                head_true, head_pred_mean, head_pred_std = get_ensemble_mean_std(file_name)
+                ifeat = var_config["output_index"][ihead]
+                outtype = var_config["type"][ihead]
+                varname = var_config["output_names"][ihead]
+                ax = axs[ihead]
+
+                #hist1d, bin_edges = np.histogram(head_pred_std, bins=50)
+                _, bins = np.histogram(np.log10(head_pred_std), bins=40 )#'auto')
+                hist1d, bin_edges = np.histogram(head_pred_std, bins=10**bins)
+                ax.plot(0.5 * (bin_edges[:-1] + bin_edges[1:]), hist1d/sum(hist1d), linestyle[idataset], linewidth=3.0, label=dataset)
+                #ax.set_title(setname + "; " + varname, fontsize=24)
+                ax.set_title(varname, fontsize=28)
+                if ihead==1:
+                    ax.set_xlabel("Uncertainty $\sigma_{\\tilde y}$", fontsize=28)
+                ax.set_ylabel("Count Ratio", fontsize=28)
+                ax.set_xscale('log')
+    #axs[0].legend()
+    axs[1].legend(fontsize=20)
+    plt.subplots_adjust(left=0.20, bottom=0.1, right=0.97, top=0.95, wspace=0.2, hspace=0.3)
+    fig.savefig("./logs/" + log_name + "/uncertainties_testset_hist_plot_"+'-'.join(modellist)+"_vertical.png")
+    fig.savefig("./logs/" + log_name + "/uncertainties_testset_hist_plot_"+'-'.join(modellist)+"_vertical.pdf")
+    plt.close()
+
+    fig, axs = plt.subplots(nheads, 1, figsize=(7, 10))
+    for icol, setname in enumerate(["test"]):
+        for  ihead, (output_name, output_type, output_dim) in enumerate(zip(
+        config["NeuralNetwork"]["Variables_of_interest"]["output_names"],
+        config["NeuralNetwork"]["Variables_of_interest"]["type"],
+        config["NeuralNetwork"]["Variables_of_interest"]["output_dim"],
+        )):
+            true=[]
+            pred=[]
+            for idataset, dataset in enumerate(modellist):
+                saveresultsto=f"./logs/{log_name}/{dataset}_{setname}_"
+         
+                file_name= saveresultsto +"head%d_atomnum_batch_0.db"%ihead
+                head_true, head_pred_mean, head_pred_std = get_ensemble_mean_std(file_name)
+                true.extend(head_true)
+                pred.extend(head_pred_mean)
+            ifeat = var_config["output_index"][ihead]
+            outtype = var_config["type"][ihead]
+            varname = var_config["output_names"][ihead]
+            ax = axs[ihead]
+
+            hist2d_norm = getcolordensity(true, pred)
+            #ax.errorbar(head_true, head_pred_mean, yerr=head_pred_std, fmt = '', linewidth=0.5, ecolor="b", markerfacecolor="none", ls='none')
+            sc=ax.scatter(true, pred, s=12, c=hist2d_norm, vmin=0, vmax=1)
+            minv = np.minimum(np.amin(pred), np.amin(true))
+            maxv = np.maximum(np.amax(pred), np.amax(true))
+            ax.plot([minv, maxv], [minv, maxv], "r--")
+            #ax.set_title(setname + "; " + varname, fontsize=24)
+            ax.set_title(varname, fontsize=28)
+            if ihead==1:
+                ax.set_xlabel("True value", fontsize=28)
+            ax.set_ylabel("Predicted value", fontsize=28) # $\\tilde y$
+            cbar=plt.colorbar(sc)
+            cbar.ax.set_ylabel('Density', rotation=90)
+            ax.set_aspect('equal', adjustable='box')
+    plt.subplots_adjust(left=0.12, bottom=0.1, right=0.95, top=0.95, wspace=0.175, hspace=0.3)
+    fig.savefig("./logs/" + log_name + "/parityplot_testset_scatter_plot_"+'-'.join(modellist)+"_vertical.png",dpi=500)
+    fig.savefig("./logs/" + log_name + "/parityplot_testset_scatter_plot_"+'-'.join(modellist)+"_vertical.pdf")
+    plt.close()
+    ##################################################################################################################
+    linestyle=["-","--","-.",":","-","--","-.",":"]
     fig, axs = plt.subplots(1, nheads, figsize=(12, 6))
     for icol, setname in enumerate(["test"]):
         for idataset, dataset in enumerate(modellist):
@@ -177,18 +251,57 @@ if __name__ == "__main__":
                 #hist1d, bin_edges = np.histogram(head_pred_std, bins=50)
                 _, bins = np.histogram(np.log10(head_pred_std), bins=40 )#'auto')
                 hist1d, bin_edges = np.histogram(head_pred_std, bins=10**bins)
-                ax.plot(0.5 * (bin_edges[:-1] + bin_edges[1:]), hist1d/sum(hist1d), linestyle[idataset], linewidth=2.0, label=dataset)
+                ax.plot(0.5 * (bin_edges[:-1] + bin_edges[1:]), hist1d/sum(hist1d), linestyle[idataset], linewidth=3.0, label=dataset)
                 #ax.set_title(setname + "; " + varname, fontsize=24)
-                ax.set_title(varname, fontsize=24)
+                ax.set_title(varname, fontsize=28)
                 if ihead==0:
-                    ax.set_ylabel("Ratio")
-                ax.set_xlabel("Uncertainty")
+                    ax.set_ylabel("Count Ratio", fontsize=28)
+                ax.set_xlabel("Uncertainty $\sigma_{\\tilde y}$", fontsize=28)
                 ax.set_xscale('log')
     #axs[0].legend()
-    axs[1].legend()
-    plt.subplots_adjust(left=0.1, bottom=0.15, right=0.99, top=0.925, wspace=0.2, hspace=0.3)
+    axs[1].legend(fontsize=20)
+    plt.subplots_adjust(left=0.12, bottom=0.16, right=0.99, top=0.925, wspace=0.2, hspace=0.3)
     fig.savefig("./logs/" + log_name + "/uncertainties_testset_hist_plot_"+'-'.join(modellist)+".png")
     fig.savefig("./logs/" + log_name + "/uncertainties_testset_hist_plot_"+'-'.join(modellist)+".pdf")
+    plt.close()
+
+    fig, axs = plt.subplots(1, nheads, figsize=(12, 5))
+    for icol, setname in enumerate(["test"]):
+        for  ihead, (output_name, output_type, output_dim) in enumerate(zip(
+        config["NeuralNetwork"]["Variables_of_interest"]["output_names"],
+        config["NeuralNetwork"]["Variables_of_interest"]["type"],
+        config["NeuralNetwork"]["Variables_of_interest"]["output_dim"],
+        )):
+            true=[]
+            pred=[]
+            for idataset, dataset in enumerate(modellist):
+                saveresultsto=f"./logs/{log_name}/{dataset}_{setname}_"
+         
+                file_name= saveresultsto +"head%d_atomnum_batch_0.db"%ihead
+                head_true, head_pred_mean, head_pred_std = get_ensemble_mean_std(file_name)
+                true.extend(head_true)
+                pred.extend(head_pred_mean)
+            ifeat = var_config["output_index"][ihead]
+            outtype = var_config["type"][ihead]
+            varname = var_config["output_names"][ihead]
+            ax = axs[ihead]
+
+            hist2d_norm = getcolordensity(true, pred)
+            #ax.errorbar(head_true, head_pred_mean, yerr=head_pred_std, fmt = '', linewidth=0.5, ecolor="b", markerfacecolor="none", ls='none')
+            sc=ax.scatter(true, pred, s=12, c=hist2d_norm, vmin=0, vmax=1)
+            minv = np.minimum(np.amin(pred), np.amin(true))
+            maxv = np.maximum(np.amax(pred), np.amax(true))
+            ax.plot([minv, maxv], [minv, maxv], "r--")
+            #ax.set_title(setname + "; " + varname, fontsize=24)
+            ax.set_title(varname, fontsize=28)
+            if ihead==0:
+                ax.set_ylabel("Predicted value", fontsize=28) # $\\tilde y$
+            ax.set_xlabel("True value", fontsize=28)
+            plt.colorbar(sc)
+            ax.set_aspect('equal', adjustable='box')
+    plt.subplots_adjust(left=0.15, bottom=0.16, right=0.99, top=0.925, wspace=0.175, hspace=0.3)
+    fig.savefig("./logs/" + log_name + "/parityplot_testset_scatter_plot_"+'-'.join(modellist)+".png",dpi=500)
+    fig.savefig("./logs/" + log_name + "/parityplot_testset_scatter_plot_"+'-'.join(modellist)+".pdf")
     plt.close()
     ##################################################################################################################
     fig, axs = plt.subplots(nheads, 3, figsize=(18, 6*nheads))
@@ -224,7 +337,6 @@ if __name__ == "__main__":
     ax.legend()
     fig.savefig("./logs/" + log_name + "/uncertainties_hist_plot_"+'-'.join(modellist)+".png")
     plt.close()
-    """
     ##################################################################################################################
     fig, axs = plt.subplots(nheads, 3, figsize=(18, 6*nheads))
     for icol,  setname in enumerate(["train", "val", "test"]):  
@@ -274,7 +386,7 @@ if __name__ == "__main__":
             ax.set_ylim(min(xmin, ymin), max(xmax,ymax))
             ax.set_aspect('equal', adjustable='box')
 
-    plt.subplots_adjust(left=0.1, bottom=0.15, right=0.95, top=0.925, wspace=0.2, hspace=0.3)
+    plt.subplots_adjust(left=0.075, bottom=0.1, right=0.975, top=0.95, wspace=0.2, hspace=0.3)
     fig.savefig("./logs/" + log_name + "/parity_plot_all_errorbar_"+'-'.join(modellist)+".png",dpi=500)
     fig.savefig("./logs/" + log_name + "/parity_plot_all_errorbar_"+'-'.join(modellist)+".pdf")
     plt.close()
