@@ -84,6 +84,7 @@ def test_ens(model_ens, loader, verbosity, num_samples=None, saveresultsto=None)
         pred_ens = model_ens(data)
         ###########################
         ytrue = data.y
+        print("Pei checking sizes: %d/%d"%(hydragnn.utils.get_comm_size_and_rank()[1], hydragnn.utils.get_comm_size_and_rank()[0]), ytrue.size(), head_index, num_heads, data.batch.max())
         for ihead in range(num_heads):
             head_val = ytrue[head_index[ihead]]
             true_values[ihead].extend(head_val)
@@ -97,6 +98,8 @@ def test_ens(model_ens, loader, verbosity, num_samples=None, saveresultsto=None)
             for itask in range(len(tasks_rmse)):
                 tasks_error[imodel, itask] += tasks_rmse[itask].item() * data.num_graphs
             for ihead in range(num_heads):
+                if debug_nan(pred[ihead], message="pred from model %d"%imodel):
+                    print("Pei debugging: NAN detected in prediction of model %s"%model_ens.module.model_dir_list[imodel])
                 head_pre = pred[ihead].reshape(-1, 1)
                 pred_shape = head_pre.shape
                 predicted_values[imodel][ihead].extend(head_pre.tolist())
@@ -113,7 +116,7 @@ def test_ens(model_ens, loader, verbosity, num_samples=None, saveresultsto=None)
         head_pred = []
         for imodel in range(len(model_ens.module)):
             head_all = torch.tensor(predicted_values[imodel][ihead])
-            head_all = gather_tensor_ranks(head_all)
+            #head_all = gather_tensor_ranks(head_all)
             if debug_nan(head_all, message="pred from model %d"%imodel):
                 print("Warning: NAN detected in model %d; prediction skipped"%imodel)
                 continue
@@ -122,15 +125,15 @@ def test_ens(model_ens, loader, verbosity, num_samples=None, saveresultsto=None)
         head_pred_ens = torch.stack(head_pred, dim=0).squeeze()
         head_pred_mean = head_pred_ens.mean(axis=0)
         head_pred_std = head_pred_ens.std(axis=0)
-        true_values[ihead] = gather_tensor_ranks(true_values[ihead])
+        #true_values[ihead] = gather_tensor_ranks(true_values[ihead])
         predicted_mean[ihead] = head_pred_mean 
         predicted_std[ihead] = head_pred_std
         print(head_pred_ens.size(), true_values[ihead].size())
-        if saveresultsto is not None and hydragnn.utils.get_comm_size_and_rank()[1]==0:
+        if saveresultsto is not None: # and hydragnn.utils.get_comm_size_and_rank()[1]==0:
             m = {'true': true_values[ihead], 'pred_ens': head_pred_ens}
             #torch.save(m, saveresultsto +"head%d.db"%ihead)
             #torch.save(m, saveresultsto +"head%d_%s.db"%(ihead, str(device)))
-            torch.save(m, saveresultsto +"head%d_atomnum_batch_%s.db"%(ihead, str(hydragnn.utils.get_comm_size_and_rank()[1])))
+            torch.save(m, saveresultsto +"head%d_proc%s.db"%(ihead, str(hydragnn.utils.get_comm_size_and_rank()[1])))
 
 
     return (

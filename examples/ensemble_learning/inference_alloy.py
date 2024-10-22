@@ -41,6 +41,7 @@ except ImportError:
 
 import matplotlib.pyplot as plt
 from ensemble_utils import model_ensemble, test_ens, debug_nan
+from mpl_toolkits.axes_grid1 import make_axes_locatable
 
 plt.rcParams.update({"font.size": 20})
 
@@ -155,10 +156,11 @@ if __name__ == "__main__":
         trainset,
         valset,
         testset,
-        #32,
-        config["NeuralNetwork"]["Training"]["batch_size"],
+        8,
+        #config["NeuralNetwork"]["Training"]["batch_size"],
         test_sampler_shuffle=False,
     )
+    print(hydragnn.utils.get_comm_size_and_rank(), config["NeuralNetwork"]["Training"]["batch_size"], len(train_loader), len(val_loader), len(test_loader))
     ##################################################################################################################
     model_ens = model_ensemble(modeldirlist)
     model_ens = hydragnn.utils.get_distributed_model(model_ens, verbosity)
@@ -167,7 +169,7 @@ if __name__ == "__main__":
     nheads = len(config["NeuralNetwork"]["Variables_of_interest"]["output_names"])
     fig, axs = plt.subplots(nheads, 3, figsize=(18, 6*nheads))
     for icol, (loader, setname) in enumerate(zip([train_loader, val_loader, test_loader], ["train", "val", "test"])):
-        error, rmse_task, true_values, predicted_mean, predicted_std = test_ens(model_ens, loader, verbosity, num_samples=1000)
+        error, rmse_task, true_values, predicted_mean, predicted_std = test_ens(model_ens, loader, verbosity) #, num_samples=1024)
         print_distributed(verbosity,"number of heads %d"%len(true_values))
         print_distributed(verbosity,"number of samples %d"%len(true_values[0]))
         if hydragnn.utils.get_comm_size_and_rank()[1]==0:
@@ -195,6 +197,7 @@ if __name__ == "__main__":
             error_rmse = np.sqrt(np.mean(np.abs(head_pred - head_true) ** 2))
             if hydragnn.utils.get_comm_size_and_rank()[1]==0:
                 print(setname, varname, ": mae=", error_mae, ", rmse= ", error_rmse)
+            print(hydragnn.utils.get_comm_size_and_rank()[1], head_true.size, head_pred.size)
             hist2d_norm = getcolordensity(head_true, head_pred)
             #ax.errorbar(head_true, head_pred, yerr=head_pred_std, fmt = '', linewidth=0.5, ecolor="b", markerfacecolor="none", ls='none')
             sc=ax.scatter(head_true, head_pred, s=12, c=hist2d_norm, vmin=0, vmax=1)
@@ -211,7 +214,13 @@ if __name__ == "__main__":
                 ax.set_ylabel("Predicted")
             if ihead==1:
                 ax.set_xlabel("True")
-            plt.colorbar(sc)
+            #plt.colorbar(sc)
+            divider = make_axes_locatable(ax)
+            cax = divider.append_axes('right', size='5%', pad=0.05)
+            fig.colorbar(sc, cax=cax, orientation='vertical')
+            #cbar=plt.colorbar(sc)
+            #cbar.ax.set_ylabel('Density', rotation=90)
+            #ax.set_aspect('equal', adjustable='box')
     plt.subplots_adjust(left=0.1, bottom=0.1, right=0.95, top=0.95, wspace=0.4, hspace=0.3)
     fig.savefig("./logs/" + log_name + "/parity_plot_all.png",dpi=500)
     fig.savefig("./logs/" + log_name + "/parity_plot_all.pdf")
@@ -219,7 +228,7 @@ if __name__ == "__main__":
     
     fig, axs = plt.subplots(nheads, 3, figsize=(18, 6*nheads))
     for icol, (loader, setname) in enumerate(zip([train_loader, val_loader, test_loader], ["train", "val", "test"])):
-        error, rmse_task, true_values, predicted_mean, predicted_std = test_ens(model_ens, loader, verbosity, num_samples=1000)
+        error, rmse_task, true_values, predicted_mean, predicted_std = test_ens(model_ens, loader, verbosity)#, num_samples=1024)
         print_distributed(verbosity,"number of heads %d"%len(true_values))
         print_distributed(verbosity,"number of samples %d"%len(true_values[0]))
         if hydragnn.utils.get_comm_size_and_rank()[1]==0:
@@ -263,7 +272,9 @@ if __name__ == "__main__":
                 ax.set_ylabel("Predicted")
             if ihead==1:
                 ax.set_xlabel("True")
-            plt.colorbar(sc)
+            #cbar=plt.colorbar(sc)
+            #cbar.ax.set_ylabel('Density', rotation=90)
+            ax.set_aspect('equal', adjustable='box')
     fig.savefig("./logs/" + log_name + "/parity_plot_all_errorbar.png",dpi=500)
     fig.savefig("./logs/" + log_name + "/parity_plot_all_errorbar.pdf")
     plt.close()
@@ -271,7 +282,9 @@ if __name__ == "__main__":
     fig, axs = plt.subplots(nheads, 3, figsize=(18, 6*nheads))
     for icol, (loader, setname) in enumerate(zip([train_loader, val_loader, test_loader], ["train", "val", "test"])):
         #error, rmse_task, true_values, predicted_mean, predicted_std = test_ens(model_ens, loader, verbosity, num_samples=1000, saveresultsto=f"./logs/{log_name}/{setname}_")
-        error, rmse_task, true_values, predicted_mean, predicted_std = test_ens(model_ens, loader, verbosity,saveresultsto=f"./logs/{log_name}/{setname}_")
+        #error, rmse_task, true_values, predicted_mean, predicted_std = test_ens(model_ens, loader, verbosity,  num_samples=4096, saveresultsto=f"./logs/{log_name}/{setname}_")
+        #error, rmse_task, true_values, predicted_mean, predicted_std = test_ens(model_ens, loader, verbosity,  num_samples=8192, saveresultsto=f"./logs/{log_name}/{setname}_")
+        error, rmse_task, true_values, predicted_mean, predicted_std = test_ens(model_ens, loader, verbosity, saveresultsto=f"./logs/{log_name}/{setname}_")
         print_distributed(verbosity,"number of heads %d"%len(true_values))
         print_distributed(verbosity,"number of samples %d"%len(true_values[0]))
         if hydragnn.utils.get_comm_size_and_rank()[1]==0:
@@ -308,7 +321,6 @@ if __name__ == "__main__":
                 ax.set_ylabel("Number of points")
             if ihead==1:
                 ax.set_xlabel("Error=Pred-True")
-            plt.colorbar(sc)
     fig.savefig("./logs/" + log_name + "/errorhist_plot_all.png")
     plt.close()
     ##################################################################################################################
