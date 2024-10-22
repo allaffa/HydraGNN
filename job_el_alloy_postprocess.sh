@@ -56,7 +56,11 @@ env | grep ^HYDRA
 #export PYTHONPATH=/dir/to/HydraGNN:$PYTHONPATH
 export PYTHONPATH=/lustre/orion/cph161/proj-shared/zhangp/HydraGNN_EL:$PYTHONPATH
 
-srun -n1 python -u ./examples/ensemble_learning/inference_alloy_postprocess.py --models_dir_folder=examples/ensemble_learning/alloy_binary_rmsd_1,examples/ensemble_learning/alloy_binary_rmsd_2 --log="EL_rmsd2"
-srun -n1 python -u ./examples/ensemble_learning/inference_alloy_postprocess.py --models_dir_folder=examples/ensemble_learning/alloy_binary_energy --log="EL_energy2"
-srun -n1 python -u ./examples/ensemble_learning/inference_alloy_postprocess.py --models_dir_folder=examples/ensemble_learning/alloy_binary_lattice --log="EL_lattice2"
+srun -n1 python -u ./examples/ensemble_learning/inference_alloy_postprocess.py --models_dir_folder=examples/ensemble_learning/alloy_ternary_rmsd  --log="EL_ternary_rmsd3" --nprocs=16
+srun -n1 python -u ./examples/ensemble_learning/inference_alloy_postprocess.py --models_dir_folder=examples/ensemble_learning/alloy_ternary_energy --log="EL_ternary_energy3" --nprocs=16
+#srun -n1 python -u ./examples/ensemble_learning/inference_alloy_postprocess.py --models_dir_folder=examples/ensemble_learning/alloy_ternary_lattice --log="EL_ternary_lattice" --nprocs=16
+
+srun -n1 python -u ./examples/ensemble_learning/inference_alloy_postprocess.py --models_dir_folder=examples/ensemble_learning/alloy_binary_rmsd_1,examples/ensemble_learning/alloy_binary_rmsd_2 --log="EL_rmsd3" --nprocs=16
+srun -n1 python -u ./examples/ensemble_learning/inference_alloy_postprocess.py --models_dir_folder=examples/ensemble_learning/alloy_binary_energy --log="EL_energy3" --nprocs=16
+####srun -n1 python -u ./examples/ensemble_learning/inference_alloy_postprocess.py --models_dir_folder=examples/ensemble_learning/alloy_binary_lattice --log="EL_lattice2"
 
