@@ -5,7 +5,7 @@
 #SBATCH -e job-%j.out
 #SBATCH -t 01:00:00
 #SBATCH -p batch
-#SBATCH -q debug
+##SBATCH -q debug
 #SBATCH -N 8 
 ##SBATCH -S 1
 
@@ -55,10 +55,19 @@ env | grep ^HYDRA
 #export PYTHONPATH=/dir/to/HydraGNN:$PYTHONPATH
 export PYTHONPATH=/lustre/orion/cph161/proj-shared/zhangp/HydraGNN_EL:$PYTHONPATH
 
-srun -N$SLURM_JOB_NUM_NODES -n$((SLURM_JOB_NUM_NODES*8)) -c7 --gpus-per-task=1 --gpu-bind=closest python -u ./examples/ensemble_learning/inference_GFM_bydataset.py --models_dir_folder=examples/ensemble_learning/GFM_logs --multi --ddstore --multi_model_list=ANI1x-v2
-srun -N$SLURM_JOB_NUM_NODES -n$((SLURM_JOB_NUM_NODES*8)) -c7 --gpus-per-task=1 --gpu-bind=closest python -u ./examples/ensemble_learning/inference_GFM_bydataset.py --models_dir_folder=examples/ensemble_learning/GFM_logs --multi --ddstore --multi_model_list=MPTrj-v2
-srun -N$SLURM_JOB_NUM_NODES -n$((SLURM_JOB_NUM_NODES*8)) -c7 --gpus-per-task=1 --gpu-bind=closest python -u ./examples/ensemble_learning/inference_GFM_bydataset.py --models_dir_folder=examples/ensemble_learning/GFM_logs --multi --ddstore --multi_model_list=OC2020-20M-v2
-srun -N$SLURM_JOB_NUM_NODES -n$((SLURM_JOB_NUM_NODES*8)) -c7 --gpus-per-task=1 --gpu-bind=closest python -u ./examples/ensemble_learning/inference_GFM_bydataset.py --models_dir_folder=examples/ensemble_learning/GFM_logs --multi --ddstore --multi_model_list=OC2022-v2
-srun -N$SLURM_JOB_NUM_NODES -n$((SLURM_JOB_NUM_NODES*8)) -c7 --gpus-per-task=1 --gpu-bind=closest python -u ./examples/ensemble_learning/inference_GFM_bydataset.py --models_dir_folder=examples/ensemble_learning/GFM_logs --multi --ddstore --multi_model_list=qm7x-v2
+srun -N$SLURM_JOB_NUM_NODES -n$((SLURM_JOB_NUM_NODES*8)) -c7 --gpus-per-task=1 --gpu-bind=closest python -u ./examples/ensemble_learning/inference_GFM_bydataset.py \
+--models_dir_folder=examples/ensemble_learning/GFM_logs_1028 --dataname=GFM_dataset_1028 --multi --ddstore --multi_model_list=ANI1x-v3 --log=GFM_EnsembleInference_1028
+
+srun -N$SLURM_JOB_NUM_NODES -n$((SLURM_JOB_NUM_NODES*8)) -c7 --gpus-per-task=1 --gpu-bind=closest python -u ./examples/ensemble_learning/inference_GFM_bydataset.py \
+--models_dir_folder=examples/ensemble_learning/GFM_logs_1028 --dataname=GFM_dataset_1028 --multi --ddstore --multi_model_list=MPTrj-v3 --log=GFM_EnsembleInference_1028
+
+srun -N$SLURM_JOB_NUM_NODES -n$((SLURM_JOB_NUM_NODES*8)) -c7 --gpus-per-task=1 --gpu-bind=closest python -u ./examples/ensemble_learning/inference_GFM_bydataset.py \
+--models_dir_folder=examples/ensemble_learning/GFM_logs_1028 --dataname=GFM_dataset_1028  --multi --ddstore --multi_model_list=OC2020-20M-v3 --log=GFM_EnsembleInference_1028
+
+srun -N$SLURM_JOB_NUM_NODES -n$((SLURM_JOB_NUM_NODES*8)) -c7 --gpus-per-task=1 --gpu-bind=closest python -u ./examples/ensemble_learning/inference_GFM_bydataset.py \
+--models_dir_folder=examples/ensemble_learning/GFM_logs_1028 --dataname=GFM_dataset_1028  --multi --ddstore --multi_model_list=OC2022-v3 --log=GFM_EnsembleInference_1028
+
+srun -N$SLURM_JOB_NUM_NODES -n$((SLURM_JOB_NUM_NODES*8)) -c7 --gpus-per-task=1 --gpu-bind=closest python -u ./examples/ensemble_learning/inference_GFM_bydataset.py \
+--models_dir_folder=examples/ensemble_learning/GFM_logs_1028 --dataname=GFM_dataset_1028  --multi --ddstore --multi_model_list=qm7x-v3 --log=GFM_EnsembleInference_1028
 
 
