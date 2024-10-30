@@ -292,7 +292,8 @@ if __name__ == "__main__":
             #hist1d, bin_edges = np.histogram(head_pred_std, bins=10**bins)
 
             ax.plot(0.5 * (bin_edges[:-1] + bin_edges[1:]), hist1d/sum(hist1d), "-", label=setname+"; "+str(sum(hist1d)))
-        
+            np.savez("./logs/" + log_name +'/uncertainty.npz', uncer_bins=0.5 * (bin_edges[:-1] + bin_edges[1:]), count_ratio=hist1d/sum(hist1d))
+
         ax.set_title(varname, fontsize=24)
         ax.set_ylabel("Count Ratio", fontsize=28)
         ax.set_xlabel("Uncertainties")
