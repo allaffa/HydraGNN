@@ -38,9 +38,9 @@ def main():
         formatter_class=argparse.ArgumentDefaultsHelpFormatter
     )
     parser.add_argument(
-        "--inputfile", help="input file", type=str, default="vasp_multitasking.json"
+        "--inputfile", help="input file", type=str, default="vasp_pinn.json"
     )
-    parser.add_argument("--model_type", help="model_type", default="EGNN")
+    parser.add_argument("--model_type", help="model_type", default="MACE")
     parser.add_argument("--hidden_dim", type=int, help="hidden_dim", default=5)
     parser.add_argument(
         "--num_conv_layers", type=int, help="num_conv_layers", default=6
@@ -108,7 +108,6 @@ def main():
     node_feature_names = ["atomic_number", "cartesian_coordinates", "forces"]
     node_feature_dims = [1, 3, 3]
     dirpwd = os.path.dirname(os.path.abspath(__file__))
-    datadir = os.path.join(dirpwd, "dataset")
     ##################################################################################################################
     input_filename = os.path.join(dirpwd, args.inputfile)
     ##################################################################################################################
@@ -121,6 +120,9 @@ def main():
     var_config["graph_feature_dims"] = graph_feature_dims
     var_config["node_feature_names"] = node_feature_names
     var_config["node_feature_dims"] = node_feature_dims
+
+    if args.batch_size is not None:
+        config["NeuralNetwork"]["Training"]["batch_size"] = args.batch_size
 
     # Update the config dictionary with the suggested hyperparameters
     config["NeuralNetwork"]["Architecture"]["model_type"] = args.parameters[
@@ -294,6 +296,7 @@ def main():
         log_name,
         verbosity,
         create_plots=False,
+        compute_grad_energy=True,
     )
 
     hydragnn.utils.model.save_model(model, optimizer, log_name)

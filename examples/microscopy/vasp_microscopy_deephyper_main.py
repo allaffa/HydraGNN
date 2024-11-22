@@ -127,23 +127,23 @@ if __name__ == "__main__":
     from deephyper.evaluator import Evaluator, ProcessPoolEvaluator, queued
     from deephyper.problem import HpProblem
     from deephyper.search.hps import CBO
-    from hydragnn.utils.deephyper import read_node_list
+    from hydragnn.utils.hpo.deephyper import read_node_list
 
     # define the variable you want to optimize
     problem = HpProblem()
 
     # Define the search space for hyperparameters
     problem.add_hyperparameter((1, 5), "num_conv_layers")  # discrete parameter
-    problem.add_hyperparameter((300, 2000), "hidden_dim")  # discrete parameter
+    problem.add_hyperparameter((100, 500), "hidden_dim")  # discrete parameter
     problem.add_hyperparameter((1, 5), "num_sharedlayers")  # discrete parameter
-    problem.add_hyperparameter((500, 2000), "dim_sharedlayers")  # discrete parameter
+    problem.add_hyperparameter((100, 500), "dim_sharedlayers")  # discrete parameter
     problem.add_hyperparameter((1, 3), "num_headlayers")  # discrete parameter
     problem.add_hyperparameter(
-        (500, 1000), "dim_headlayers_graph"
+        (100, 500), "dim_headlayers_graph"
     )  # discrete parameter
-    problem.add_hyperparameter((500, 3000), "dim_headlayers_node")  # discrete parameter
+    problem.add_hyperparameter((100, 500), "dim_headlayers_node")  # discrete parameter
     problem.add_hyperparameter(
-        ["EGNN", "SchNet", "PNA"], "model_type"
+        ["MACE"], "model_type"
     )  # categorical parameter
 
     # Create the node queue
