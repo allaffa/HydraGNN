@@ -408,6 +408,7 @@ class VASPDataset(AbstractBaseDataset):
 
                     for data_object in temp_dataset:
                         if data_object is not None:
+                            data_object.pbc = [True, True, True]
                             data_object = self.radius_graph(data_object)
                             data_object = transform_coordinates(data_object)
                             self.dataset.append(data_object)
