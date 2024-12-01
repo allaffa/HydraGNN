@@ -76,6 +76,12 @@ def main():
         help="set num samples per process for weak-scaling test",
         default=None,
     )
+    parser.add_argument(
+        "--compute_grad_energy",
+        action="store_true",
+        help="use automatic differentiation to compute gradiens of energy",
+        default=False,
+    )
 
     group = parser.add_mutually_exclusive_group()
     group.add_argument(
@@ -164,7 +170,7 @@ def main():
                 "dim_headlayers"
             ] = dim_headlayers_node
 
-    if args.parameters["model_type"] not in ["EGNN", "SchNet", "DimeNet"]:
+    if args.parameters["model_type"] not in ["EGNN", "SchNet", "DimeNet", "MACE"]:
         config["NeuralNetwork"]["Architecture"]["equivariance"] = False
 
     if args.batch_size is not None:
@@ -266,7 +272,6 @@ def main():
         config=config["NeuralNetwork"],
         verbosity=verbosity,
     )
-    print("MASSI --- HELP")
     model = hydragnn.utils.distributed.get_distributed_model(model, verbosity)
 
     # Print details of neural network architecture
@@ -296,7 +301,7 @@ def main():
         log_name,
         verbosity,
         create_plots=False,
-        compute_grad_energy=True,
+        compute_grad_energy=args.compute_grad_energy,
     )
 
     hydragnn.utils.model.save_model(model, optimizer, log_name)
