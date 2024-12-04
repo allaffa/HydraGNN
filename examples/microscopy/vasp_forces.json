@@ -4,7 +4,7 @@
     },
     "Dataset": {
         "name": "MOS2",
-        "path": {"total": "./dataset/undoped_MOS2_structures"},
+        "path": {"total": "./dataset/MOS2"},
         "format": "VASP",
         "compositional_stratified_splitting": false,
 	    "rotational_invariance": true,

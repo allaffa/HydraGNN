@@ -5,7 +5,7 @@
     "Dataset": {
         "name": "MOS2",
         "path": {
-            "total": "./dataset/new_aggregated_data"
+            "total": "./dataset/MO2"
         },
         "format": "VASP",
         "compositional_stratified_splitting": false,
