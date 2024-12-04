@@ -196,12 +196,18 @@ if __name__ == "__main__":
         true_values = []
         predicted_values = []
 
-        for data_id, data in enumerate(tqdm(testset)):
+        # Batch size
+        from torch_geometric.loader import DataLoader
+        batch_size = 1
+        test_data_loader = DataLoader(testset, batch_size=batch_size, shuffle=True)
+
+        # for data_id, data in enumerate(tqdm(testset)):
+        for data in tqdm(test_data_loader):
             predicted = model(data.to(get_device()))
             predicted = predicted[variable_index].flatten()
             start = data.y_loc[0][variable_index].item()
             end = data.y_loc[0][variable_index + 1].item()
-            true = data.y[start:end, 0]
+            true = data.y.squeeze(1)#[start:end, 0]
             test_MAE += torch.norm(predicted - true, p=1).item() / len(testset)
             predicted_values.extend(predicted.tolist())
             true_values.extend(true.tolist())
@@ -213,10 +219,16 @@ if __name__ == "__main__":
         plt.clim(0, 1)
         ax.plot(ax.get_xlim(), ax.get_xlim(), ls="--", color="red")
         plt.colorbar()
-        plt.xlim([-10.0, 70.0])
-        plt.ylim([-10.0, 70.0])
-        plt.xlabel("True values (meV/atom)")
-        plt.ylabel("Predicted values (meV/atom)")
+        # Energy
+        # plt.xlim([-10.0, 70.0])
+        # plt.ylim([-10.0, 70.0])
+        # plt.xlabel("True values (meV/atom)")
+        # plt.ylabel("Predicted values (meV/atom)")
+        # RMSD
+        plt.xlim([0.0, 0.15])
+        plt.ylim([0.0, 0.15])
+        plt.xlabel("True values (ansgtrom)")
+        plt.ylabel("Predicted values (angstrom)")
         plt.title(f"{output_name}")
         plt.draw()
         plt.tight_layout()
