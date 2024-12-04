@@ -143,9 +143,14 @@ if __name__ == "__main__":
         (100, 500), "dim_headlayers_graph"
     )  # discrete parameter
     problem.add_hyperparameter((100, 500), "dim_headlayers_node")  # discrete parameter
-    problem.add_hyperparameter(
-        ["PNA", "PNAPlus", "PNAEq", "PAINN", "EGNN", "SchNet", "DimeNet", "MACE"], "model_type"
-    )  # categorical parameter
+    if args.compute_grad_energy:
+        problem.add_hyperparameter(
+            ["PNAPlus", "PNAEq", "PAINN", "EGNN", "SchNet", "DimeNet", "MACE"], "model_type"
+        )  # categorical parameter
+    else:
+        problem.add_hyperparameter(
+            ["PNA", "PNAPlus", "PNAEq", "PAINN", "EGNN", "SchNet", "DimeNet", "MACE"], "model_type"
+        )  # categorical parameter
 
     # Create the node queue
     queue, _ = read_node_list()

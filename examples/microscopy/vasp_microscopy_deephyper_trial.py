@@ -170,7 +170,7 @@ def main():
                 "dim_headlayers"
             ] = dim_headlayers_node
 
-    if args.parameters["model_type"] not in ["EGNN", "SchNet", "MACE"]:
+    if args.parameters["model_type"] not in ["EGNN", "SchNet", "PNAEq", "PAINN", "MACE"]:
         config["NeuralNetwork"]["Architecture"]["equivariance"] = False
 
     if args.batch_size is not None:
