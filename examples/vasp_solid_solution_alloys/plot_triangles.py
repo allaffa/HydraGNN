@@ -168,7 +168,7 @@ def plot_ternary_field(composition_dict, atom_type_mapping):
 
     # Add color bar to the right
     # Create a normalization object with the desired range
-    norm = Normalize(vmin=0.0, vmax=0.01)
+    norm = Normalize(vmin=vmin, vmax=vmax)
 
     # Create a color bar with the specified normalization
     cbar = plt.colorbar(
