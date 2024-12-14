@@ -100,6 +100,7 @@ def run(trial, dequed=None):
             ##f'--multi_model_list="ANI1x"',
             f"--num_epoch=300",
             f"--log={log_name}",
+            f"--compute_grad_energy",
         ]
     )
     print("Command = ", command, flush=True, file=f)
@@ -160,9 +161,15 @@ if __name__ == "__main__":
         (500, 1000), "dim_headlayers_graph"
     )  # discrete parameter
     problem.add_hyperparameter((500, 3000), "dim_headlayers_node")  # discrete parameter
+    problem.add_hyperparameter((100, 500), "dim_headlayers_node")  # discrete parameter
     problem.add_hyperparameter(
-        ["EGNN", "SchNet", "PNA"], "model_type"
+        ["PNAPlus", "PNAEq", "PAINN", "EGNN", "SchNet", "DimeNet", "MACE"], "model_type"
     )  # categorical parameter
+    """
+    problem.add_hyperparameter(
+        ["MACE"], "model_type"
+    )  # categorical parameter
+    """
 
     # Create the node queue
     queue, _ = read_node_list()
