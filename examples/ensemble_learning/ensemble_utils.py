@@ -66,6 +66,10 @@ def debug_nan(x, message=""):
 
     return False
 def test_ens(model_ens, loader, verbosity, num_samples=None, saveresultsto=None):
+
+    pure_elements_dictionary = {'V': 23, 'Nb': 41, 'Ta': 73} #tmp for alloy datasets
+    elements_list = ['V', 'Nb', 'Ta']
+
     n_ens=len(model_ens.module)
     num_heads=model_ens.module.num_heads
 
@@ -77,11 +81,17 @@ def test_ens(model_ens, loader, verbosity, num_samples=None, saveresultsto=None)
 
     true_values = [[] for _ in range(num_heads)]
     predicted_values = [[[] for _ in range(num_heads)] for _ in range(n_ens)]
+    compositions=[]
     for data in iterate_tqdm(loader, verbosity):
         data=data.to(device)
         head_index = get_head_indices(model_ens.module.model_ens[0], data)
         ###########################
         pred_ens = model_ens(data)
+        ###########################
+        assert data.batch.max()==0 #checking the composition for individual structure
+        comp=[sum(data.x[:, 0] == pure_elements_dictionary[ele]).item() / data.num_nodes for ele in elements_list]
+        compositions.append(comp)
+        print("Pei checking atom numbers: ", data.x[:,0], comp)
         ###########################
         ytrue = data.y
         print("Pei checking sizes: %d/%d"%(hydragnn.utils.get_comm_size_and_rank()[1], hydragnn.utils.get_comm_size_and_rank()[0]), ytrue.size(), head_index, num_heads, data.batch.max())
@@ -105,7 +115,7 @@ def test_ens(model_ens, loader, verbosity, num_samples=None, saveresultsto=None)
                 predicted_values[imodel][ihead].extend(head_pre.tolist())
         if num_samples is not None and num_samples_total > num_samples//hydragnn.utils.get_comm_size_and_rank()[0]-1:
             break
-    
+    compositions = torch.tensor(compositions)
     total_error = reduce_values_ranks(total_error)
     tasks_error = reduce_values_ranks(tasks_error)
     num_samples_total = reduce_values_ranks(torch.tensor(num_samples_total)).item()
@@ -130,7 +140,8 @@ def test_ens(model_ens, loader, verbosity, num_samples=None, saveresultsto=None)
         predicted_std[ihead] = head_pred_std
         print(head_pred_ens.size(), true_values[ihead].size())
         if saveresultsto is not None: # and hydragnn.utils.get_comm_size_and_rank()[1]==0:
-            m = {'true': true_values[ihead], 'pred_ens': head_pred_ens}
+            #m = {'true': true_values[ihead], 'pred_ens': head_pred_ens}
+            m = {'true': true_values[ihead], 'pred_ens': head_pred_ens, 'compositions': compositions}
             #torch.save(m, saveresultsto +"head%d.db"%ihead)
             #torch.save(m, saveresultsto +"head%d_%s.db"%(ihead, str(device)))
             torch.save(m, saveresultsto +"head%d_proc%s.db"%(ihead, str(hydragnn.utils.get_comm_size_and_rank()[1])))

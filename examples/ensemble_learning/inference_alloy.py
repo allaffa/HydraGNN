@@ -105,14 +105,21 @@ if __name__ == "__main__":
     modelname=args.dataname
 
     var_config = None
+    modeldirlist_real=[]
     for modeldir in modeldirlist:
         input_filename = os.path.join(modeldir, "config.json")
+        if not os.path.exists(input_filename):
+            continue
+
         with open(input_filename, "r") as f:
             config = json.load(f)
         if var_config is not None:
             assert var_config==config["NeuralNetwork"]["Variables_of_interest"], "Inconsistent variable config in %s"%input_filename
         else:
             var_config = config["NeuralNetwork"]["Variables_of_interest"]
+        modeldirlist_real.append(modeldir)
+    
+    modeldirlist = modeldirlist_real
     verbosity=config["Verbosity"]["level"]
     log_name = "GFM_EnsembleInference" if args.log is None else args.log
     hydragnn.utils.setup_log(log_name)
@@ -156,7 +163,7 @@ if __name__ == "__main__":
         trainset,
         valset,
         testset,
-        8,
+        1,
         #config["NeuralNetwork"]["Training"]["batch_size"],
         test_sampler_shuffle=False,
     )
