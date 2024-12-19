@@ -81,7 +81,7 @@ if __name__ == "__main__":
         modeldirlist = []
         for models_dir_folder in modeldirlists:
             modeldirlist.extend([os.path.join(models_dir_folder, name) for name in os.listdir(models_dir_folder) if os.path.isdir(os.path.join(models_dir_folder, name))])
-
+    
     var_config = None
     modeldirlist_real=[]
     for modeldir in modeldirlist:
@@ -102,9 +102,11 @@ if __name__ == "__main__":
     ##################################################################################################################
     ##################################################################################################################
     def get_ensemble_mean_std(file_name):
+        #m = {'true': true_values[ihead], 'pred_ens': head_pred_ens, 'compositions': compositions}
         loaded = torch.load(file_name)
         true_values=loaded['true']
         head_pred_ens=loaded['pred_ens']
+        comp_values=loaded['compositions']
         print(file_name, head_pred_ens.size(), true_values.size())
         #print_distributed(verbosity,"number of samples %d"%len(true_values))
         head_pred_mean = head_pred_ens.mean(axis=0)
@@ -113,11 +115,13 @@ if __name__ == "__main__":
         head_pred_ens = head_pred_ens.cpu().squeeze().numpy() 
         head_pred_mean = head_pred_mean.cpu().squeeze().numpy() 
         head_pred_std = head_pred_std.cpu().squeeze().numpy() 
-        return head_true, head_pred_mean, head_pred_std
+        comp_values = comp_values.cpu().squeeze().numpy() 
+        return head_true, head_pred_mean, head_pred_std, comp_values
     ##################################################################################################################
     ##################################################################################################################
-    fig, axs = plt.subplots(1, 3, figsize=(15, 5))
-    for icol, setname in enumerate(["train", "val", "test"]):
+    #fig, axs = plt.subplots(1, 3, figsize=(15, 5))
+    fig, axs = plt.subplots(1, 3, figsize=(16, 5))
+    for icol, setname in enumerate(["test"]):
         saveresultsto=f"./logs/{log_name}/{setname}_"
 
         for  ihead, (output_name, output_type, output_dim) in enumerate(zip(
@@ -125,36 +129,38 @@ if __name__ == "__main__":
         config["NeuralNetwork"]["Variables_of_interest"]["type"],
         config["NeuralNetwork"]["Variables_of_interest"]["output_dim"],
         )):
-            assert ihead==0
-            ax = axs[icol]
-            """
-            file_name= saveresultsto +"head%d.db"%ihead
-            loaded = torch.load(file_name)
-            true_values=loaded['true']
-            head_pred_ens=loaded['pred_ens']
-            print(head_pred_ens.size())
-            #print_distributed(verbosity,"number of samples %d"%len(true_values))
-            head_pred_mean = head_pred_ens.mean(axis=0)
-            head_pred_std = head_pred_ens.std(axis=0)
-            head_true = true_values.cpu().squeeze().numpy() 
-            head_pred_ens = head_pred_ens.cpu().squeeze().numpy() 
-            head_pred_mean = head_pred_mean.cpu().squeeze().numpy() 
-            head_pred_std = head_pred_std.cpu().squeeze().numpy() 
-            """ 
+            assert ihead==0 and icol==0
+            ax = axs[0]
             head_true=[None]*nprocs
             head_pred_mean=[None]*nprocs
             head_pred_std=[None]*nprocs
+            comp_values = [None]*nprocs
             for iproc in range(nprocs):    
                 file_name= saveresultsto +"head%d_proc%d.db"%(ihead, iproc)
-                head_true[iproc], head_pred_mean[iproc], head_pred_std[iproc] = get_ensemble_mean_std(file_name)
+                head_true[iproc], head_pred_mean[iproc], head_pred_std[iproc], comp_values[iproc] = get_ensemble_mean_std(file_name)
             head_true=np.concatenate(head_true)
             head_pred_mean=np.concatenate(head_pred_mean)
             head_pred_std=np.concatenate(head_pred_std)
-
+            comp_values=np.concatenate(comp_values)
             ifeat = var_config["output_index"][ihead]
             outtype = var_config["type"][ihead]
             varname = var_config["output_names"][ihead]
             
+            if varname=="formation_enthalpy":
+                print(f"checking {varname} outlier values:", head_true[np.where(head_true>=75)])
+                print(f"checking {varname} outlier values with composition:", comp_values[np.where(head_true>=75)])
+                head_pred_mean=head_pred_mean[np.where(head_true<75)]
+                head_pred_std=head_pred_std[np.where(head_true<75)]
+                comp_values=comp_values[np.where(head_true<75)]
+                head_true=head_true[np.where(head_true<75)]
+            elif varname=="rmsd":
+                print(np.where(head_true<=1e-4))
+                print(f"checking {varname} outlier values:", head_true[np.where(head_true<=1e-4)])
+                print(f"checking {varname} outlier values with composition:", comp_values[np.where(head_true<=1e-4)])
+                head_pred_mean=head_pred_mean[np.where(head_true>1e-4)]
+                head_pred_std=head_pred_std[np.where(head_true>1e-4)]
+                comp_values=comp_values[np.where(head_true>1e-4)]
+                head_true=head_true[np.where(head_true>1e-4)]
 
             error_mae = np.mean(np.abs(head_pred_mean - head_true))
             error_rmse = np.sqrt(np.mean(np.abs(head_pred_mean - head_true) ** 2))
@@ -167,8 +173,10 @@ if __name__ == "__main__":
             ax.plot([minv, maxv], [minv, maxv], "r--")
             ax.set_title(setname + "; " + varname, fontsize=24)
             ax.text(
+                #minv + 0.1 * (maxv - minv),
+                maxv - 0.75 * (maxv - minv),
+                #maxv - 0.1 * (maxv - minv),
                 minv + 0.1 * (maxv - minv),
-                maxv - 0.1 * (maxv - minv),
                 "MAE: {:.2e}".format(error_mae),
             )
             if icol==0:
@@ -179,55 +187,40 @@ if __name__ == "__main__":
             if True: #icol==2:
                 divider = make_axes_locatable(ax)
                 cax = divider.append_axes('right', size='5%', pad=0.05)
-                if icol==2:
+                if True: #icol==2:
                     fig.colorbar(sc, cax=cax, orientation='vertical')
-                else:
-                    cax.set_axis_off()
-    plt.subplots_adjust(left=0.08, bottom=0.1, right=0.95, top=0.95, wspace=0.2, hspace=0.3)
-    fig.savefig("./logs/" + log_name + "/parity_plot_post.png",dpi=500)
-    fig.savefig("./logs/" + log_name + "/parity_plot_post.pdf")
-    plt.close()
-    ##################################################################################################################
-    ##################################################################################################################
-    fig, axs = plt.subplots(1, 3, figsize=(15, 5))
-    for icol, setname in enumerate(["train", "val", "test"]):
-        saveresultsto=f"./logs/{log_name}/{setname}_"
-
-        for  ihead, (output_name, output_type, output_dim) in enumerate(zip(
-        config["NeuralNetwork"]["Variables_of_interest"]["output_names"],
-        config["NeuralNetwork"]["Variables_of_interest"]["type"],
-        config["NeuralNetwork"]["Variables_of_interest"]["output_dim"],
-        )):
-            assert ihead==0
-            ax = axs[icol]
-            """
-            file_name= saveresultsto +"head%d.db"%ihead
-            loaded = torch.load(file_name)
-            true_values=loaded['true']
-            head_pred_ens=loaded['pred_ens']
-            print(head_pred_ens.size())
-            #print_distributed(verbosity,"number of samples %d"%len(true_values))
-            head_pred_mean = head_pred_ens.mean(axis=0)
-            head_pred_std = head_pred_ens.std(axis=0)
-            head_true = true_values.cpu().squeeze().numpy() 
-            head_pred_ens = head_pred_ens.cpu().squeeze().numpy() 
-            head_pred_mean = head_pred_mean.cpu().squeeze().numpy() 
-            head_pred_std = head_pred_std.cpu().squeeze().numpy() 
-            """ 
+            ax = axs[1]
             head_true=[None]*nprocs
             head_pred_mean=[None]*nprocs
             head_pred_std=[None]*nprocs
+            comp_values = [None]*nprocs
             for iproc in range(nprocs):    
                 file_name= saveresultsto +"head%d_proc%d.db"%(ihead, iproc)
-                head_true[iproc], head_pred_mean[iproc], head_pred_std[iproc] = get_ensemble_mean_std(file_name)
+                head_true[iproc], head_pred_mean[iproc], head_pred_std[iproc], comp_values[iproc] = get_ensemble_mean_std(file_name)
             head_true=np.concatenate(head_true)
             head_pred_mean=np.concatenate(head_pred_mean)
             head_pred_std=np.concatenate(head_pred_std)
+            comp_values=np.concatenate(comp_values)
 
             ifeat = var_config["output_index"][ihead]
             outtype = var_config["type"][ihead]
             varname = var_config["output_names"][ihead]
             
+            if varname=="formation_enthalpy":
+                print(f"checking {varname} outlier values:", head_true[np.where(head_true>=75)])
+                print(f"checking {varname} outlier values with composition:", comp_values[np.where(head_true>=75)])
+                head_pred_mean=head_pred_mean[np.where(head_true<75)]
+                head_pred_std=head_pred_std[np.where(head_true<75)]
+                comp_values=comp_values[np.where(head_true<75)]
+                head_true=head_true[np.where(head_true<75)]
+            elif varname=="rmsd":
+                print(np.where(head_true<=1e-4))
+                print(f"checking {varname} outlier values:", head_true[np.where(head_true<=1e-4)])
+                print(f"checking {varname} outlier values with composition:", comp_values[np.where(head_true<=1e-4)])
+                head_pred_mean=head_pred_mean[np.where(head_true>1e-4)]
+                head_pred_std=head_pred_std[np.where(head_true>1e-4)]
+                comp_values=comp_values[np.where(head_true>1e-4)]
+                head_true=head_true[np.where(head_true>1e-4)]
 
             error_mae = np.mean(np.abs(head_pred_mean - head_true))
             error_rmse = np.sqrt(np.mean(np.abs(head_pred_mean - head_true) ** 2))
@@ -240,78 +233,87 @@ if __name__ == "__main__":
             ax.plot([minv, maxv], [minv, maxv], "r--")
             ax.set_title(setname + "; " + varname, fontsize=24)
             ax.text(
+                #minv + 0.1 * (maxv - minv),
+                maxv - 0.75 * (maxv - minv),
+                #maxv - 0.1 * (maxv - minv),
                 minv + 0.1 * (maxv - minv),
-                maxv - 0.1 * (maxv - minv),
                 "MAE: {:.2e}".format(error_mae),
             )
-            if icol==0:
-                ax.set_ylabel("Predicted")
+            #if icol==0:
+            #    ax.set_ylabel("Predicted")
             ax.set_xlabel("True")
             ax.set_aspect('equal', adjustable='box')
             #plt.colorbar(sc)
             if True: #icol==2:
                 divider = make_axes_locatable(ax)
                 cax = divider.append_axes('right', size='5%', pad=0.05)
-                if icol==2:
-                    fig.colorbar(sc, cax=cax, orientation='vertical')
-                else:
-                    cax.set_axis_off()
+                cax.set_axis_off()
             xmin, xmax = ax.get_ylim()
             ymin, ymax = ax.get_ylim()
             ax.set_xlim(min(xmin, ymin), max(xmax,ymax))
             ax.set_ylim(min(xmin, ymin), max(xmax,ymax))
             ax.set_aspect('equal', adjustable='box')
-            
-    plt.subplots_adjust(left=0.08, bottom=0.1, right=0.95, top=0.95, wspace=0.2, hspace=0.3)
-    fig.savefig("./logs/" + log_name + "/parity_plot_post_errorbar.png",dpi=500)
-    fig.savefig("./logs/" + log_name + "/parity_plot_post_errorbar.pdf")
-    plt.close()
-    ##################################################################################################################
-    ##################################################################################################################
-    fig, ax = plt.subplots(1, 1, figsize=(6, 5))
-    for icol, setname in enumerate(["train", "val", "test"]):
-        saveresultsto=f"./logs/{log_name}/{setname}_"
 
-        for  ihead, (output_name, output_type, output_dim) in enumerate(zip(
-        config["NeuralNetwork"]["Variables_of_interest"]["output_names"],
-        config["NeuralNetwork"]["Variables_of_interest"]["type"],
-        config["NeuralNetwork"]["Variables_of_interest"]["output_dim"],
-        )):
-            assert ihead==0
+            ax=axs[2]
             head_true=[None]*nprocs
             head_pred_mean=[None]*nprocs
             head_pred_std=[None]*nprocs
+            comp_values = [None]*nprocs
             for iproc in range(nprocs):    
                 file_name= saveresultsto +"head%d_proc%d.db"%(ihead, iproc)
-                head_true[iproc], head_pred_mean[iproc], head_pred_std[iproc] = get_ensemble_mean_std(file_name)
+                head_true[iproc], head_pred_mean[iproc], head_pred_std[iproc], comp_values[iproc] = get_ensemble_mean_std(file_name)
             head_true=np.concatenate(head_true)
             head_pred_mean=np.concatenate(head_pred_mean)
             head_pred_std=np.concatenate(head_pred_std)
+            comp_values=np.concatenate(comp_values)
 
             ifeat = var_config["output_index"][ihead]
             outtype = var_config["type"][ihead]
             varname = var_config["output_names"][ihead]
+            
+            if varname=="formation_enthalpy":
+                print(f"checking {varname} outlier values:", head_true[np.where(head_true>=75)])
+                print(f"checking {varname} outlier values with composition:", comp_values[np.where(head_true>=75)])
+                head_pred_mean=head_pred_mean[np.where(head_true<75)]
+                head_pred_std=head_pred_std[np.where(head_true<75)]
+                comp_values=comp_values[np.where(head_true<75)]
+                head_true=head_true[np.where(head_true<75)]
+            elif varname=="rmsd":
+                print(np.where(head_true<=1e-4))
+                print(f"checking {varname} outlier values:", head_true[np.where(head_true<=1e-4)])
+                print(f"checking {varname} outlier values with composition:", comp_values[np.where(head_true<=1e-4)])
+                head_pred_mean=head_pred_mean[np.where(head_true>1e-4)]
+                head_pred_std=head_pred_std[np.where(head_true>1e-4)]
+                comp_values=comp_values[np.where(head_true>1e-4)]
+                head_true=head_true[np.where(head_true>1e-4)]
             
             hist1d, bin_edges = np.histogram(head_pred_std, bins=50)
             #_, bins = np.histogram(np.log10(head_pred_std), bins='auto')
             #hist1d, bin_edges = np.histogram(head_pred_std, bins=10**bins)
 
-            ax.plot(0.5 * (bin_edges[:-1] + bin_edges[1:]), hist1d/sum(hist1d), "-", label=setname+"; "+str(sum(hist1d)))
-            np.savez("./logs/" + log_name +'/uncertainty.npz', uncer_bins=0.5 * (bin_edges[:-1] + bin_edges[1:]), count_ratio=hist1d/sum(hist1d))
+            #ax.plot(0.5 * (bin_edges[:-1] + bin_edges[1:]), hist1d/sum(hist1d), "-", label=setname)#+"; "+str(sum(hist1d)))
+            ax.plot(0.5 * (bin_edges[:-1] + bin_edges[1:]), hist1d/sum(hist1d), "-", label=setname+" ("+str(sum(hist1d))+")", linewidth=2.0)
 
-        ax.set_title(varname, fontsize=24)
-        ax.set_ylabel("Count Ratio", fontsize=28)
-        ax.set_xlabel("Uncertainties")
-         
-    ax.legend()
-    plt.subplots_adjust(left=0.2, bottom=0.15, right=0.98, top=0.925)#, wspace=0.2, hspace=0.3)
-    fig.savefig("./logs/" + log_name + "/hist_uncertainty.png",dpi=500)
-    fig.savefig("./logs/" + log_name + "/hist_uncertainty.pdf")
+            if True: #icol==2:
+                divider = make_axes_locatable(ax)
+                cax = divider.append_axes('right', size='5%', pad=0.05)
+                cax.set_axis_off()
+            ax.set_box_aspect(1)
+            ax.set_title(varname)
+            ax.set_ylabel("Count Ratio")
+            ax.set_xlabel("Uncertainties")
+            np.savez("./logs/" + log_name +'/uncertainty.npz', uncer_bins=0.5 * (bin_edges[:-1] + bin_edges[1:]), count_ratio=hist1d/sum(hist1d))
+        ax.legend()
+    ##################################################################################################################
+    #plt.subplots_adjust(left=0.06, bottom=0.1, right=0.99, top=0.925, wspace=0.25, hspace=0.3)
+    plt.subplots_adjust(left=0.09, bottom=0.1, right=0.99, top=0.925, wspace=0.35, hspace=0.3)
+
+    fig.savefig("./logs/" + log_name + f"/crosscheck_post_errorbar_{log_name}.png",dpi=500)
+    fig.savefig("./logs/" + log_name + f"/crosscheck_post_errorbar_{log_name}.pdf")
     plt.close()
     ##################################################################################################################
-    """
-    fig, axs = plt.subplots(2, 3, figsize=(18, 12))
-    for icol, setname in enumerate(["train", "val", "test"]):
+    fig, axs = plt.subplots(1, 3, figsize=(15, 5))
+    for icol, setname in enumerate(["test"]):
         saveresultsto=f"./logs/{log_name}/{setname}_"
 
         for  ihead, (output_name, output_type, output_dim) in enumerate(zip(
@@ -319,47 +321,92 @@ if __name__ == "__main__":
         config["NeuralNetwork"]["Variables_of_interest"]["type"],
         config["NeuralNetwork"]["Variables_of_interest"]["output_dim"],
         )):
-            ax = axs[ihead, icol]
-            
-            file_name= saveresultsto +"head%d.db"%ihead
-            loaded = torch.load(file_name)
-            true_values=loaded['true']
-            head_pred_ens=loaded['pred_ens']
-            print(head_pred_ens.size())
-            #print_distributed(verbosity,"number of samples %d"%len(true_values))
-            head_pred_mean = head_pred_ens.mean(axis=0)
-            head_pred_std = head_pred_ens.std(axis=0)
-            head_true = true_values.cpu().squeeze().numpy() 
-            head_pred_ens = head_pred_ens.cpu().squeeze().numpy() 
-            head_pred_mean = head_pred_mean.cpu().squeeze().numpy() 
-            head_pred_std = head_pred_std.cpu().squeeze().numpy() 
+            assert ihead==0 and icol==0
+            head_true=[None]*nprocs
+            head_pred_mean=[None]*nprocs
+            head_pred_std=[None]*nprocs
+            comp_values = [None]*nprocs
+            for iproc in range(nprocs):    
+                file_name= saveresultsto +"head%d_proc%d.db"%(ihead, iproc)
+                head_true[iproc], head_pred_mean[iproc], head_pred_std[iproc], comp_values[iproc] = get_ensemble_mean_std(file_name)
+            head_true=np.concatenate(head_true)
+            head_pred_mean=np.concatenate(head_pred_mean)
+            head_pred_std=np.concatenate(head_pred_std)
+            comp_values=np.concatenate(comp_values)
 
             ifeat = var_config["output_index"][ihead]
             outtype = var_config["type"][ihead]
             varname = var_config["output_names"][ihead]
+            error_diff = head_pred_mean - head_true
+            pure_elements_dictionary = {'V': 23, 'Nb': 41, 'Ta': 73} #tmp for alloy datasets
+            elements_list = ['V', 'Nb', 'Ta']
+            for icomp in range(3):
+                print(comp_values.shape)
+                compvalue=comp_values[:,icomp].squeeze()
+                ax=axs[icomp]
+                hist2d_norm = getcolordensity( compvalue, error_diff,)
 
-            for imodel in range(head_pred_ens.shape[0]):
-                head_pred = head_pred_ens[imodel,:].squeeze()
-                hist1d, bin_edges = np.histogram(head_pred - head_true, bins=50)
-                ax.plot(0.5 * (bin_edges[:-1] + bin_edges[1:]), hist1d, "-")
-                ax.set_title(setname + "; " + varname, fontsize=24)
-
-            
-         
-            hist1d, bin_edges = np.histogram(head_pred_mean - head_true, bins=50)
-            ax.plot(0.5 * (bin_edges[:-1] + bin_edges[1:]), hist1d, "ro-")
-            ax.plot([0.0, 0.0],[0.0, max(hist1d)*1.2],"k:")
-            ax.set_title(setname + "; " + varname, fontsize=24)
-            if icol==0:
-                ax.set_ylabel("Number of points")
-            if ihead==1:
-                ax.set_xlabel("Error=Pred-True")
-                ax.set_xlim(-0.75, .75)
-            else:
-                ax.set_xlim(-0.01, 0.01)
-    #fig.savefig("./logs/" + log_name + "/errorhist_plot_allmodels.png")
-    fig.savefig("./logs/" + log_name + "/errorhist_plot_allmodels_zoomin.png")
+                sc=ax.scatter(compvalue, error_diff, s=12, c=hist2d_norm, vmin=0, vmax=1)
+                if True: #icol==2:
+                    divider = make_axes_locatable(ax)
+                    cax = divider.append_axes('right', size='5%', pad=0.05)
+                    cax.set_axis_off()
+                ax.set_box_aspect(1)
+                ax.set_title(varname)
+                if icomp==0:
+                    ax.set_ylabel("Error=Pre-True")
+                ax.set_xlabel(f"Comp-{elements_list[icomp]}")
+    ##################################################################################################################
+    plt.subplots_adjust(left=0.1, bottom=0.1, right=0.99, top=0.925, wspace=0.15, hspace=0.3)
+    fig.savefig("./logs/" + log_name + f"/crosscheck_post_comp_{log_name}.png",dpi=500)
+    fig.savefig("./logs/" + log_name + f"/crosscheck_post_comp_{log_name}.pdf")
     plt.close()
-    """
+
+    fig, axs = plt.subplots(1, 1, figsize=(5, 5))
+    ax=axs
+    for icol, setname in enumerate(["test"]):
+        saveresultsto=f"./logs/{log_name}/{setname}_"
+
+        for  ihead, (output_name, output_type, output_dim) in enumerate(zip(
+        config["NeuralNetwork"]["Variables_of_interest"]["output_names"],
+        config["NeuralNetwork"]["Variables_of_interest"]["type"],
+        config["NeuralNetwork"]["Variables_of_interest"]["output_dim"],
+        )):
+            assert ihead==0 and icol==0
+            head_true=[None]*nprocs
+            head_pred_mean=[None]*nprocs
+            head_pred_std=[None]*nprocs
+            comp_values = [None]*nprocs
+            for iproc in range(nprocs):    
+                file_name= saveresultsto +"head%d_proc%d.db"%(ihead, iproc)
+                head_true[iproc], head_pred_mean[iproc], head_pred_std[iproc], comp_values[iproc] = get_ensemble_mean_std(file_name)
+            head_true=np.concatenate(head_true)
+            head_pred_mean=np.concatenate(head_pred_mean)
+            head_pred_std=np.concatenate(head_pred_std)
+            comp_values=np.concatenate(comp_values)
+
+            ifeat = var_config["output_index"][ihead]
+            outtype = var_config["type"][ihead]
+            varname = var_config["output_names"][ihead]
+            error_diff = head_pred_mean - head_true
+            pure_elements_dictionary = {'V': 23, 'Nb': 41, 'Ta': 73} #tmp for alloy datasets
+            elements_list = ['V', 'Nb', 'Ta']
+
+            compvalue=np.sqrt(np.sum((comp_values-np.array([[0.5, 0.5, 0.5]]))**2, axis=1))
+            hist2d_norm = getcolordensity(compvalue, error_diff)
+            sc=ax.scatter(compvalue, error_diff, s=12, c=hist2d_norm, vmin=0, vmax=1)
+            if True: #icol==2:
+                divider = make_axes_locatable(ax)
+                cax = divider.append_axes('right', size='5%', pad=0.05)
+                cax.set_axis_off()
+            ax.set_box_aspect(1)
+            ax.set_title(varname)
+            ax.set_ylabel("Error=Pre-True")
+            ax.set_xlabel("Comp-Dist")
+    ##################################################################################################################
+    plt.subplots_adjust(left=0.15, bottom=0.15, right=0.99, top=0.925, wspace=0.25, hspace=0.3)
+    fig.savefig("./logs/" + log_name + f"/crosscheck_post_compdist_{log_name}.png",dpi=500)
+    fig.savefig("./logs/" + log_name + f"/crosscheck_post_compdist_{log_name}.pdf")
+    plt.close()
     ##################################################################################################################
     sys.exit(0)

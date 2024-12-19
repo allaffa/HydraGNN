@@ -81,7 +81,7 @@ if __name__ == "__main__":
         modeldirlist = []
         for models_dir_folder in modeldirlists:
             modeldirlist.extend([os.path.join(models_dir_folder, name) for name in os.listdir(models_dir_folder) if os.path.isdir(os.path.join(models_dir_folder, name))])
-
+    
     var_config = None
     modeldirlist_real=[]
     for modeldir in modeldirlist:
@@ -117,7 +117,7 @@ if __name__ == "__main__":
     ##################################################################################################################
     ##################################################################################################################
     fig, axs = plt.subplots(1, 3, figsize=(15, 5))
-    for icol, setname in enumerate(["train", "val", "test"]):
+    for icol, setname in enumerate(["test"]):
         saveresultsto=f"./logs/{log_name}/{setname}_"
 
         for  ihead, (output_name, output_type, output_dim) in enumerate(zip(
@@ -125,22 +125,8 @@ if __name__ == "__main__":
         config["NeuralNetwork"]["Variables_of_interest"]["type"],
         config["NeuralNetwork"]["Variables_of_interest"]["output_dim"],
         )):
-            assert ihead==0
-            ax = axs[icol]
-            """
-            file_name= saveresultsto +"head%d.db"%ihead
-            loaded = torch.load(file_name)
-            true_values=loaded['true']
-            head_pred_ens=loaded['pred_ens']
-            print(head_pred_ens.size())
-            #print_distributed(verbosity,"number of samples %d"%len(true_values))
-            head_pred_mean = head_pred_ens.mean(axis=0)
-            head_pred_std = head_pred_ens.std(axis=0)
-            head_true = true_values.cpu().squeeze().numpy() 
-            head_pred_ens = head_pred_ens.cpu().squeeze().numpy() 
-            head_pred_mean = head_pred_mean.cpu().squeeze().numpy() 
-            head_pred_std = head_pred_std.cpu().squeeze().numpy() 
-            """ 
+            assert ihead==0 and icol==0
+            ax = axs[0]
             head_true=[None]*nprocs
             head_pred_mean=[None]*nprocs
             head_pred_std=[None]*nprocs
@@ -179,41 +165,9 @@ if __name__ == "__main__":
             if True: #icol==2:
                 divider = make_axes_locatable(ax)
                 cax = divider.append_axes('right', size='5%', pad=0.05)
-                if icol==2:
+                if True: #icol==2:
                     fig.colorbar(sc, cax=cax, orientation='vertical')
-                else:
-                    cax.set_axis_off()
-    plt.subplots_adjust(left=0.08, bottom=0.1, right=0.95, top=0.95, wspace=0.2, hspace=0.3)
-    fig.savefig("./logs/" + log_name + "/parity_plot_post.png",dpi=500)
-    fig.savefig("./logs/" + log_name + "/parity_plot_post.pdf")
-    plt.close()
-    ##################################################################################################################
-    ##################################################################################################################
-    fig, axs = plt.subplots(1, 3, figsize=(15, 5))
-    for icol, setname in enumerate(["train", "val", "test"]):
-        saveresultsto=f"./logs/{log_name}/{setname}_"
-
-        for  ihead, (output_name, output_type, output_dim) in enumerate(zip(
-        config["NeuralNetwork"]["Variables_of_interest"]["output_names"],
-        config["NeuralNetwork"]["Variables_of_interest"]["type"],
-        config["NeuralNetwork"]["Variables_of_interest"]["output_dim"],
-        )):
-            assert ihead==0
-            ax = axs[icol]
-            """
-            file_name= saveresultsto +"head%d.db"%ihead
-            loaded = torch.load(file_name)
-            true_values=loaded['true']
-            head_pred_ens=loaded['pred_ens']
-            print(head_pred_ens.size())
-            #print_distributed(verbosity,"number of samples %d"%len(true_values))
-            head_pred_mean = head_pred_ens.mean(axis=0)
-            head_pred_std = head_pred_ens.std(axis=0)
-            head_true = true_values.cpu().squeeze().numpy() 
-            head_pred_ens = head_pred_ens.cpu().squeeze().numpy() 
-            head_pred_mean = head_pred_mean.cpu().squeeze().numpy() 
-            head_pred_std = head_pred_std.cpu().squeeze().numpy() 
-            """ 
+            ax = axs[1]
             head_true=[None]*nprocs
             head_pred_mean=[None]*nprocs
             head_pred_std=[None]*nprocs
@@ -244,40 +198,22 @@ if __name__ == "__main__":
                 maxv - 0.1 * (maxv - minv),
                 "MAE: {:.2e}".format(error_mae),
             )
-            if icol==0:
-                ax.set_ylabel("Predicted")
+            #if icol==0:
+            #    ax.set_ylabel("Predicted")
             ax.set_xlabel("True")
             ax.set_aspect('equal', adjustable='box')
             #plt.colorbar(sc)
             if True: #icol==2:
                 divider = make_axes_locatable(ax)
                 cax = divider.append_axes('right', size='5%', pad=0.05)
-                if icol==2:
-                    fig.colorbar(sc, cax=cax, orientation='vertical')
-                else:
-                    cax.set_axis_off()
+                cax.set_axis_off()
             xmin, xmax = ax.get_ylim()
             ymin, ymax = ax.get_ylim()
             ax.set_xlim(min(xmin, ymin), max(xmax,ymax))
             ax.set_ylim(min(xmin, ymin), max(xmax,ymax))
             ax.set_aspect('equal', adjustable='box')
-            
-    plt.subplots_adjust(left=0.08, bottom=0.1, right=0.95, top=0.95, wspace=0.2, hspace=0.3)
-    fig.savefig("./logs/" + log_name + "/parity_plot_post_errorbar.png",dpi=500)
-    fig.savefig("./logs/" + log_name + "/parity_plot_post_errorbar.pdf")
-    plt.close()
-    ##################################################################################################################
-    ##################################################################################################################
-    fig, ax = plt.subplots(1, 1, figsize=(6, 5))
-    for icol, setname in enumerate(["train", "val", "test"]):
-        saveresultsto=f"./logs/{log_name}/{setname}_"
 
-        for  ihead, (output_name, output_type, output_dim) in enumerate(zip(
-        config["NeuralNetwork"]["Variables_of_interest"]["output_names"],
-        config["NeuralNetwork"]["Variables_of_interest"]["type"],
-        config["NeuralNetwork"]["Variables_of_interest"]["output_dim"],
-        )):
-            assert ihead==0
+            ax=axs[2]
             head_true=[None]*nprocs
             head_pred_mean=[None]*nprocs
             head_pred_std=[None]*nprocs
@@ -296,70 +232,21 @@ if __name__ == "__main__":
             #_, bins = np.histogram(np.log10(head_pred_std), bins='auto')
             #hist1d, bin_edges = np.histogram(head_pred_std, bins=10**bins)
 
-            ax.plot(0.5 * (bin_edges[:-1] + bin_edges[1:]), hist1d/sum(hist1d), "-", label=setname+"; "+str(sum(hist1d)))
+            ax.plot(0.5 * (bin_edges[:-1] + bin_edges[1:]), hist1d/sum(hist1d), "-", label=setname)#+"; "+str(sum(hist1d)))
+            if True: #icol==2:
+                divider = make_axes_locatable(ax)
+                cax = divider.append_axes('right', size='5%', pad=0.05)
+                cax.set_axis_off()
+            ax.set_box_aspect(1)
+            ax.set_title(varname)
+            ax.set_ylabel("Count Ratio")
+            ax.set_xlabel("Uncertainties")
             np.savez("./logs/" + log_name +'/uncertainty.npz', uncer_bins=0.5 * (bin_edges[:-1] + bin_edges[1:]), count_ratio=hist1d/sum(hist1d))
-
-        ax.set_title(varname, fontsize=24)
-        ax.set_ylabel("Count Ratio", fontsize=28)
-        ax.set_xlabel("Uncertainties")
-         
-    ax.legend()
-    plt.subplots_adjust(left=0.2, bottom=0.15, right=0.98, top=0.925)#, wspace=0.2, hspace=0.3)
-    fig.savefig("./logs/" + log_name + "/hist_uncertainty.png",dpi=500)
-    fig.savefig("./logs/" + log_name + "/hist_uncertainty.pdf")
-    plt.close()
+        ax.legend()
     ##################################################################################################################
-    """
-    fig, axs = plt.subplots(2, 3, figsize=(18, 12))
-    for icol, setname in enumerate(["train", "val", "test"]):
-        saveresultsto=f"./logs/{log_name}/{setname}_"
-
-        for  ihead, (output_name, output_type, output_dim) in enumerate(zip(
-        config["NeuralNetwork"]["Variables_of_interest"]["output_names"],
-        config["NeuralNetwork"]["Variables_of_interest"]["type"],
-        config["NeuralNetwork"]["Variables_of_interest"]["output_dim"],
-        )):
-            ax = axs[ihead, icol]
-            
-            file_name= saveresultsto +"head%d.db"%ihead
-            loaded = torch.load(file_name)
-            true_values=loaded['true']
-            head_pred_ens=loaded['pred_ens']
-            print(head_pred_ens.size())
-            #print_distributed(verbosity,"number of samples %d"%len(true_values))
-            head_pred_mean = head_pred_ens.mean(axis=0)
-            head_pred_std = head_pred_ens.std(axis=0)
-            head_true = true_values.cpu().squeeze().numpy() 
-            head_pred_ens = head_pred_ens.cpu().squeeze().numpy() 
-            head_pred_mean = head_pred_mean.cpu().squeeze().numpy() 
-            head_pred_std = head_pred_std.cpu().squeeze().numpy() 
-
-            ifeat = var_config["output_index"][ihead]
-            outtype = var_config["type"][ihead]
-            varname = var_config["output_names"][ihead]
-
-            for imodel in range(head_pred_ens.shape[0]):
-                head_pred = head_pred_ens[imodel,:].squeeze()
-                hist1d, bin_edges = np.histogram(head_pred - head_true, bins=50)
-                ax.plot(0.5 * (bin_edges[:-1] + bin_edges[1:]), hist1d, "-")
-                ax.set_title(setname + "; " + varname, fontsize=24)
-
-            
-         
-            hist1d, bin_edges = np.histogram(head_pred_mean - head_true, bins=50)
-            ax.plot(0.5 * (bin_edges[:-1] + bin_edges[1:]), hist1d, "ro-")
-            ax.plot([0.0, 0.0],[0.0, max(hist1d)*1.2],"k:")
-            ax.set_title(setname + "; " + varname, fontsize=24)
-            if icol==0:
-                ax.set_ylabel("Number of points")
-            if ihead==1:
-                ax.set_xlabel("Error=Pred-True")
-                ax.set_xlim(-0.75, .75)
-            else:
-                ax.set_xlim(-0.01, 0.01)
-    #fig.savefig("./logs/" + log_name + "/errorhist_plot_allmodels.png")
-    fig.savefig("./logs/" + log_name + "/errorhist_plot_allmodels_zoomin.png")
+    plt.subplots_adjust(left=0.06, bottom=0.1, right=0.99, top=0.925, wspace=0.25, hspace=0.3)
+    fig.savefig("./logs/" + log_name + "/crosscheck_post_errorbar.png",dpi=500)
+    fig.savefig("./logs/" + log_name + "/crosscheck_post_errorbar.pdf")
     plt.close()
-    """
     ##################################################################################################################
     sys.exit(0)
