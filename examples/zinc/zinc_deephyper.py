@@ -3,6 +3,7 @@ import logging
 
 import torch
 import torch_geometric
+from torch_geometric.datasets import ZINC
 from torch_geometric.transforms import AddLaplacianEigenvectorPE
 
 torch.backends.cudnn.enabled = False
@@ -15,37 +16,23 @@ except:
 
 import hydragnn
 
-num_samples = int(1e7)
-
-# Update each sample prior to loading.
-def qm9_pre_transform(data, transform):
-    # LPE
+def zinc_pre_transform(data, transform):
+    data.x = data.x.float().view(-1, 1)
+    data.edge_attr = data.edge_attr.float().view(-1, 1)
     data = transform(data)
-    # Set descriptor as element type.
-    data.x = data.z.float().view(-1, 1)
-    # Only predict free energy (index 10 of 19 properties) for this run.
-    data.y = data.y[:, 10] / len(data.x)
-    graph_features_dim = [1]
-    node_feature_dim = [1]
     # gps requires relative edge features, introduced rel_lapPe as edge encodings
     source_pe = data.pe[data.edge_index[0]]
     target_pe = data.pe[data.edge_index[1]]
     data.rel_pe = torch.abs(source_pe - target_pe)  # Compute feature-wise difference
     return data
 
-
-def qm9_pre_filter(data):
-    return data.idx < num_samples
-
-
-log_name = "qm9_hpo_trials"
+log_name = "zinc_hpo_trials"
 
 # Configurable run choices (JSON file that accompanies this example script).
-filename = os.path.join(os.path.dirname(os.path.abspath(__file__)), "qm9.json")
+filename = os.path.join(os.path.dirname(os.path.abspath(__file__)), "zinc.json")
 with open(filename, "r") as f:
     config = json.load(f)
 verbosity = config["Verbosity"]["level"]
-
 
 # LPE
 transform = AddLaplacianEigenvectorPE(
@@ -57,19 +44,20 @@ transform = AddLaplacianEigenvectorPE(
 # Use built-in torch_geometric datasets.
 # Filter function above used to run quick example.
 # NOTE: data is moved to the device in the pre-transform.
-# NOTE: transforms/filters will NOT be re-run unless the qm9/processed/ directory is removed.
-dataset = torch_geometric.datasets.QM9(
-    root="dataset/qm9",
-    pre_transform=lambda data: qm9_pre_transform(data, transform),
-    pre_filter=qm9_pre_filter,
+# NOTE: transforms/filters will NOT be re-run unless the zinc/processed/ directory is removed.
+train = ZINC(
+    root="dataset/zinc", subset=False, split="train", pre_transform=lambda data: zinc_pre_transform(data, transform)
+)
+val = ZINC(
+    root="dataset/zinc", subset=False, split="val", pre_transform=lambda data: zinc_pre_transform(data, transform)
+)
+test = ZINC(
+    root="dataset/zinc", subset=False, split="test", pre_transform=lambda data: zinc_pre_transform(data, transform)
 )
 
-
-trainset, valset, testset = hydragnn.preprocess.split_dataset(dataset, 0.8, False)
-(train_loader, val_loader, test_loader) = hydragnn.preprocess.create_dataloaders(
-    trainset, valset, testset, config["NeuralNetwork"]["Training"]["batch_size"]
+(train_loader, val_loader, test_loader,) = hydragnn.preprocess.create_dataloaders(
+    train, val, test, config["NeuralNetwork"]["Training"]["batch_size"]
 )
-
 
 def run(trial):
 
@@ -124,12 +112,10 @@ def run(trial):
             "dim_headlayers"
         ] = dim_headlayers
 
-    if trial.parameters["mpnn_type"] not in ["EGNN", "SchNet", "DimeNet"]:
+    if trial.parameters["mpnn_type"] not in ["EGNN", "DimeNet"]:
         trial_config["NeuralNetwork"]["Architecture"]["equivariance"] = False
 
-    trial_config = hydragnn.utils.input_config_parsing.update_config(
-        trial_config, train_loader, val_loader, test_loader
-    )
+    trial_config = hydragnn.utils.input_config_parsing.update_config(trial_config, train_loader, val_loader, test_loader)
 
     hydragnn.utils.input_config_parsing.save_config(trial_config, trial_log_name)
 
@@ -139,9 +125,7 @@ def run(trial):
     )
     model = hydragnn.utils.distributed.get_distributed_model(model, verbosity)
 
-    learning_rate = trial_config["NeuralNetwork"]["Training"]["Optimizer"][
-        "learning_rate"
-    ]
+    learning_rate = trial_config["NeuralNetwork"]["Training"]["Optimizer"]["learning_rate"]
     optimizer = torch.optim.AdamW(model.parameters(), lr=learning_rate)
     scheduler = torch.optim.lr_scheduler.ReduceLROnPlateau(
         optimizer, mode="min", factor=0.5, patience=5, min_lr=0.00001
@@ -167,7 +151,7 @@ def run(trial):
     )
 
     hydragnn.utils.model.model.save_model(model, optimizer, trial_log_name)
-    hydragnn.utils.print.print_distributed(verbosity)
+    hydragnn.utils.print.print_timers(verbosity)
 
     # Return the metric to minimize (e.g., validation loss)
     validation_loss, tasks_loss = hydragnn.train.validate(
@@ -184,7 +168,6 @@ def run(trial):
 
 
 if __name__ == "__main__":
-
     # Choose the sampler (e.g., TPESampler or RandomSampler)
     from deephyper.hpo import HpProblem, CBO
     from deephyper.evaluator import Evaluator
@@ -194,15 +177,15 @@ if __name__ == "__main__":
 
     # Define the search space for hyperparameters
     problem.add_hyperparameter((1, 4), "num_conv_layers")  # discrete parameter
-    problem.add_hyperparameter((1, 100), "hidden_dim")  # discrete parameter
+    problem.add_hyperparameter((1,100), "hidden_dim")  # discrete parameter
     problem.add_hyperparameter((1, 3), "num_headlayers")  # discrete parameter
     problem.add_hyperparameter((1, 3), "dim_headlayers")  # discrete parameter
-
+    
     # Include "global_attn_heads" to list of hyperparameters if global attention engine is used
     if config["NeuralNetwork"]["Architecture"]["global_attn_engine"] is not None:
         problem.add_hyperparameter([2, 4, 8], "global_attn_heads")  # discrete parameter
     problem.add_hyperparameter(
-        ["EGNN", "PNA", "SchNet", "DimeNet"], "mpnn_type"
+        ["EGNN", "PNA"], "mpnn_type"
     )  # categorical parameter
 
     # Define the search space for hyperparameters

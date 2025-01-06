@@ -7,11 +7,11 @@
         "Architecture": {
             "global_attn_engine": "GPS",
             "global_attn_type": "multihead",
-            "mpnn_type": "SchNet",
+            "mpnn_type": "PNA",
             "radius": 7,
             "max_neighbours": 5,
             "periodic_boundary_conditions": false,
-            "pe_dim": 6,
+            "pe_dim": 5,
             "global_attn_heads": 8,
             "edge_features": ["length"],
             "hidden_dim": 64,
@@ -47,7 +47,7 @@
             "denormalize_output": false
         },
         "Training": {
-            "num_epoch": 20,
+            "num_epoch": 2,
             "perc_train": 0.7,
             "loss_function_type": "mse",
             "batch_size": 64,

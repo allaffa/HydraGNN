@@ -14,19 +14,17 @@ except ImportError:
 
 import hydragnn
 
-num_samples = 1000000
-
 
 # Update each sample prior to loading.
-def qm9_pre_transform(data, transform):
-    # LPE
-    data = transform(data)
+def md17_pre_transform(data, compute_edges, transform):
     # Set descriptor as element type.
     data.x = data.z.float().view(-1, 1)
-    # Only predict free energy (index 10 of 19 properties) for this run.
-    data.y = data.y[:, 10] / len(data.x)
+    # Only predict energy (index 0 of 2 properties) for this run.
+    data.y = data.energy / len(data.x)
     graph_features_dim = [1]
     node_feature_dim = [1]
+    data = compute_edges(data)
+    data = transform(data)
     # gps requires relative edge features, introduced rel_lapPe as edge encodings
     source_pe = data.pe[data.edge_index[0]]
     target_pe = data.pe[data.edge_index[1]]
@@ -34,8 +32,9 @@ def qm9_pre_transform(data, transform):
     return data
 
 
-def qm9_pre_filter(data):
-    return data.idx < num_samples
+# Randomly select ~1000 samples
+def md17_pre_filter(data):
+    return torch.rand(1) < 1.1
 
 
 def main(mpnn_type=None, global_attn_engine=None, global_attn_type=None):
@@ -44,17 +43,17 @@ def main(mpnn_type=None, global_attn_engine=None, global_attn_type=None):
     torch.manual_seed(random_state)
 
     # Set this path for output.
-    try:
-        os.environ["SERIALIZED_DATA_PATH"]
-    except KeyError:
-        os.environ["SERIALIZED_DATA_PATH"] = os.getcwd()
+    os.environ.setdefault("SERIALIZED_DATA_PATH", os.getcwd())
 
     # Configurable run choices (JSON file that accompanies this example script).
-    filename = os.path.join(os.path.dirname(os.path.abspath(__file__)), "qm9.json")
+    filename = os.path.join(os.path.dirname(__file__), "md17.json")
     with open(filename, "r") as f:
         config = json.load(f)
 
-    # If a model type is provided, update the configuration accordingly.
+    verbosity = config["Verbosity"]["level"]
+    arch_config = config["NeuralNetwork"]["Architecture"]
+
+    # If a model type is provided, update the configuration
     if global_attn_engine:
         config["NeuralNetwork"]["Architecture"][
             "global_attn_engine"
@@ -66,15 +65,15 @@ def main(mpnn_type=None, global_attn_engine=None, global_attn_type=None):
     if mpnn_type:
         config["NeuralNetwork"]["Architecture"]["mpnn_type"] = mpnn_type
 
-    verbosity = config["Verbosity"]["level"]
-    var_config = config["NeuralNetwork"]["Variables_of_interest"]
-
     # Always initialize for multi-rank training.
     world_size, world_rank = hydragnn.utils.distributed.setup_ddp()
 
-    log_name = f"qm9_test_{mpnn_type}" if mpnn_type else "qm9_test"
+    log_name = f"md17_test_{mpnn_type}" if mpnn_type else "md17_test"
     # Enable print to log file.
     hydragnn.utils.print.print_utils.setup_log(log_name)
+
+    # Preprocess configurations for edge computation
+    compute_edges = hydragnn.preprocess.get_radius_graph_config(arch_config)
 
     # LPE
     transform = AddLaplacianEigenvectorPE(
@@ -83,19 +82,18 @@ def main(mpnn_type=None, global_attn_engine=None, global_attn_type=None):
         is_undirected=True,
     )
 
-    # Use built-in torch_geometric datasets.
-    # Filter function above used to run quick example.
-    # NOTE: data is moved to the device in the pre-transform.
-    # NOTE: transforms/filters will NOT be re-run unless the qm9/processed/ directory is removed.
-    dataset = torch_geometric.datasets.QM9(
-        root="dataset/qm9",
-        pre_transform=lambda data: qm9_pre_transform(data, transform),
-        pre_filter=qm9_pre_filter,
+    # Fix for MD17 datasets
+    torch_geometric.datasets.MD17.file_names["uracil"] = "md17_uracil.npz"
+
+    dataset = torch_geometric.datasets.MD17(
+        root="dataset/md17",
+        name="uracil",
+        pre_transform=lambda data: md17_pre_transform(data, compute_edges, transform),
+        pre_filter=md17_pre_filter,
     )
     train, val, test = hydragnn.preprocess.split_dataset(
         dataset, config["NeuralNetwork"]["Training"]["perc_train"], False
     )
-
     (train_loader, val_loader, test_loader,) = hydragnn.preprocess.create_dataloaders(
         train, val, test, config["NeuralNetwork"]["Training"]["batch_size"]
     )
@@ -116,7 +114,7 @@ def main(mpnn_type=None, global_attn_engine=None, global_attn_type=None):
         optimizer, mode="min", factor=0.5, patience=5, min_lr=0.00001
     )
 
-    # Run training with the given model and qm9 datasets.
+    # Run training with the given model and md17 dataset.
     writer = hydragnn.utils.model.model.get_summary_writer(log_name)
     hydragnn.utils.input_config_parsing.save_config(config, log_name)
 
@@ -136,7 +134,7 @@ def main(mpnn_type=None, global_attn_engine=None, global_attn_type=None):
 
 if __name__ == "__main__":
     parser = argparse.ArgumentParser(
-        description="Run the QM9 example with optional model type."
+        description="Run MD17 example with an optional model type."
     )
     parser.add_argument(
         "--mpnn_type",
@@ -144,17 +142,20 @@ if __name__ == "__main__":
         default=None,
         help="Specify the model type for training (default: None).",
     )
+
     parser.add_argument(
         "--global_attn_engine",
         type=str,
         default=None,
         help="Specify if global attention is being used (default: None).",
     )
+
     parser.add_argument(
         "--global_attn_type",
         type=str,
         default=None,
         help="Specify the global attention type (default: None).",
     )
+
     args = parser.parse_args()
     main(mpnn_type=args.mpnn_type)
