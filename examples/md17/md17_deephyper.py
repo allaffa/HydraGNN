@@ -15,6 +15,7 @@ except ImportError:
 
 import hydragnn
 
+torch.backends.cudnn.enabled = False
 
 # Update each sample prior to loading.
 def md17_pre_transform(data, compute_edges, transform):
