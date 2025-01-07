@@ -14,7 +14,7 @@ except ImportError:
 
 import hydragnn
 
-num_samples = 1000000
+num_samples = int(1e7)
 
 
 # Update each sample prior to loading.

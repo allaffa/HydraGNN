@@ -14,7 +14,7 @@ search:
   initial_points: null
   kappa: 1.96
   kwargs: {}
-  log_dir: qm9_hpo_trials
+  log_dir: md17_hpo_trials
   max_failures: 100
   moo_lower_bounds: null
   moo_scalarization_strategy: Chebyshev
