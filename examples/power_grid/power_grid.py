@@ -76,7 +76,7 @@ class PowerGridDataset(AbstractBaseDataset):
         super().__init__()
 
         self.var_config = var_config
-        self.data_path = os.path.join(dirpath, "DATA_CASE5_", "output_files")
+        self.data_path = os.path.join(dirpath, "output_files")
 
         self.radius_graph = RadiusGraph(5.0, loop=False, max_num_neighbors=50)
 
@@ -197,7 +197,7 @@ class PowerGridDataset(AbstractBaseDataset):
 
                 # Add mask as additional input
                 #data_sample = Data(x=node_features, edge_index=edge_index, edge_attr=edge_attr, grid_system=base_name)
-                data_sample = Data(x=node_features, edge_index=edge_index, edge_attr=edge_attr, grid_system=base_name)
+                data_sample = Data(x=node_features, edge_index=edge_index, edge_attr=edge_attr, grid_system=base_name, true_P=torch.tensor(data_csv['Pin']).unsqueeze(1), true_Q=torch.tensor(data_csv['Qin']).unsqueeze(1))
 
                 self.dataset.append(data_sample)
 
@@ -462,6 +462,7 @@ if __name__ == "__main__":
         log_name,
         verbosity,
         create_plots=False,
+        compute_power_flow=True
     )
 
     hydragnn.utils.model.save_model(model, optimizer, log_name)

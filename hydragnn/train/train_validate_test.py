@@ -65,6 +65,7 @@ def train_validate_test(
     create_plots=False,
     use_deepspeed=False,
     compute_grad_energy=False,
+    compute_power_flow=False,
 ):
     num_epoch = config["Training"]["num_epoch"]
     EarlyStop = (
@@ -168,6 +169,7 @@ def train_validate_test(
                 profiler=prof,
                 use_deepspeed=use_deepspeed,
                 compute_grad_energy=compute_grad_energy,
+                compute_power_flow=compute_power_flow,
             )
             tr.stop("train")
             tr.disable()
@@ -183,6 +185,7 @@ def train_validate_test(
             verbosity,
             reduce_ranks=True,
             compute_grad_energy=compute_grad_energy,
+            compute_power_flow=compute_power_flow,
         )
         test_loss, test_taskserr, true_values, predicted_values = test(
             test_loader,
@@ -191,6 +194,7 @@ def train_validate_test(
             reduce_ranks=True,
             return_samples=plot_hist_solution,
             compute_grad_energy=compute_grad_energy,
+            compute_power_flow=compute_power_flow,
         )
         scheduler.step(val_loss)
         if writer is not None:
@@ -454,6 +458,7 @@ def train(
     profiler=None,
     use_deepspeed=False,
     compute_grad_energy=False,
+    compute_power_flow=False,
 ):
     if profiler is None:
         profiler = Profiler()
@@ -519,6 +524,11 @@ def train(
             else:
                 pred = model(data)
                 loss, tasks_loss = model.module.loss(pred, data.y, head_index)
+                if compute_power_flow:
+                    power_flow_residual_loss = model.module.compute_power_flow_residual_loss(pred, data)
+                    true_power_flow_residual = model.module.compute_power_true_flow_residual(pred, data)
+                    print("Power flow loss: ", power_flow_residual_loss, " True power flow residual: ", true_power_flow_residual)
+                    loss += 1e-1 * power_flow_residual_loss
             if trace_level > 0:
                 tr.start("forward_sync", **syncopt)
                 MPI.COMM_WORLD.Barrier()
@@ -566,7 +576,7 @@ def train(
 
 
 @torch.no_grad()
-def validate(loader, model, verbosity, reduce_ranks=True, compute_grad_energy=False):
+def validate(loader, model, verbosity, reduce_ranks=True, compute_grad_energy=False, compute_power_flow=False):
 
     total_error = torch.tensor(0.0, device=get_device())
     tasks_error = torch.zeros(model.module.num_heads, device=get_device())
@@ -598,6 +608,9 @@ def validate(loader, model, verbosity, reduce_ranks=True, compute_grad_energy=Fa
         else:
             pred = model(data)
             error, tasks_loss = model.module.loss(pred, data.y, head_index)
+            if compute_power_flow:
+                power_flow_residual_loss = model.module.compute_power_flow_residual_loss(pred, data)
+                error += power_flow_residual_loss
         total_error += error * data.num_graphs
         num_samples_local += data.num_graphs
         for itask in range(len(tasks_loss)):
@@ -623,6 +636,7 @@ def test(
     reduce_ranks=True,
     return_samples=True,
     compute_grad_energy=False,
+    compute_power_flow=False,
 ):
 
     total_error = torch.tensor(0.0, device=get_device())
@@ -658,6 +672,9 @@ def test(
         else:
             pred = model(data)
             error, tasks_loss = model.module.loss(pred, data.y, head_index)
+            if compute_power_flow:
+                power_flow_residual_loss = model.module.compute_power_flow_residual_loss(pred, data)
+                error += power_flow_residual_loss
         ## FIXME: temporary
         if int(os.getenv("HYDRAGNN_DUMP_TESTDATA", "0")) == 1:
             if model.module.var_output:

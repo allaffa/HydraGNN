@@ -8,9 +8,10 @@ from pandapower.pypower.makeYbus import makeYbus
 from scipy.sparse import csc_matrix
 
 # Function to generate pandapower data and print Ybus matrix
-def generate_pandapower_data(num_cases, output_dir="output_files"):
+def generate_pandapower_data(num_cases, output_dir="dataset/output_files"):
 
-    cases = ['case14', 'case300', 'case6470orte']
+    #cases = ['case14', 'case300', 'case6470orte']
+    cases = ['case14']
 
     # Ensure the output directory exists
     os.makedirs(output_dir, exist_ok=True)
@@ -71,13 +72,8 @@ def generate_pandapower_data(num_cases, output_dir="output_files"):
                 Xbus_numpyarray = Zbus_numpyarray.imag
                 Xbus = csc_matrix((Xbus_numpyarray, Ybus.indices, Ybus.indptr), shape=Ybus.shape)
 
-                # Filter out self-loops
-                mask = rows != cols
-                rows_no_self_loops = rows[mask]
-                cols_no_self_loops = cols[mask]
-
                 # Save binary adjacency matrix rows and cols to a .npz file
-                np.savez(os.path.join(output_dir, case, f"{case}_Instance{case_num}_adjacency_binary_matrix.npz"), rows=rows_no_self_loops, cols=cols_no_self_loops)
+                np.savez(os.path.join(output_dir, case, f"{case}_Instance{case_num}_adjacency_binary_matrix.npz"), rows=rows, cols=cols)
 
                 # Save conductance matrix rows and cols to a .npz file
                 np.savez(os.path.join(output_dir, case, f"{case}_Instance{case_num}_conductance_matrix.npz"), data=Gbus.data,
@@ -129,7 +125,7 @@ def generate_pandapower_data(num_cases, output_dir="output_files"):
             count = count+1
 
 # Parameters
-num_cases = 1000  # Number of runs
+num_cases = 100  # Number of runs
 
 # Run the function
 generate_pandapower_data(num_cases)
