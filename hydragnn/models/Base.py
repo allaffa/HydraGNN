@@ -12,6 +12,9 @@
 import torch
 from torch.nn import ModuleList, Sequential, ReLU, Linear, Module
 import torch.nn.functional as F
+
+from torch_scatter import scatter_add
+
 from torch_geometric.nn import global_mean_pool, BatchNorm
 from torch.nn import GaussianNLLLoss
 from torch.utils.checkpoint import checkpoint
@@ -438,6 +441,102 @@ class Base(Module):
         ##        so, we need to do loss calculation manually without calling the other functions.
 
         return tot_loss, tasks_loss
+
+
+    def compute_power_flow_residual_loss(self, pred, data):
+        # Extract known and predicted data
+        P_actual = data.true_P  # Actual P values
+        Q_actual = data.true_Q  # Actual Q values
+        V_predicted = pred[0]  # Predicted V values
+        theta_predicted = pred[1]  # Predicted theta values
+
+        # Extract edge information
+        edge_index = data.edge_index  # [2, num_edges]
+        num_buses = data.x.size(0)
+
+        # Initialize residuals
+        r_P = torch.zeros(num_buses,1)
+        r_Q = torch.zeros(num_buses,1)
+
+        # Compute power predictions based on edge connectivity
+        for k in range(edge_index.size(1)):  # Iterate over edges
+            i = edge_index[0, k]  # Source bus
+            j = edge_index[1, k]  # Target bus
+
+            V_i = V_predicted[i]
+            theta_i = theta_predicted[i]
+            V_j = V_predicted[j]
+            theta_j = theta_predicted[j]
+
+            # Extract conductance (G_ij) and susceptance (B_ij) from edge attributes
+            G_ij = data.edge_attr[k, 0]
+            B_ij = data.edge_attr[k, 1]
+
+            angle_diff = theta_i - theta_j
+
+            # Increment predicted P and Q for bus i due to edge (i, j)
+            r_P[i] += V_i * V_j * (G_ij * torch.cos(angle_diff) + B_ij * torch.sin(angle_diff))
+            r_Q[i] += V_i * V_j * (G_ij * torch.sin(angle_diff) - B_ij * torch.cos(angle_diff))
+
+            # For undirected graphs, update the contribution to bus j as well
+            r_P[j] += V_j * V_i * (G_ij * torch.cos(-angle_diff) + B_ij * torch.sin(-angle_diff))
+            r_Q[j] += V_j * V_i * (G_ij * torch.sin(-angle_diff) - B_ij * torch.cos(-angle_diff))
+
+        # Compute residuals
+        r_P = P_actual - r_P
+        r_Q = Q_actual - r_Q
+
+        power_flow_loss = (torch.norm(r_P) + torch.norm(r_Q))/data.num_graphs
+
+        return power_flow_loss
+
+    def compute_power_true_flow_residual(self, pred, data):
+        # Extract known and predicted data
+        P_actual = data.true_P  # Actual P values
+        Q_actual = data.true_Q  # Actual Q values
+        true_V = data.y[0:data.num_nodes]  # Predicted V values
+        true_theta = data.y[data.num_nodes:]  # Predicted theta values
+
+        # Extract edge information
+        edge_index = data.edge_index  # [2, num_edges]
+        num_buses = data.x.size(0)
+
+        # Initialize residuals
+        r_P = torch.zeros(num_buses, 1)
+        r_Q = torch.zeros(num_buses, 1)
+
+        # Compute power predictions based on edge connectivity
+        for k in range(edge_index.size(1)):  # Iterate over edges
+            i = edge_index[0, k]  # Source bus
+            j = edge_index[1, k]  # Target bus
+
+            V_i = true_V[i]
+            theta_i = true_theta[i]
+            V_j = true_V[j]
+            theta_j = true_theta[j]
+
+            # Extract conductance (G_ij) and susceptance (B_ij) from edge attributes
+            G_ij = data.edge_attr[k, 0]
+            B_ij = data.edge_attr[k, 1]
+
+            angle_diff = theta_i - theta_j
+
+            # Increment predicted P and Q for bus i due to edge (i, j)
+            r_P[i] += V_i * V_j * (G_ij * torch.cos(angle_diff) + B_ij * torch.sin(angle_diff))
+            r_Q[i] += V_i * V_j * (G_ij * torch.sin(angle_diff) - B_ij * torch.cos(angle_diff))
+
+            # For undirected graphs, update the contribution to bus j as well
+            r_P[j] += V_j * V_i * (G_ij * torch.cos(-angle_diff) + B_ij * torch.sin(-angle_diff))
+            r_Q[j] += V_j * V_i * (G_ij * torch.sin(-angle_diff) - B_ij * torch.cos(-angle_diff))
+
+        # Compute residuals
+        r_P = P_actual - r_P
+        r_Q = Q_actual - r_Q
+
+        power_flow_loss = (torch.norm(r_P) + torch.norm(r_Q)) / data.num_graphs
+
+        return power_flow_loss
+
 
     def loss_nll(self, pred, value, head_index, var=None):
         # negative log likelihood loss
