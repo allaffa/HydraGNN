@@ -6,7 +6,7 @@ import torch_geometric
 from torch_geometric.datasets import ZINC
 from torch_geometric.transforms import AddLaplacianEigenvectorPE
 
-torch.backends.cudnn.enabled = False
+# torch.backends.cudnn.enabled = False # #TODO:change to 0.25 before merge
 
 # deprecated in torch_geometric 2.0
 try:

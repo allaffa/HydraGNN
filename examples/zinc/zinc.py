@@ -57,13 +57,13 @@ def zinc_pre_transform(data):
 
 
 train = ZINC(
-    root="dataset/zinc", subset=True, split="train", pre_transform=zinc_pre_transform
+    root="dataset/zinc", subset=False, split="train", pre_transform=zinc_pre_transform #TODO:change subset=True before merge
 )
 val = ZINC(
-    root="dataset/zinc", subset=True, split="val", pre_transform=zinc_pre_transform
+    root="dataset/zinc", subset=False, split="val", pre_transform=zinc_pre_transform
 )
 test = ZINC(
-    root="dataset/zinc", subset=True, split="test", pre_transform=zinc_pre_transform
+    root="dataset/zinc", subset=False, split="test", pre_transform=zinc_pre_transform
 )
 
 (train_loader, val_loader, test_loader,) = hydragnn.preprocess.create_dataloaders(

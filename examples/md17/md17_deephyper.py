@@ -15,7 +15,7 @@ except ImportError:
 
 import hydragnn
 
-torch.backends.cudnn.enabled = False
+# torch.backends.cudnn.enabled = False #TODO:remove before merge
 
 # Update each sample prior to loading.
 def md17_pre_transform(data, compute_edges, transform):
@@ -36,7 +36,7 @@ def md17_pre_transform(data, compute_edges, transform):
 
 # Randomly select ~1000 samples
 def md17_pre_filter(data):
-    return torch.rand(1) < 1.1
+    return torch.rand(1) < 1.1 #TODO:change to 0.25 before merge
 
 log_name = "md17_hpo_trials"
 
@@ -184,41 +184,6 @@ def run(trial):
     # By default, DeepHyper maximized the objective function, so we need to flip the sign of the validation loss function
     print("validation_loss.item()", validation_loss.item())
     return -validation_loss.item()
-   
-
-    config = hydragnn.utils.input_config_parsing.update_config(
-        config, train_loader, val_loader, test_loader
-    )
-
-    model = hydragnn.models.create_model_config(
-        config=config["NeuralNetwork"],
-        verbosity=verbosity,
-    )
-    model = hydragnn.utils.distributed.get_distributed_model(model, verbosity)
-
-    learning_rate = config["NeuralNetwork"]["Training"]["Optimizer"]["learning_rate"]
-    optimizer = torch.optim.AdamW(model.parameters(), lr=learning_rate)
-    scheduler = torch.optim.lr_scheduler.ReduceLROnPlateau(
-        optimizer, mode="min", factor=0.5, patience=5, min_lr=0.00001
-    )
-
-    # Run training with the given model and md17 dataset.
-    writer = hydragnn.utils.model.model.get_summary_writer(log_name)
-    hydragnn.utils.input_config_parsing.save_config(config, log_name)
-
-    hydragnn.train.train_validate_test(
-        model,
-        optimizer,
-        train_loader,
-        val_loader,
-        test_loader,
-        writer,
-        scheduler,
-        config["NeuralNetwork"],
-        log_name,
-        verbosity,
-    )
-
 
 if __name__ == "__main__":
 
