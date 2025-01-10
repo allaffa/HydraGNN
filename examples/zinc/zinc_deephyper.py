@@ -47,13 +47,13 @@ transform = AddLaplacianEigenvectorPE(
 # NOTE: transforms/filters will NOT be re-run unless the zinc/processed/ directory is removed.
 train = ZINC(
     root="dataset/zinc", subset=False, split="train", pre_transform=lambda data: zinc_pre_transform(data, transform)
-)
+) #TODO:change subset=True before merge
 val = ZINC(
     root="dataset/zinc", subset=False, split="val", pre_transform=lambda data: zinc_pre_transform(data, transform)
-)
+) #TODO:change subset=True before merge
 test = ZINC(
     root="dataset/zinc", subset=False, split="test", pre_transform=lambda data: zinc_pre_transform(data, transform)
-)
+) #TODO:change subset=True before merge
 
 (train_loader, val_loader, test_loader,) = hydragnn.preprocess.create_dataloaders(
     train, val, test, config["NeuralNetwork"]["Training"]["batch_size"]
