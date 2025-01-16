@@ -114,6 +114,15 @@ class PowerGridDataset(AbstractBaseDataset):
                 # Extract the string "Instance"
                 base_name = os.path.splitext(csv_file)[0]  # Remove the file extension
 
+                # per unit scaling factor
+                # Specify the file name
+                per_unit_scale_factor_name = os.path.join(self.data_path, directory, base_name+"_per_unit_scaling_factor.txt")
+
+                # Open the file in read mode and read the float
+                with open(per_unit_scale_factor_name, "r") as file:
+                    content = file.read().strip()  # Read the content and remove any extra whitespace or newlines
+                    S_base = float(content)  # Convert the string to a float
+
                 # Load the saved .npz file to extract information about the binary adjacency matrix
                 loaded_data = np.load(os.path.join(self.data_path, directory, base_name+"_adjacency_binary_matrix.npz"))
                 rows = loaded_data['rows']
@@ -197,7 +206,7 @@ class PowerGridDataset(AbstractBaseDataset):
 
                 # Add mask as additional input
                 #data_sample = Data(x=node_features, edge_index=edge_index, edge_attr=edge_attr, grid_system=base_name)
-                data_sample = Data(x=node_features, edge_index=edge_index, edge_attr=edge_attr, grid_system=base_name, true_P=torch.tensor(data_csv['Pin']).unsqueeze(1), true_Q=torch.tensor(data_csv['Qin']).unsqueeze(1))
+                data_sample = Data(per_unit_scaling_factor=S_base, x=node_features, edge_index=edge_index, edge_attr=edge_attr, grid_system=base_name, true_P=torch.tensor(data_csv['Pin']).unsqueeze(1), true_Q=torch.tensor(data_csv['Qin']).unsqueeze(1))
 
                 self.dataset.append(data_sample)
 

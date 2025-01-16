@@ -5,7 +5,7 @@ import os
 import numpy as np
 from pandapower.pypower.makeYbus import makeYbus
 
-from scipy.sparse import csc_matrix
+from scipy.sparse import csc_matrix, triu
 
 # Function to generate pandapower data and print Ybus matrix
 def generate_pandapower_data(num_cases, output_dir="dataset/output_files"):
@@ -17,6 +17,9 @@ def generate_pandapower_data(num_cases, output_dir="dataset/output_files"):
     os.makedirs(output_dir, exist_ok=True)
 
     count = 1
+
+    # per unit scaling factor
+    S_base = 1.0
 
     for case in cases:
 
@@ -46,9 +49,20 @@ def generate_pandapower_data(num_cases, output_dir="dataset/output_files"):
                 # Run power flow
                 pp.runpp(net)
 
+                S_base = net.sn_mva
+
+                # Specify the file name
+                per_unit_scale_factor_name = os.path.join(output_dir, case, f"{case}_Instance{case_num}_per_unit_scaling_factor.txt")
+
+                # Open the file in write mode and save the float
+                with open(per_unit_scale_factor_name, "w") as file:
+                    file.write(f"{S_base}\n")
+
                 # Generate the admittance matrix Ybus
                 baseMVA, bus, branch = net._ppc['baseMVA'], net._ppc['bus'], net._ppc['branch']
                 Ybus, _, _ = makeYbus(baseMVA, bus, branch)
+
+                assert (Ybus != Ybus.T).nnz == 0
 
                 # Extract rows and cols (non-zero entries)
                 rows, cols = Ybus.nonzero()
@@ -89,6 +103,52 @@ def generate_pandapower_data(num_cases, output_dir="dataset/output_files"):
                 # Save reactance matrix rows and cols to a .npz file
                 np.savez(os.path.join(output_dir, case, f"{case}_Instance{case_num}_reactance_matrix.npz"), data=Xbus.data, indices=Xbus.indices, indptr=Xbus.indptr, shape=Xbus.shape)
 
+                """
+                            assert (Ybus != Ybus.T).nnz == 0, f"The admittance matrix for {case}/{case_num} is not symmetric"
+
+                Ybus_upper = triu(Ybus).tocsc()
+
+                # Extract rows and cols (non-zero entries)
+                rows, cols = Ybus_upper.nonzero()
+
+                # Compute the impedance matrix (Zbus) by calculating the entry-wise inverse of the admittance matrix Zbus
+                Zbus_upper_numpyarray = 1.0 / Ybus_upper.data
+
+                # Compute the conductance matrix, which is the real part of the admittance
+                Gbus_upper_numpyarray = Ybus_upper.data.real
+                Gbus_upper = csc_matrix((Gbus_upper_numpyarray, Ybus_upper.indices, Ybus_upper.indptr), shape=Ybus_upper.shape)
+
+                # Compute the susceptance matrix, which is the imaginary part of the admittance
+                Bbus_upper_numpyarray = Ybus_upper.data.imag
+                Bbus_upper = csc_matrix((Bbus_upper_numpyarray, Ybus_upper.indices, Ybus_upper.indptr), shape=Ybus_upper.shape)
+
+                # Compute the resistance matrix Rbus by calculating the real part of each entry of Zbus
+                Rbus_upper_numpyarray = Zbus_upper_numpyarray.real
+                Rbus_upper = csc_matrix((Rbus_upper_numpyarray, Ybus_upper.indices, Ybus_upper.indptr), shape=Ybus_upper.shape)
+
+                # Compute the reactance matrix Xbus by calculating the real part of each entry of Zbus
+                Xbus_upper_numpyarray = Zbus_upper_numpyarray.imag
+                Xbus_upper = csc_matrix((Xbus_upper_numpyarray, Ybus_upper.indices, Ybus_upper.indptr), shape=Ybus_upper.shape)
+
+                # Save binary adjacency matrix rows and cols to a .npz file
+                np.savez(os.path.join(output_dir, case, f"{case}_Instance{case_num}_adjacency_binary_matrix.npz"), rows=rows, cols=cols)
+
+                # Save conductance matrix rows and cols to a .npz file
+                np.savez(os.path.join(output_dir, case, f"{case}_Instance{case_num}_conductance_matrix.npz"), data=Gbus_upper.data,
+                         indices=Gbus_upper.indices, indptr=Gbus_upper.indptr, shape=Gbus_upper.shape)
+
+                # Save susceptance matrix rows and cols to a .npz file
+                np.savez(os.path.join(output_dir, case, f"{case}_Instance{case_num}_susceptance_matrix.npz"), data=Bbus_upper.data,
+                         indices=Bbus_upper.indices, indptr=Bbus_upper.indptr, shape=Bbus_upper.shape)
+
+                # Save resistance matrix rows and cols to a .npz file
+                np.savez(os.path.join(output_dir, case, f"{case}_Instance{case_num}_resistance_matrix.npz"), data=Rbus_upper.data, indices=Rbus_upper.indices, indptr=Rbus_upper.indptr, shape=Rbus_upper.shape)
+
+                # Save reactance matrix rows and cols to a .npz file
+                np.savez(os.path.join(output_dir, case, f"{case}_Instance{case_num}_reactance_matrix.npz"), data=Xbus_upper.data, indices=Xbus_upper.indices, indptr=Xbus_upper.indptr, shape=Xbus_upper.shape)
+
+                """
+
                 # Collect data for each bus
                 bus_data = []
                 for bus_idx in range(len(net.bus)):
@@ -103,10 +163,10 @@ def generate_pandapower_data(num_cases, output_dir="dataset/output_files"):
                         bus_type = "PQ Bus"  # Transit buses, treated as PQ for simplicity
 
                     # Get power injections and voltage data
-                    pin = net.res_bus.p_mw.at[bus_idx]
-                    qin = net.res_bus.q_mvar.at[bus_idx]
+                    pin = - net.res_bus.p_mw.at[bus_idx] # Adjust sign for injection convention
+                    qin = - net.res_bus.q_mvar.at[bus_idx]
                     vmag = net.res_bus.vm_pu.at[bus_idx]
-                    vang = net.res_bus.va_degree.at[bus_idx]
+                    vang = np.deg2rad(net.res_bus.va_degree.at[bus_idx]) # Convertion of phase angle from degrees into radiant
 
                     # Append data for this bus
                     bus_data.append([bus_type, pin, qin, vmag, vang])

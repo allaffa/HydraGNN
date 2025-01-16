@@ -479,8 +479,13 @@ class Base(Module):
             r_Q[i] += V_i * V_j * (G_ij * torch.sin(angle_diff) - B_ij * torch.cos(angle_diff))
 
             # For undirected graphs, update the contribution to bus j as well
-            r_P[j] += V_j * V_i * (G_ij * torch.cos(-angle_diff) + B_ij * torch.sin(-angle_diff))
-            r_Q[j] += V_j * V_i * (G_ij * torch.sin(-angle_diff) - B_ij * torch.cos(-angle_diff))
+            # This is not needed because each edge is counted twice in the adjacency matrix
+            #r_P[j] += V_j * V_i * (G_ij * torch.cos(-angle_diff) + B_ij * torch.sin(-angle_diff))
+            #r_Q[j] += V_j * V_i * (G_ij * torch.sin(-angle_diff) - B_ij * torch.cos(-angle_diff))
+
+        # Scale from per-unit to MW using system base power
+        r_P *= data.per_unit_scaling_factor
+        r_Q *= data.per_unit_scaling_factor
 
         # Compute residuals
         r_P = P_actual - r_P
@@ -526,8 +531,13 @@ class Base(Module):
             r_Q[i] += V_i * V_j * (G_ij * torch.sin(angle_diff) - B_ij * torch.cos(angle_diff))
 
             # For undirected graphs, update the contribution to bus j as well
-            r_P[j] += V_j * V_i * (G_ij * torch.cos(-angle_diff) + B_ij * torch.sin(-angle_diff))
-            r_Q[j] += V_j * V_i * (G_ij * torch.sin(-angle_diff) - B_ij * torch.cos(-angle_diff))
+            # This is not needed because each edge is counted twice in the adjacency matrix
+            #r_P[j] += V_j * V_i * (G_ij * torch.cos(-angle_diff) + B_ij * torch.sin(-angle_diff))
+            #r_Q[j] += V_j * V_i * (G_ij * torch.sin(-angle_diff) - B_ij * torch.cos(-angle_diff))
+
+        # Scale from per-unit to MW using system base power
+        r_P *= data.per_unit_scaling_factor
+        r_Q *= data.per_unit_scaling_factor
 
         # Compute residuals
         r_P = P_actual - r_P
