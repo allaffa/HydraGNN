@@ -36,7 +36,8 @@ def md17_pre_transform(data, compute_edges, transform):
 
 # Randomly select ~1000 samples
 def md17_pre_filter(data):
-    return torch.rand(1) < 1.1 #TODO:change to 0.25 before merge
+    return torch.rand(1) < 1.1  # TODO:change to 0.25 before merge
+
 
 log_name = "md17_hpo_trials"
 
@@ -58,7 +59,7 @@ arch_config = config["NeuralNetwork"]["Architecture"]
 # Preprocess configurations for edge computation
 compute_edges = hydragnn.preprocess.get_radius_graph_config(arch_config)
 
- # Fix for MD17 datasets
+# Fix for MD17 datasets
 torch_geometric.datasets.MD17.file_names["uracil"] = "md17_uracil.npz"
 
 dataset = torch_geometric.datasets.MD17(
@@ -73,6 +74,7 @@ train, val, test = hydragnn.preprocess.split_dataset(
 (train_loader, val_loader, test_loader,) = hydragnn.preprocess.create_dataloaders(
     train, val, test, config["NeuralNetwork"]["Training"]["batch_size"]
 )
+
 
 def run(trial):
 
@@ -184,6 +186,7 @@ def run(trial):
     # By default, DeepHyper maximized the objective function, so we need to flip the sign of the validation loss function
     print("validation_loss.item()", validation_loss.item())
     return -validation_loss.item()
+
 
 if __name__ == "__main__":
 

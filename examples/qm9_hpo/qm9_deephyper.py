@@ -15,7 +15,7 @@ except:
 
 import hydragnn
 
-num_samples = int(1e7) #TODO:change to 10000 before merge
+num_samples = int(1e7)  # TODO:change to 10000 before merge
 
 # Update each sample prior to loading.
 def qm9_pre_transform(data, transform):

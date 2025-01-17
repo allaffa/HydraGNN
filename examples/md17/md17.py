@@ -34,7 +34,7 @@ def md17_pre_transform(data, compute_edges, transform):
 
 # Randomly select ~1000 samples
 def md17_pre_filter(data):
-    return torch.rand(1) < 1.1 #TODO:change to 0.25 before merge
+    return torch.rand(1) < 1.1  # TODO:change to 0.25 before merge
 
 
 def main(mpnn_type=None, global_attn_engine=None, global_attn_type=None):
