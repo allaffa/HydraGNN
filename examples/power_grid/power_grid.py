@@ -61,15 +61,15 @@ def rescale(value, old_min=0.9, old_max=1.1, new_min=0.0, new_max=1.0):
 """
 data.x[:,0] contains P
 data.x[:,1] contains Q
-data.x[:,2] contains V
-data.x[:,3] contains theta
+data.x[:,2] contains Vmag (magnitude of voltage)
+data.x[:,3] contains theta (phase angle of voltage measured in radiants)
 data.x[:,4] is binary columns. 1 means that P is known, 0 means that P is not known
 data.x[:,5] is binary columns. 1 means that Q is known, 0 means that Q is not known
 data.x[:,6] is binary columns. 1 means that V is known, 0 means that V is not known
 data.x[:,7] is binary columns. 1 means that theta is known, 0 means that theta is not known
 
-data.y[:,0] contains predictions of V
-data.y[:,1] contains predictions of theta
+data.y[:,0] contains values of Vmag (magnitude of voltage)
+data.y[:,1] contains values of theta (phase angle of voltage measured in radiants)
 """
 
 
@@ -116,7 +116,7 @@ class PowerGridDataset(AbstractBaseDataset):
             ]
             log("local files list", len(local_csv_files_list))
 
-            for csv_file in csv_files_list:
+            for csv_file in local_csv_files_list:
 
                 # Extract the string "Instance"
                 base_name = os.path.splitext(csv_file)[0]  # Remove the file extension
