@@ -21,6 +21,8 @@ from hydragnn.utils.profiling_and_tracing.time_utils import Timer
 from hydragnn.utils.input_config_parsing.config_utils import get_log_name_config
 from hydragnn.utils.model import print_model
 
+from hydragnn.utils.distributed import nsplit
+
 from hydragnn.preprocess.load_data import split_dataset
 
 import hydragnn.utils.profiling_and_tracing.tracer as tr
@@ -32,9 +34,7 @@ from hydragnn.utils.datasets.pickledataset import (
     SimplePickleDataset,
 )
 from hydragnn.preprocess.graph_samples_checks_and_updates import gather_deg
-from hydragnn.preprocess.graph_samples_checks_and_updates import (
-    RadiusGraph
-)
+from hydragnn.preprocess.graph_samples_checks_and_updates import RadiusGraph
 
 try:
     from hydragnn.utils.datasets.adiosdataset import AdiosWriter, AdiosDataset
@@ -57,6 +57,7 @@ def info(*args, logtype="info", sep=" "):
 def rescale(value, old_min=0.9, old_max=1.1, new_min=0.0, new_max=1.0):
     return (value - old_min) / (old_max - old_min) * (new_max - new_min) + new_min
 
+
 """
 data.x[:,0] contains P
 data.x[:,1] contains Q
@@ -70,6 +71,7 @@ data.x[:,7] is binary columns. 1 means that theta is known, 0 means that theta i
 data.y[:,0] contains predictions of V
 data.y[:,1] contains predictions of theta
 """
+
 
 class PowerGridDataset(AbstractBaseDataset):
     def __init__(self, dirpath, var_config, dist=False):
@@ -89,20 +91,25 @@ class PowerGridDataset(AbstractBaseDataset):
 
         # TO DO: assume you know Pin and Qin at generation and load buses, goal: predict Vmag and Vangle at all buses
 
-
         self.dist = dist
         if self.dist:
             assert torch.distributed.is_initialized()
             self.world_size = torch.distributed.get_world_size()
             self.rank = torch.distributed.get_rank()
 
-        directories_list = [d for d in os.listdir(self.data_path) if os.path.isdir(os.path.join(self.data_path, d))]
+        directories_list = [
+            d
+            for d in os.listdir(self.data_path)
+            if os.path.isdir(os.path.join(self.data_path, d))
+        ]
 
-        #for directory in directories_list:
+        for directory in directories_list:
 
-        for directory in ["case14"]:
-
-            csv_files_list = [file for file in os.listdir(os.path.join(self.data_path, directory)) if file.endswith(".csv")]
+            csv_files_list = [
+                file
+                for file in os.listdir(os.path.join(self.data_path, directory))
+                if file.endswith(".csv")
+            ]
 
             local_csv_files_list = list(nsplit(csv_files_list, self.world_size))[
                 self.rank
@@ -116,57 +123,120 @@ class PowerGridDataset(AbstractBaseDataset):
 
                 # per unit scaling factor
                 # Specify the file name
-                per_unit_scale_factor_name = os.path.join(self.data_path, directory, base_name+"_per_unit_scaling_factor.txt")
+                per_unit_scale_factor_name = os.path.join(
+                    self.data_path,
+                    directory,
+                    base_name + "_per_unit_scaling_factor.txt",
+                )
 
                 # Open the file in read mode and read the float
                 with open(per_unit_scale_factor_name, "r") as file:
-                    content = file.read().strip()  # Read the content and remove any extra whitespace or newlines
+                    content = (
+                        file.read().strip()
+                    )  # Read the content and remove any extra whitespace or newlines
                     S_base = float(content)  # Convert the string to a float
 
                 # Load the saved .npz file to extract information about the binary adjacency matrix
-                loaded_data = np.load(os.path.join(self.data_path, directory, base_name+"_adjacency_binary_matrix.npz"))
-                rows = loaded_data['rows']
-                cols = loaded_data['cols']
+                loaded_data = np.load(
+                    os.path.join(
+                        self.data_path,
+                        directory,
+                        base_name + "_adjacency_binary_matrix.npz",
+                    )
+                )
+                rows = loaded_data["rows"]
+                cols = loaded_data["cols"]
 
                 # Create edge_index
                 edge_index = torch.tensor([rows, cols], dtype=torch.long)
 
                 # Load the saved .npz file to extract information about the conductance matrix
-                conductance_loaded_data = np.load(os.path.join(self.data_path, directory, base_name+"_conductance_matrix.npz"))
+                conductance_loaded_data = np.load(
+                    os.path.join(
+                        self.data_path, directory, base_name + "_conductance_matrix.npz"
+                    )
+                )
 
                 # Reconstruct the csc_matrix for resistance
-                G_loaded = csc_matrix((conductance_loaded_data['data'], conductance_loaded_data['indices'], conductance_loaded_data['indptr']), shape=conductance_loaded_data['shape'])
+                G_loaded = csc_matrix(
+                    (
+                        conductance_loaded_data["data"],
+                        conductance_loaded_data["indices"],
+                        conductance_loaded_data["indptr"],
+                    ),
+                    shape=conductance_loaded_data["shape"],
+                )
 
                 # Create resistance as edge attribute
-                conductance_attribute = torch.tensor(G_loaded[rows, cols], dtype=torch.float32)
+                conductance_attribute = torch.tensor(
+                    G_loaded[rows, cols], dtype=torch.float32
+                )
 
                 # Load the saved .npz file to extract information about the conductance matrix
-                susceptance_loaded_data = np.load(os.path.join(self.data_path, directory, base_name + "_susceptance_matrix.npz"))
+                susceptance_loaded_data = np.load(
+                    os.path.join(
+                        self.data_path, directory, base_name + "_susceptance_matrix.npz"
+                    )
+                )
 
                 # Reconstruct the csc_matrix for resistance
-                B_loaded = csc_matrix((susceptance_loaded_data['data'], susceptance_loaded_data['indices'],
-                                       susceptance_loaded_data['indptr']), shape=susceptance_loaded_data['shape'])
+                B_loaded = csc_matrix(
+                    (
+                        susceptance_loaded_data["data"],
+                        susceptance_loaded_data["indices"],
+                        susceptance_loaded_data["indptr"],
+                    ),
+                    shape=susceptance_loaded_data["shape"],
+                )
 
                 # Create resistance as edge attribute
-                susceptance_attribute = torch.tensor(B_loaded[rows, cols], dtype=torch.float32)
+                susceptance_attribute = torch.tensor(
+                    B_loaded[rows, cols], dtype=torch.float32
+                )
 
                 # Load the saved .npz file to extract information about the resistance matrix
-                resistance_loaded_data = np.load(os.path.join(self.data_path, directory, base_name+"_resistance_matrix.npz"))
+                resistance_loaded_data = np.load(
+                    os.path.join(
+                        self.data_path, directory, base_name + "_resistance_matrix.npz"
+                    )
+                )
 
                 # Reconstruct the csc_matrix for resistance
-                R_loaded = csc_matrix((resistance_loaded_data['data'], resistance_loaded_data['indices'], resistance_loaded_data['indptr']), shape=resistance_loaded_data['shape'])
+                R_loaded = csc_matrix(
+                    (
+                        resistance_loaded_data["data"],
+                        resistance_loaded_data["indices"],
+                        resistance_loaded_data["indptr"],
+                    ),
+                    shape=resistance_loaded_data["shape"],
+                )
 
                 # Create resistance as edge attribute
-                resistance_attribute = torch.tensor(R_loaded[rows, cols], dtype=torch.float32)
+                resistance_attribute = torch.tensor(
+                    R_loaded[rows, cols], dtype=torch.float32
+                )
 
                 # Load the saved .npz file to extract information about the reactance matrix
-                reactance_loaded_data = np.load(os.path.join(self.data_path, directory, base_name+"_reactance_matrix.npz"))
+                reactance_loaded_data = np.load(
+                    os.path.join(
+                        self.data_path, directory, base_name + "_reactance_matrix.npz"
+                    )
+                )
 
                 # Reconstruct the csc_matrix for reactance
-                X_loaded = csc_matrix((reactance_loaded_data['data'], reactance_loaded_data['indices'], reactance_loaded_data['indptr']), shape=reactance_loaded_data['shape'])
+                X_loaded = csc_matrix(
+                    (
+                        reactance_loaded_data["data"],
+                        reactance_loaded_data["indices"],
+                        reactance_loaded_data["indptr"],
+                    ),
+                    shape=reactance_loaded_data["shape"],
+                )
 
                 # Create resistance as edge attribute
-                reactance_attribute = torch.tensor(X_loaded[rows, cols], dtype=torch.float32)
+                reactance_attribute = torch.tensor(
+                    X_loaded[rows, cols], dtype=torch.float32
+                )
 
                 # Check that binary adjacency matrix, resistance matrix, and reactance matrix have the same shape
                 assert edge_index.shape[1] == conductance_attribute.shape[1]
@@ -174,25 +244,43 @@ class PowerGridDataset(AbstractBaseDataset):
                 assert edge_index.shape[1] == resistance_attribute.shape[1]
                 assert edge_index.shape[1] == reactance_attribute.shape[1]
 
-                edge_attr = torch.cat([conductance_attribute, susceptance_attribute, resistance_attribute, reactance_attribute], dim=0).t()
+                edge_attr = torch.cat(
+                    [
+                        conductance_attribute,
+                        susceptance_attribute,
+                        resistance_attribute,
+                        reactance_attribute,
+                    ],
+                    dim=0,
+                ).t()
 
                 # Load the CSV file into a DataFrame
-                data_csv = pd.read_csv(os.path.join(self.data_path, directory, csv_file))
-                node_features = torch.cat([torch.tensor(data_csv['Pin']).unsqueeze(1), torch.tensor(data_csv['Qin']).unsqueeze(1), torch.tensor(data_csv['Vmag']).unsqueeze(1), torch.tensor(data_csv['Vang']).unsqueeze(1)], dim=1)
+                data_csv = pd.read_csv(
+                    os.path.join(self.data_path, directory, csv_file)
+                )
+                node_features = torch.cat(
+                    [
+                        torch.tensor(data_csv["Pin"]).unsqueeze(1),
+                        torch.tensor(data_csv["Qin"]).unsqueeze(1),
+                        torch.tensor(data_csv["Vmag"]).unsqueeze(1),
+                        torch.tensor(data_csv["Vang"]).unsqueeze(1),
+                    ],
+                    dim=1,
+                )
 
                 # Apply rescale to Vmag (index 2)
-                #node_features[:, 2] = rescale(node_features[:, 2], old_min=0.95, old_max=1.1)
+                # node_features[:, 2] = rescale(node_features[:, 2], old_min=0.95, old_max=1.1)
 
                 # Initialize an empty mask with the same shape as node_features
                 node_mask = torch.zeros_like(node_features, dtype=torch.int)
 
                 # Assign values to the mask based on 'Bus Type'
-                for idx, bus_type in enumerate(data_csv['Bus Type']):
-                    if bus_type == 'Slack':
+                for idx, bus_type in enumerate(data_csv["Bus Type"]):
+                    if bus_type == "Slack":
                         node_mask[idx] = torch.tensor([0, 0, 1, 1], dtype=torch.int)
-                    elif bus_type == 'PQ':
+                    elif bus_type == "PQ":
                         node_mask[idx] = torch.tensor([1, 1, 0, 0], dtype=torch.int)
-                    elif bus_type == 'PV':
+                    elif bus_type == "PV":
                         node_mask[idx] = torch.tensor([1, 0, 1, 0], dtype=torch.int)
 
                 # De-activate input features of the nodes based on the partial information available in real-case scenarios
@@ -202,11 +290,26 @@ class PowerGridDataset(AbstractBaseDataset):
                 node_features = torch.cat([node_features, node_mask], dim=1)
 
                 # we need to concatenate the voltage feaurtes one more time because the HydraGNN code will extract them and put them in data.y
-                node_features = torch.cat([node_features, torch.tensor(data_csv.Vmag).unsqueeze(1), torch.tensor(data_csv.Vang).unsqueeze(1)], dim=1).to(dtype=torch.float32)
+                node_features = torch.cat(
+                    [
+                        node_features,
+                        torch.tensor(data_csv.Vmag).unsqueeze(1),
+                        torch.tensor(data_csv.Vang).unsqueeze(1),
+                    ],
+                    dim=1,
+                ).to(dtype=torch.float32)
 
                 # Add mask as additional input
-                #data_sample = Data(x=node_features, edge_index=edge_index, edge_attr=edge_attr, grid_system=base_name)
-                data_sample = Data(per_unit_scaling_factor=S_base, x=node_features, edge_index=edge_index, edge_attr=edge_attr, grid_system=base_name, true_P=torch.tensor(data_csv['Pin']).unsqueeze(1), true_Q=torch.tensor(data_csv['Qin']).unsqueeze(1))
+                # data_sample = Data(x=node_features, edge_index=edge_index, edge_attr=edge_attr, grid_system=base_name)
+                data_sample = Data(
+                    per_unit_scaling_factor=S_base,
+                    x=node_features,
+                    edge_index=edge_index,
+                    edge_attr=edge_attr,
+                    grid_system=base_name,
+                    true_P=torch.tensor(data_csv["Pin"]).unsqueeze(1),
+                    true_Q=torch.tensor(data_csv["Qin"]).unsqueeze(1),
+                )
 
                 self.dataset.append(data_sample)
 
@@ -217,7 +320,6 @@ class PowerGridDataset(AbstractBaseDataset):
 
     def get(self, idx):
         return self.dataset[idx]
-
 
 
 if __name__ == "__main__":
@@ -260,7 +362,18 @@ if __name__ == "__main__":
 
     graph_feature_names = [""]
     graph_feature_dims = []
-    node_feature_names = ["Pin", "Qin", "Vmag", "Vang", "Mask1", "Mask2", "Mask3", "Mask4", "Vmag", "Vang"]
+    node_feature_names = [
+        "Pin",
+        "Qin",
+        "Vmag",
+        "Vang",
+        "Mask1",
+        "Mask2",
+        "Mask3",
+        "Mask4",
+        "Vmag",
+        "Vang",
+    ]
     node_feature_dims = [1, 1, 1, 1, 1, 1, 1, 1, 1, 1]
     dirpwd = os.path.dirname(os.path.abspath(__file__))
     datadir = os.path.join(dirpwd, "dataset")
@@ -471,7 +584,7 @@ if __name__ == "__main__":
         log_name,
         verbosity,
         create_plots=False,
-        compute_power_flow=True
+        compute_power_flow=True,
     )
 
     hydragnn.utils.model.save_model(model, optimizer, log_name)

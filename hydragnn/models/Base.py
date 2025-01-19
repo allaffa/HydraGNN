@@ -442,7 +442,6 @@ class Base(Module):
 
         return tot_loss, tasks_loss
 
-
     def compute_power_flow_residual_loss(self, pred, data):
         # Extract known and predicted data
         P_actual = data.true_P  # Actual P values
@@ -455,8 +454,8 @@ class Base(Module):
         num_buses = data.x.size(0)
 
         # Initialize residuals
-        r_P = torch.zeros(num_buses,1)
-        r_Q = torch.zeros(num_buses,1)
+        r_P = torch.zeros(num_buses, 1)
+        r_Q = torch.zeros(num_buses, 1)
 
         # Compute power predictions based on edge connectivity
         for k in range(edge_index.size(1)):  # Iterate over edges
@@ -475,13 +474,21 @@ class Base(Module):
             angle_diff = theta_i - theta_j
 
             # Increment predicted P and Q for bus i due to edge (i, j)
-            r_P[i] += V_i * V_j * (G_ij * torch.cos(angle_diff) + B_ij * torch.sin(angle_diff))
-            r_Q[i] += V_i * V_j * (G_ij * torch.sin(angle_diff) - B_ij * torch.cos(angle_diff))
+            r_P[i] += (
+                V_i
+                * V_j
+                * (G_ij * torch.cos(angle_diff) + B_ij * torch.sin(angle_diff))
+            )
+            r_Q[i] += (
+                V_i
+                * V_j
+                * (G_ij * torch.sin(angle_diff) - B_ij * torch.cos(angle_diff))
+            )
 
             # For undirected graphs, update the contribution to bus j as well
             # This is not needed because each edge is counted twice in the adjacency matrix
-            #r_P[j] += V_j * V_i * (G_ij * torch.cos(-angle_diff) + B_ij * torch.sin(-angle_diff))
-            #r_Q[j] += V_j * V_i * (G_ij * torch.sin(-angle_diff) - B_ij * torch.cos(-angle_diff))
+            # r_P[j] += V_j * V_i * (G_ij * torch.cos(-angle_diff) + B_ij * torch.sin(-angle_diff))
+            # r_Q[j] += V_j * V_i * (G_ij * torch.sin(-angle_diff) - B_ij * torch.cos(-angle_diff))
 
         # Scale from per-unit to MW using system base power
         r_P *= data.per_unit_scaling_factor
@@ -491,7 +498,86 @@ class Base(Module):
         r_P = P_actual - r_P
         r_Q = Q_actual - r_Q
 
-        power_flow_loss = (torch.norm(r_P) + torch.norm(r_Q))/data.num_graphs
+        power_flow_loss = (torch.norm(r_P) + torch.norm(r_Q)) / data.num_graphs
+
+        return power_flow_loss
+
+    def compute_power_flow_residual_with_picard_loss(self, pred, data):
+        # Extract known and predicted data
+        P_actual = data.true_P  # Actual P values
+        Q_actual = data.true_Q  # Actual Q values
+        V_predicted = pred[0]  # Predicted V values
+        theta_predicted = pred[1]  # Predicted theta values
+
+        # Extract edge information
+        edge_index = data.edge_index  # [2, num_edges]
+        num_buses = data.x.size(0)
+
+        # Initialize residuals
+        r_P = torch.zeros(num_buses, 1)
+        r_Q = torch.zeros(num_buses, 1)
+
+        # Corrective terms for voltage magnitude and angle
+        delta_V = torch.zeros_like(V_predicted)
+        delta_theta = torch.zeros_like(theta_predicted)
+
+        # Compute power predictions based on edge connectivity
+        for k in range(edge_index.size(1)):  # Iterate over edges
+            i = edge_index[0, k]  # Source bus
+            j = edge_index[1, k]  # Target bus
+
+            V_i = V_predicted[i]
+            theta_i = theta_predicted[i]
+            V_j = V_predicted[j]
+            theta_j = theta_predicted[j]
+
+            # Extract conductance (G_ij) and susceptance (B_ij) from edge attributes
+            G_ij = data.edge_attr[k, 0]
+            B_ij = data.edge_attr[k, 1]
+
+            angle_diff = theta_i - theta_j
+
+            # Increment predicted P and Q for bus i due to edge (i, j)
+            r_P[i] += (
+                V_i
+                * V_j
+                * (G_ij * torch.cos(angle_diff) + B_ij * torch.sin(angle_diff))
+            )
+            r_Q[i] += (
+                V_i
+                * V_j
+                * (G_ij * torch.sin(angle_diff) - B_ij * torch.cos(angle_diff))
+            )
+
+            # For undirected graphs, update the contribution to bus j as well
+            # This is not needed because each edge is counted twice in the adjacency matrix
+            # r_P[j] += V_j * V_i * (G_ij * torch.cos(-angle_diff) + B_ij * torch.sin(-angle_diff))
+            # r_Q[j] += V_j * V_i * (G_ij * torch.sin(-angle_diff) - B_ij * torch.cos(-angle_diff))
+
+            """
+            # Update phase angle (theta)
+            num_theta = V_j * (B_ij * torch.cos(angle_diff) - G_ij * torch.sin(angle_diff))
+            denom_theta = V_j * (G_ij * torch.cos(angle_diff) + B_ij * torch.sin(angle_diff))
+            delta_theta[i] += torch.atan2(num_theta, denom_theta)
+
+            # Update voltage magnitude (V)
+            num_V = V_j * (G_ij * torch.sin(angle_diff) - B_ij * torch.cos(angle_diff))
+            denom_V = G_ij ** 2 + B_ij ** 2
+            delta_V[i] += torch.sqrt(num_V / (denom_V + 1e-6))
+
+            V_predicted[i] += delta_V[i]
+            theta_predicted[i] += delta_theta[i]
+            """
+
+        # Scale from per-unit to MW using system base power
+        r_P *= data.per_unit_scaling_factor
+        r_Q *= data.per_unit_scaling_factor
+
+        # Compute residuals
+        r_P = P_actual - r_P
+        r_Q = Q_actual - r_Q
+
+        power_flow_loss = (torch.norm(r_P) + torch.norm(r_Q)) / data.num_graphs
 
         return power_flow_loss
 
@@ -499,8 +585,8 @@ class Base(Module):
         # Extract known and predicted data
         P_actual = data.true_P  # Actual P values
         Q_actual = data.true_Q  # Actual Q values
-        true_V = data.y[0:data.num_nodes]  # Predicted V values
-        true_theta = data.y[data.num_nodes:]  # Predicted theta values
+        true_V = data.y[0 : data.num_nodes]  # Predicted V values
+        true_theta = data.y[data.num_nodes :]  # Predicted theta values
 
         # Extract edge information
         edge_index = data.edge_index  # [2, num_edges]
@@ -527,13 +613,21 @@ class Base(Module):
             angle_diff = theta_i - theta_j
 
             # Increment predicted P and Q for bus i due to edge (i, j)
-            r_P[i] += V_i * V_j * (G_ij * torch.cos(angle_diff) + B_ij * torch.sin(angle_diff))
-            r_Q[i] += V_i * V_j * (G_ij * torch.sin(angle_diff) - B_ij * torch.cos(angle_diff))
+            r_P[i] += (
+                V_i
+                * V_j
+                * (G_ij * torch.cos(angle_diff) + B_ij * torch.sin(angle_diff))
+            )
+            r_Q[i] += (
+                V_i
+                * V_j
+                * (G_ij * torch.sin(angle_diff) - B_ij * torch.cos(angle_diff))
+            )
 
             # For undirected graphs, update the contribution to bus j as well
             # This is not needed because each edge is counted twice in the adjacency matrix
-            #r_P[j] += V_j * V_i * (G_ij * torch.cos(-angle_diff) + B_ij * torch.sin(-angle_diff))
-            #r_Q[j] += V_j * V_i * (G_ij * torch.sin(-angle_diff) - B_ij * torch.cos(-angle_diff))
+            # r_P[j] += V_j * V_i * (G_ij * torch.cos(-angle_diff) + B_ij * torch.sin(-angle_diff))
+            # r_Q[j] += V_j * V_i * (G_ij * torch.sin(-angle_diff) - B_ij * torch.cos(-angle_diff))
 
         # Scale from per-unit to MW using system base power
         r_P *= data.per_unit_scaling_factor
@@ -546,7 +640,6 @@ class Base(Module):
         power_flow_loss = (torch.norm(r_P) + torch.norm(r_Q)) / data.num_graphs
 
         return power_flow_loss
-
 
     def loss_nll(self, pred, value, head_index, var=None):
         # negative log likelihood loss

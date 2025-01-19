@@ -527,8 +527,8 @@ def train(
                 if compute_power_flow:
                     power_flow_residual_loss = model.module.compute_power_flow_residual_loss(pred, data)
                     true_power_flow_residual = model.module.compute_power_true_flow_residual(pred, data)
-                    print("Power flow loss: ", power_flow_residual_loss, " True power flow residual: ", true_power_flow_residual)
-                    loss += 1e-1 * power_flow_residual_loss
+                    # print("Power flow loss: ", power_flow_residual_loss, " True power flow residual: ", true_power_flow_residual)
+                    loss += power_flow_residual_loss
             if trace_level > 0:
                 tr.start("forward_sync", **syncopt)
                 MPI.COMM_WORLD.Barrier()

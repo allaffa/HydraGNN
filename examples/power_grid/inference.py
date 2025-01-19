@@ -138,7 +138,7 @@ if __name__ == "__main__":
     hydragnn.utils.print.print_utils.setup_log((get_log_name_config(config)))
     ##################################################################################################################
     # Always initialize for multi-rank training.
-    comm_size, rank =hydragnn.utils.distributed.setup_ddp()
+    comm_size, rank = hydragnn.utils.distributed.setup_ddp()
     ##################################################################################################################
     comm = MPI.COMM_WORLD
 
@@ -197,6 +197,7 @@ if __name__ == "__main__":
 
         # Batch size
         from torch_geometric.loader import DataLoader
+
         batch_size = 1
         test_data_loader = DataLoader(testset, batch_size=batch_size, shuffle=True)
 
@@ -218,8 +219,8 @@ if __name__ == "__main__":
         plt.clim(0, 1)
         ax.plot(ax.get_xlim(), ax.get_xlim(), ls="--", color="red")
         plt.colorbar()
-        #plt.xlim([0.0, 0.15])
-        #plt.ylim([0.0, 0.15])
+        # plt.xlim([0.0, 0.15])
+        # plt.ylim([0.0, 0.15])
         plt.xlabel("True values")
         plt.ylabel("Predicted values")
         plt.title(f"{output_name}")
