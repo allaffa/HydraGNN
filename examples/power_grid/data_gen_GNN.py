@@ -12,6 +12,16 @@ from mpi4py import MPI
 import hydragnn
 from hydragnn.utils.distributed import nsplit
 
+# Mapping case names to their corresponding functions
+case_map = {
+    "case9": nw.case9,
+    "case14": nw.case14,
+    "case39": nw.case39,
+    "case118": nw.case118,
+    "case300": nw.case300,
+    "case6470rte": nw.case6470rte,
+}
+
 # Function to generate pandapower data and print Ybus matrix
 def generate_pandapower_data(num_cases, output_dir="dataset/output_files"):
 
@@ -22,7 +32,7 @@ def generate_pandapower_data(num_cases, output_dir="dataset/output_files"):
 
     comm = MPI.COMM_WORLD
 
-    cases = ["case9", "case14", "case39", "case300", "case6470orte"]
+    cases = ["case9", "case14", "case39", "case118", "case300", "case6470orte"]
 
     # Ensure the output directory exists
 
@@ -54,16 +64,9 @@ def generate_pandapower_data(num_cases, output_dir="dataset/output_files"):
         for case_index in local_cases_indices:
 
             # Reset the network to the original case
-            if case == "case9":
-                net = nw.case9()
-            elif case == "case14":
-                net = nw.case14()
-            elif case == "case39":
-                net = nw.case39()
-            elif case == "case300":
-                net = nw.case300()
-            elif case == "case6470rte":
-                net = nw.case6470rte()
+            net = case_map.get(
+                case, lambda: None
+            )()  # Defaults to None if case is not found
 
             # Identify bus types
             slack_bus = net.ext_grid.bus.values  # Slack bus indices
