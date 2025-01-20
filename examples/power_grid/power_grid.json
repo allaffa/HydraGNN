@@ -44,7 +44,7 @@
             "checkpoint_warmup": 1,
             "perc_train": 0.8,
             "loss_function_type": "mae",
-            "batch_size": 1,
+            "batch_size": 32,
             "continue": 0,
             "Optimizer": {
                 "type": "AdamW",

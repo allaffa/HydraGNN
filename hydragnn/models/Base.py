@@ -444,46 +444,46 @@ class Base(Module):
 
     def compute_power_flow_residual_loss(self, pred, data):
         # Extract known and predicted data
-        P_actual = data.true_P  # Actual P values
-        Q_actual = data.true_Q  # Actual Q values
-        V_predicted = pred[0]  # Predicted V values
-        theta_predicted = pred[1]  # Predicted theta values
+        P_actual = data.true_P.to(self.device)  # Actual P values
+        Q_actual = data.true_Q.to(self.device)  # Actual Q values
+        V_predicted = pred[0].to(self.device)  # Predicted V values
+        theta_predicted = pred[1].to(self.device)  # Predicted theta values
 
         # Extract edge information
-        edge_index = data.edge_index  # [2, num_edges]
+        edge_index = data.edge_index.to(self.device)  # [2, num_edges]
         num_buses = data.x.size(0)
 
         # Initialize residuals
-        r_P = torch.zeros(num_buses, 1)
-        r_Q = torch.zeros(num_buses, 1)
+        r_P = torch.zeros(num_buses, 1).to(self.device)
+        r_Q = torch.zeros(num_buses, 1).to(self.device)
 
         # Compute power predictions based on edge connectivity
         for k in range(edge_index.size(1)):  # Iterate over edges
             i = edge_index[0, k]  # Source bus
             j = edge_index[1, k]  # Target bus
 
-            V_i = V_predicted[i]
-            theta_i = theta_predicted[i]
-            V_j = V_predicted[j]
-            theta_j = theta_predicted[j]
+            V_i = V_predicted[i].to(self.device)
+            theta_i = theta_predicted[i].to(self.device)
+            V_j = V_predicted[j].to(self.device)
+            theta_j = theta_predicted[j].to(self.device)
 
             # Extract conductance (G_ij) and susceptance (B_ij) from edge attributes
-            G_ij = data.edge_attr[k, 0]
-            B_ij = data.edge_attr[k, 1]
+            G_ij = data.edge_attr[k, 0].to(self.device)
+            B_ij = data.edge_attr[k, 1].to(self.device)
 
-            angle_diff = theta_i - theta_j
+            angle_diff = (theta_i - theta_j).to(self.device)
 
             # Increment predicted P and Q for bus i due to edge (i, j)
             r_P[i] += (
                 V_i
                 * V_j
                 * (G_ij * torch.cos(angle_diff) + B_ij * torch.sin(angle_diff))
-            )
+            ).to(self.device)
             r_Q[i] += (
                 V_i
                 * V_j
                 * (G_ij * torch.sin(angle_diff) - B_ij * torch.cos(angle_diff))
-            )
+            ).to(self.device)
 
             # For undirected graphs, update the contribution to bus j as well
             # This is not needed because each edge is counted twice in the adjacency matrix
@@ -583,46 +583,46 @@ class Base(Module):
 
     def compute_power_true_flow_residual(self, pred, data):
         # Extract known and predicted data
-        P_actual = data.true_P  # Actual P values
-        Q_actual = data.true_Q  # Actual Q values
-        true_V = data.y[0 : data.num_nodes]  # Predicted V values
-        true_theta = data.y[data.num_nodes :]  # Predicted theta values
+        P_actual = data.true_P.to(self.device)  # Actual P values
+        Q_actual = data.true_Q.to(self.device)  # Actual Q values
+        true_V = data.y[0 : data.num_nodes].to(self.device)  # Predicted V values
+        true_theta = data.y[data.num_nodes :].to(self.device)  # Predicted theta values
 
         # Extract edge information
-        edge_index = data.edge_index  # [2, num_edges]
+        edge_index = data.edge_index.to(self.device)  # [2, num_edges]
         num_buses = data.x.size(0)
 
         # Initialize residuals
-        r_P = torch.zeros(num_buses, 1)
-        r_Q = torch.zeros(num_buses, 1)
+        r_P = torch.zeros(num_buses, 1).to(self.device)
+        r_Q = torch.zeros(num_buses, 1).to(self.device)
 
         # Compute power predictions based on edge connectivity
         for k in range(edge_index.size(1)):  # Iterate over edges
             i = edge_index[0, k]  # Source bus
             j = edge_index[1, k]  # Target bus
 
-            V_i = true_V[i]
-            theta_i = true_theta[i]
-            V_j = true_V[j]
-            theta_j = true_theta[j]
+            V_i = true_V[i].to(self.device)
+            theta_i = true_theta[i].to(self.device)
+            V_j = true_V[j].to(self.device)
+            theta_j = true_theta[j].to(self.device)
 
             # Extract conductance (G_ij) and susceptance (B_ij) from edge attributes
-            G_ij = data.edge_attr[k, 0]
-            B_ij = data.edge_attr[k, 1]
+            G_ij = data.edge_attr[k, 0].to(self.device)
+            B_ij = data.edge_attr[k, 1].to(self.device)
 
-            angle_diff = theta_i - theta_j
+            angle_diff = (theta_i - theta_j).to(self.device)
 
             # Increment predicted P and Q for bus i due to edge (i, j)
             r_P[i] += (
                 V_i
                 * V_j
                 * (G_ij * torch.cos(angle_diff) + B_ij * torch.sin(angle_diff))
-            )
+            ).to(self.device)
             r_Q[i] += (
                 V_i
                 * V_j
                 * (G_ij * torch.sin(angle_diff) - B_ij * torch.cos(angle_diff))
-            )
+            ).to(self.device)
 
             # For undirected graphs, update the contribution to bus j as well
             # This is not needed because each edge is counted twice in the adjacency matrix

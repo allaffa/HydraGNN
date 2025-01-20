@@ -268,6 +268,8 @@ class PowerGridDataset(AbstractBaseDataset):
                     dim=1,
                 )
 
+                S_base_tensor = torch.ones(node_features.shape[0], 1, dtype=torch.float32) * S_base 
+
                 # Apply rescale to Vmag (index 2)
                 # node_features[:, 2] = rescale(node_features[:, 2], old_min=0.95, old_max=1.1)
 
@@ -302,7 +304,7 @@ class PowerGridDataset(AbstractBaseDataset):
                 # Add mask as additional input
                 # data_sample = Data(x=node_features, edge_index=edge_index, edge_attr=edge_attr, grid_system=base_name)
                 data_sample = Data(
-                    per_unit_scaling_factor=S_base,
+                    per_unit_scaling_factor=S_base_tensor,
                     x=node_features,
                     edge_index=edge_index,
                     edge_attr=edge_attr,
