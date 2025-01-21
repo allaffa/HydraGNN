@@ -45,7 +45,7 @@ def run(trial, dequed=None):
     f = open(f"output-{trial.id}.txt", "w")
     python_exe = sys.executable
     python_script = os.path.join(
-        os.path.dirname(__file__), "zinc_deephyper_parallel_trial.py"
+        os.path.dirname(__file__), "zinc_deephyper_parallel_trial_arindam.py"
     )
 
     # TODO: Launch a subprocess with `srun` to train neural networks
@@ -83,10 +83,7 @@ def run(trial, dequed=None):
             f"--global_attn_heads={trial.parameters['global_attn_heads']}"
             if trial.parameters["global_attn_heads"] is not None
             else f"--global_attn_heads=None",
-            ##f"--pickle",
-            ##f"--ddstore",
-            ## debugging
-            ##f'--multi_model_list="ANI1x"',
+            f"--pickle",
             f"--num_epoch=50",
             f"--log={log_name}",
         ]
