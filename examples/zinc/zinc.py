@@ -104,6 +104,10 @@ if __name__ == "__main__":
         const="pickle",
     )
 
+    parser.set_defaults(format="pickle")
+    args = parser.parse_args()
+    args.parameters = vars(args)
+
     graph_feature_names = ["free_energy"]
     graph_feature_dims = [1]
     node_feature_names = ["atomic_number"]
