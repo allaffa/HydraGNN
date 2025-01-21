@@ -191,7 +191,7 @@ if __name__ == "__main__":
         val_list = [valset[index] for index in local_val_indices]
         test_list = [testset[index] for index in local_test_indices]
 
-        print(rank, "Local splitting: ", len(train_list), len(val_list, len(test_list)))
+        print(rank, "Local splitting: ", len(train_list), len(val_list), len(test_list))
 
         deg = gather_deg(train_list)
         config["pna_deg"] = deg
