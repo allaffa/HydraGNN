@@ -152,14 +152,8 @@ if __name__ == "__main__":
     ## add choice of optimizer as hyperparameter
     ## choice of activation function (ReLy, LeakyReLU, sigmoid)
     problem.add_hyperparameter((1, 5), "num_conv_layers")  # discrete parameter
-    problem.add_hyperparameter((300, 2000), "hidden_dim")  # discrete parameter
-    # problem.add_hyperparameter((300, 2000, "log-uniform"), "hidden_dim")  # discrete parameter, sample uniformly in log-scale
-    problem.add_hyperparameter((1, 5), "num_sharedlayers")  # discrete parameter
-    problem.add_hyperparameter((500, 2000), "dim_sharedlayers")  # discrete parameter
+    problem.add_hyperparameter((10, 300), "hidden_dim")  # discrete parameter
     problem.add_hyperparameter((1, 3), "num_headlayers")  # discrete parameter
-    problem.add_hyperparameter(
-        (500, 1000), "dim_headlayers_graph"
-    )  # discrete parameter
     problem.add_hyperparameter((500, 3000), "dim_headlayers_node")  # discrete parameter
     problem.add_hyperparameter(
         ["CGCNN", "GIN", "GAT", "PNA", "EGNN", "PNAEq"], "model_type"

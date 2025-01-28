@@ -19,12 +19,12 @@
             "num_spherical": 7,
             "num_filters": 126,
             "edge_features": ["conductance", "susceptance", "resistance", "reactance"],
-            "hidden_dim": 100,
-            "num_conv_layers": 3,
+            "hidden_dim": 10,
+            "num_conv_layers": 1,
             "output_heads": {
                 "node": {
                     "num_headlayers": 2,
-                    "dim_headlayers": [200,200],
+                    "dim_headlayers": [20,20],
                     "type": "mlp"
                 }
             },
