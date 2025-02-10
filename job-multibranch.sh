@@ -1,4 +1,3 @@
-#!/bin/bash
 #SBATCH -A LRN070
 #SBATCH -J HydraGNN
 #SBATCH -o job-%j.out
