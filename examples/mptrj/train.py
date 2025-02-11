@@ -202,17 +202,17 @@ class MPTrjDataset(AbstractBaseDataset):
                 else:
                     data_object.y = data_object.energy
 
-                if any(data["pbc"]):
+                if any(data_object["pbc"]):
                     try:
-                        data = self.radius_graph_pbc(data)
+                        data_object = self.radius_graph_pbc(data_object)
                     except:
                         print(
                             "Structure could not successfully apply pbc radius graph",
                             flush=True,
                         )
-                        data = self.radius_graph(data)
+                        data_object = self.radius_graph(data_object)
                 else:
-                    data = self.radius_graph(data)
+                    data_object = self.radius_graph(data_object)
 
                 data_object = transform_coordinates(data_object)
 
@@ -473,11 +473,7 @@ if __name__ == "__main__":
         os.environ["HYDRAGNN_AGGR_BACKEND"] = "mpi"
         os.environ["HYDRAGNN_USE_ddstore"] = "1"
 
-    (
-        train_loader,
-        val_loader,
-        test_loader,
-    ) = hydragnn.preprocess.create_dataloaders(
+    (train_loader, val_loader, test_loader, ) = hydragnn.preprocess.create_dataloaders(
         trainset, valset, testset, config["NeuralNetwork"]["Training"]["batch_size"]
     )
 
