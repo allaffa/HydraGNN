@@ -207,7 +207,7 @@ class MPTrjDataset(AbstractBaseDataset):
                         data_object = self.radius_graph_pbc(data_object)
                     except:
                         print(
-                            "Structure could not successfully apply pbc radius graph",
+                            f"Structure could not successfully apply pbc radius graph",
                             flush=True,
                         )
                         data_object = self.radius_graph(data_object)
