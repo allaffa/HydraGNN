@@ -66,6 +66,7 @@ def train_validate_test(
     plot_hist_solution=False,
     create_plots=False,
     use_deepspeed=False,
+    compute_forces=False
 ):
     num_epoch = config["Training"]["num_epoch"]
     EarlyStop = (
@@ -155,14 +156,24 @@ def train_validate_test(
         with profiler as prof:
             tr.enable()
             tr.start("train")
-            train_loss, train_taskserr = train(
-                train_loader,
-                model,
-                optimizer,
-                verbosity,
-                profiler=prof,
-                use_deepspeed=use_deepspeed,
-            )
+            if compute_forces:
+                train_loss, train_taskserr = train_compute_forces(
+                    train_loader,
+                    model,
+                    optimizer,
+                    verbosity,
+                    profiler=prof,
+                    use_deepspeed=use_deepspeed,
+                )
+            else:
+                train_loss, train_taskserr = train(
+                    train_loader,
+                    model,
+                    optimizer,
+                    verbosity,
+                    profiler=prof,
+                    use_deepspeed=use_deepspeed,
+                )
             tr.stop("train")
             tr.disable()
             if epoch == 0:
@@ -539,6 +550,127 @@ def train(loader, model, opt, verbosity, profiler=None, use_deepspeed=False):
     tasks_error = tasks_error / num_samples_local
     return train_error, tasks_error
 
+
+def train_compute_forces(loader, model, opt, verbosity, profiler=None, use_deepspeed=False):
+    if profiler is None:
+        profiler = Profiler()
+
+    total_error = torch.tensor(0.0, device=get_device())
+    tasks_error = torch.zeros(model.module.num_heads, device=get_device())
+    num_samples_local = 0
+    model.train()
+
+    use_ddstore = (
+        hasattr(loader.dataset, "ddstore")
+        and hasattr(loader.dataset.ddstore, "epoch_begin")
+        and bool(int(os.getenv("HYDRAGNN_USE_ddstore", "0")))
+    )
+
+    nbatch = get_nbatch(loader)
+    syncopt = {"cudasync": False}
+    ## 0: default (no detailed tracing), 1: sync tracing
+    trace_level = int(os.getenv("HYDRAGNN_TRACE_LEVEL", "0"))
+    if trace_level > 0:
+        syncopt = {"cudasync": True}
+    tr.start("dataload", **syncopt)
+    if use_ddstore:
+        tr.start("epoch_begin")
+        loader.dataset.ddstore.epoch_begin()
+        tr.stop("epoch_begin")
+    for ibatch, data in iterate_tqdm(
+        enumerate(loader), verbosity, desc="Train", total=nbatch
+    ):
+        if ibatch >= nbatch:
+            break
+        if use_ddstore:
+            tr.start("epoch_end")
+            loader.dataset.ddstore.epoch_end()
+            tr.stop("epoch_end")
+        if trace_level > 0:
+            tr.start("dataload_sync", **syncopt)
+            MPI.COMM_WORLD.Barrier()
+            tr.stop("dataload_sync")
+        tr.stop("dataload", **syncopt)
+        tr.start("zero_grad")
+        with record_function("zero_grad"):
+            if use_deepspeed:
+                pass
+            else:
+                opt.zero_grad()
+        tr.stop("zero_grad")
+        tr.start("get_head_indices")
+        with record_function("get_head_indices"):
+            head_index = get_head_indices(model, data)
+        tr.stop("get_head_indices")
+        tr.start("forward", **syncopt)
+        with record_function("forward"):
+            if trace_level > 0:
+                tr.start("h2d", **syncopt)
+            data = data.to(get_device())
+            if trace_level > 0:
+                tr.stop("h2d", **syncopt)
+            data.pos.requires_grad = True
+            pred = model(data)
+            assert hasattr(data, 'pos'), "The attribute 'pos' does not exist in the data object."
+            negative_grads_energy = - torch.autograd.grad(
+                outputs=pred[0],  # [n_graphs, ]
+                inputs=data.pos,  # [n_nodes, 3]
+                grad_outputs=data.num_nodes * torch.ones_like(pred[0]),
+                retain_graph=True,  # Make sure the graph is not destroyed during training
+                create_graph=True,  # Create graph for second derivative
+                allow_unused=True,  # For complete dissociation turn to true
+            )[
+                0
+            ]  # [n_nodes, 3]
+            assert hasattr(data, 'forces'), "The attribute 'forces' does not exist in the data object."
+            assert negative_grads_energy.shape == data.forces.shape, f"gradients of energy predictions w.r.t. data.pos has shape {negative_grads_energy.shape} while data.forces has shape {data.forces.shape}"
+            loss_pinn_term = torch.sum(torch.norm(negative_grads_energy - data.forces, dim=1))/data.pos.shape[0]
+            loss, tasks_loss = model.module.loss(pred, data.y, head_index)
+            loss += loss_pinn_term
+            if trace_level > 0:
+                tr.start("forward_sync", **syncopt)
+                MPI.COMM_WORLD.Barrier()
+                tr.stop("forward_sync")
+        tr.stop("forward", **syncopt)
+        tr.start("backward", **syncopt)
+        with record_function("backward"):
+            if use_deepspeed:
+                model.backward(loss)
+            else:
+                loss.backward(retain_graph=False)
+            if trace_level > 0:
+                tr.start("backward_sync", **syncopt)
+                MPI.COMM_WORLD.Barrier()
+                tr.stop("backward_sync")
+        tr.stop("backward", **syncopt)
+        tr.start("opt_step", **syncopt)
+        # print_peak_memory(verbosity, "Max memory allocated before optimizer step")
+        if use_deepspeed:
+            model.step()
+        else:
+            opt.step()
+        # print_peak_memory(verbosity, "Max memory allocated after optimizer step")
+        tr.stop("opt_step", **syncopt)
+        profiler.step()
+        with torch.no_grad():
+            total_error += loss * data.num_graphs
+            num_samples_local += data.num_graphs
+            for itask in range(len(tasks_loss)):
+                tasks_error[itask] += tasks_loss[itask] * data.num_graphs
+        if ibatch < (nbatch - 1):
+            tr.start("dataload", **syncopt)
+        if use_ddstore:
+            if ibatch < (nbatch - 1):
+                tr.start("epoch_begin")
+            loader.dataset.ddstore.epoch_begin()
+            if ibatch < (nbatch - 1):
+                tr.stop("epoch_begin")
+    if use_ddstore:
+        loader.dataset.ddstore.epoch_end()
+
+    train_error = total_error / num_samples_local
+    tasks_error = tasks_error / num_samples_local
+    return train_error, tasks_error, loss_pinn_term
 
 @torch.no_grad()
 def validate(loader, model, verbosity, reduce_ranks=True):
