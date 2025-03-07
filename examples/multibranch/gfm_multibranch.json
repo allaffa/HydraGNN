@@ -104,7 +104,6 @@
                             ],
                             "type": "mlp"
                         }
-<<<<<<< HEAD
                     },
                     {
                         "type": "branch-2",
@@ -135,8 +134,6 @@
                             ],
                             "type": "mlp"
                         }
-=======
->>>>>>> 90f9c46 (Dev hierarchical multibranch output heads  (#323))
                     }
                 ]
             },
