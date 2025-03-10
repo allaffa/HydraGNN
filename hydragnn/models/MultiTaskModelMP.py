@@ -92,11 +92,7 @@ class DecoderModel(nn.Module):
                     (len(data.dataset_name), head_dim * self.var_output),
                     device=x.device,
                 )
-<<<<<<< HEAD
                 if self.num_branches == 1:
-=======
-                if self.num_branches==1:
->>>>>>> 06824ea (add task parallel)
                     x_graph_head = self.graph_shared["branch-0"](x_graph)
                     output_head = headloc["branch-0"](x_graph_head)
                     head = output_head[:, :head_dim]
@@ -104,14 +100,9 @@ class DecoderModel(nn.Module):
                 else:
                     for ID in datasetIDs:
                         mask = data.dataset_name == ID
-<<<<<<< HEAD
                         mask = mask[:, 0]
                         branchtype = f"branch-{ID.item()}"
                         # print("Pei debugging:", branchtype, data.dataset_name, mask, data.dataset_name[mask])
-=======
-                        branchtype = f"branch-{ID.item()}"
-                        #print("Pei debugging:", branchtype, data.dataset_name, mask, data.dataset_name[mask])
->>>>>>> 06824ea (add task parallel)
                         x_graph_head = self.graph_shared[branchtype](x_graph[mask, :])
                         output_head = headloc[branchtype](x_graph_head)
                         head[mask] = output_head[:, :head_dim]
@@ -125,13 +116,8 @@ class DecoderModel(nn.Module):
                 headvar = torch.zeros(
                     (x.shape[0], head_dim * self.var_output), device=x.device
                 )
-<<<<<<< HEAD
                 if self.num_branches == 1:
                     branchtype = "branch-0"
-=======
-                if self.num_branches==1:
-                    branchtype="branch-0"
->>>>>>> 06824ea (add task parallel)
                     if node_NN_type == "conv":
                         inv_node_feat = x
                         equiv_node_feat_ = equiv_node_feat
@@ -155,11 +141,7 @@ class DecoderModel(nn.Module):
                         mask = data.dataset_name == ID
                         mask_nodes = torch.repeat_interleave(mask, node_counts)
                         branchtype = f"branch-{ID.item()}"
-<<<<<<< HEAD
                         # print("Pei debugging:", branchtype, data.dataset_name, mask, data.dataset_name[mask])
-=======
-                        #print("Pei debugging:", branchtype, data.dataset_name, mask, data.dataset_name[mask])
->>>>>>> 06824ea (add task parallel)
                         if node_NN_type == "conv":
                             inv_node_feat = x[mask_nodes, :]
                             equiv_node_feat_ = equiv_node_feat[mask_nodes, :]
@@ -210,18 +192,10 @@ class MultiTaskModelMP(nn.Module):
             group_color,
         )
 
-<<<<<<< HEAD
         # assert self.shared_pg_size % self.head_pg_size == 0
         # self.total_num_heads = self.shared_pg_size // self.head_pg_size
         self.branch_id = group_color
         print(self.shared_pg_rank, "branch_id:", self.branch_id)
-=======
-        assert self.shared_pg_size % self.head_pg_size == 0
-        self.total_num_heads = self.shared_pg_size // self.head_pg_size
-        self.branch_id = group_color
-        print(self.shared_pg_rank, "branch_id:", self.branch_id)
-        os.environ["HYDRAGNN_HEAD_FILTER"] = str(self.branch_id)
->>>>>>> 06824ea (add task parallel)
 
         self.encoder = EncoderModel(base_model)
         self.decoder = DecoderModel(base_model)
@@ -231,10 +205,6 @@ class MultiTaskModelMP(nn.Module):
             if name != f"branch-{self.branch_id}":
                 delete_list.append(name)
 
-<<<<<<< HEAD
-=======
-        print("delete_list:", delete_list)
->>>>>>> 06824ea (add task parallel)
         for k in delete_list:
             del self.decoder.graph_shared[k]
 
@@ -243,10 +213,6 @@ class MultiTaskModelMP(nn.Module):
             for k in layer.keys():
                 if k != f"branch-{self.branch_id}":
                     delete_list.append(k)
-<<<<<<< HEAD
-=======
-            print("delete_list:", delete_list)
->>>>>>> 06824ea (add task parallel)
             for k in delete_list:
                 del layer[k]
 
@@ -292,7 +258,6 @@ class MultiTaskModelMP(nn.Module):
     def gradient_all_reduce(self):
         average_gradients(self.encoder, self.shared_pg)
         average_gradients(self.decoder, self.head_pg)
-<<<<<<< HEAD
 
     @contextmanager
     def no_sync(self):
@@ -309,5 +274,3 @@ class MultiTaskModelMP(nn.Module):
             self.decoder.require_backward_grad_sync = (
                 old_decoder_require_backward_grad_sync
             )
-=======
->>>>>>> 06824ea (add task parallel)
