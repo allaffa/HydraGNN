@@ -3,10 +3,10 @@
 #SBATCH -J HydraGNN-multibranch
 #SBATCH -o job-%j.out
 #SBATCH -e job-%j.out
-#SBATCH -t 00:30:00
+#SBATCH -t 02:00:00
 #SBATCH -p batch 
 #SBATCH -q debug
-#SBATCH -N 5 #16 
+#SBATCH -N 20 
 ##SBATCH -S 1
 
  
