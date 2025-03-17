@@ -68,7 +68,6 @@ def save_model(model, optimizer, name, path="./logs/", use_deepspeed=False):
             optimizer.consolidate_state_dict()
 
         from hydragnn.models import MultiTaskModelMP
-
         if isinstance(model, MultiTaskModelMP):
             eligible = model.head_pg_rank == 0
         else:
