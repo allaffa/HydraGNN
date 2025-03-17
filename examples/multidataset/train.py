@@ -257,6 +257,8 @@ if __name__ == "__main__":
             "edge_index",
             "edge_attr",
             "pos",
+            "energy",
+            "forces",
             "y",
         ]
         fname = os.path.join(os.path.dirname(__file__), "./dataset/%s.bp" % mymodel)
