@@ -293,7 +293,7 @@ class PowerGridDataset(AbstractBaseDataset):
                         node_mask[idx] = torch.tensor([0, 0, 1], dtype=torch.int)
 
                 # Provide information about what has been masked as additional inoptu feature
-                node_features = torch.cat([node_features, node_mask], dim=1)
+                # node_features = torch.cat([node_features, node_mask], dim=1)
 
                 # we need to concatenate the voltage feaurtes one more time because the HydraGNN code will extract them and put them in data.y
                 node_features = torch.cat(
@@ -371,13 +371,13 @@ if __name__ == "__main__":
     node_feature_names = [
         "input_feature_1",
         "input_feature_2",
-        "Mask1",
-        "Mask2",
-        "Mask3",
+#        "Mask1",
+#        "Mask2",
+#        "Mask3",
         "Vmag",
         "Vang",
     ]
-    node_feature_dims = [1, 1, 1, 1, 1, 1, 1]
+    node_feature_dims = [1, 1, 1, 1]
     dirpwd = os.path.dirname(os.path.abspath(__file__))
     datadir = os.path.join(dirpwd, "dataset")
     ##################################################################################################################
