@@ -8,7 +8,6 @@ import hydragnn.utils.profiling_and_tracing.tracer as tr
 import os
 from contextlib import contextmanager
 
-
 def average_gradients(model, group):
     """Averages gradients across all processes using all_reduce."""
     group_size = dist.get_world_size(group=group)
