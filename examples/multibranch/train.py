@@ -134,7 +134,7 @@ if __name__ == "__main__":
 
     ##################################################################################################################
     # Always initialize for multi-rank training.
-    comm_size, rank = hydragnn.utils.distributed.setup_ddp()
+    comm_size, rank = hydragnn.utils.distributed.setup_ddp_aurora()
     ##################################################################################################################
 
     comm = MPI.COMM_WORLD
@@ -457,7 +457,17 @@ if __name__ == "__main__":
         config=config["NeuralNetwork"],
         verbosity=verbosity,
     )
+    print_model(model)
 
+    learning_rate = config["NeuralNetwork"]["Training"]["Optimizer"]["learning_rate"]
+    optimizer = torch.optim.AdamW(model.parameters(), lr=learning_rate)
+    scheduler = torch.optim.lr_scheduler.ReduceLROnPlateau(
+        optimizer, mode="min", factor=0.5, patience=5, min_lr=0.00001
+    )
+    if hasattr(torch, 'xpu') and torch.xpu.is_available():
+        print("Using ipex.optimize wrapper")
+        import intel_extension_for_pytorch as ipex
+        model, optimizer = ipex.optimize(model, optimizer=optimizer)
     ## task parallel
     if args.task_parallel:
         model = MultiTaskModelMP(model, branch_id, branch_group)
@@ -468,12 +478,6 @@ if __name__ == "__main__":
 
     # Print details of neural network architecture
     print_model(model)
-
-    learning_rate = config["NeuralNetwork"]["Training"]["Optimizer"]["learning_rate"]
-    optimizer = torch.optim.AdamW(model.parameters(), lr=learning_rate)
-    scheduler = torch.optim.lr_scheduler.ReduceLROnPlateau(
-        optimizer, mode="min", factor=0.5, patience=5, min_lr=0.00001
-    )
 
     hydragnn.utils.model.load_existing_model_config(
         model, config["NeuralNetwork"]["Training"], optimizer=optimizer
