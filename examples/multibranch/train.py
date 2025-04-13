@@ -474,7 +474,7 @@ if __name__ == "__main__":
         model = hydragnn.utils.distributed.get_distributed_model(model, verbosity)
 
     # Print details of neural network architecture
-    print_model(model)
+    # print_model(model)
 
     hydragnn.utils.model.load_existing_model_config(
         model, config["NeuralNetwork"]["Training"], optimizer=optimizer
