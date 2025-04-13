@@ -476,7 +476,7 @@ if __name__ == "__main__":
         )
 
     # Print details of neural network architecture
-    print_model(model)
+    # print_model(model)
 
     hydragnn.utils.model.load_existing_model_config(
         model, config["NeuralNetwork"]["Training"], optimizer=optimizer
