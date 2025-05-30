@@ -172,7 +172,6 @@ def setup_ddp(use_deepspeed=False):
             master_addr = parse_slurm_nodelist(os.environ["PBS_O_HOST"])[0]
 
     try:
-        print("master_addr, master_port:", master_addr, master_port, backend, get_local_rank())
         if backend in ["nccl", "gloo", "ccl"]:
             os.environ["MASTER_ADDR"] = master_addr
             os.environ["MASTER_PORT"] = master_port
