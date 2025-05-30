@@ -95,6 +95,10 @@ def init_comm_size_and_rank():
         ## CADES
         world_size = int(os.environ["SLURM_NPROCS"])
         world_rank = int(os.environ["SLURM_PROCID"])
+    else:
+        from mpi4py import MPI
+        world_size = MPI.COMM_WORLD.Get_size()
+        world_rank = MPI.COMM_WORLD.Get_rank()
 
     ## Fall back to default
     if world_size is None:
@@ -155,11 +159,21 @@ def setup_ddp(use_deepspeed=False):
         ## The following is CADES specific
         master_addr = parse_slurm_nodelist(os.environ["SLURM_NODELIST"])[0]
     elif os.getenv("PBS_O_HOST") is not None:
-        ## The following is CADES specific
-        master_addr = parse_slurm_nodelist(os.environ["PBS_O_HOST"])[0]
+        if os.environ["PBS_O_HOST"][-19:] == "aurora.alcf.anl.gov":
+            from mpi4py import MPI
+            import oneccl_bindings_for_pytorch as torch_ccl
+
+            RANK = MPI.COMM_WORLD.Get_rank()
+            MASTER_ADDR = socket.gethostname() if RANK == 0 else None
+            MASTER_ADDR = MPI.COMM_WORLD.bcast(MASTER_ADDR, root=0)
+            master_addr = f"{MASTER_ADDR}.hsn.cm.aurora.alcf.anl.gov"
+        else:
+            ## The following is CADES specific
+            master_addr = parse_slurm_nodelist(os.environ["PBS_O_HOST"])[0]
 
     try:
-        if backend in ["nccl", "gloo"]:
+        print("master_addr, master_port:", master_addr, master_port, backend, get_local_rank())
+        if backend in ["nccl", "gloo", "ccl"]:
             os.environ["MASTER_ADDR"] = master_addr
             os.environ["MASTER_PORT"] = master_port
             os.environ["WORLD_SIZE"] = str(world_size)
@@ -200,7 +214,6 @@ def setup_ddp(use_deepspeed=False):
 
 def setup_ddp_aurora(use_deepspeed=False):
     from mpi4py import MPI
-    import socket
     import oneccl_bindings_for_pytorch as torch_ccl
 
     # DDP: Set environmental variables used by PyTorch
@@ -279,7 +292,10 @@ def get_device_name(use_gpu=True, rank_per_model=1, verbosity_level=0, no_prefix
     elif torch.cuda.is_available():
         device_name = "cuda:" + str(localrank)
     elif hasattr(torch, "xpu") and torch.xpu.is_available():
-        device_name = "xpu:" + str(localrank)
+        ## (2025/05) jyc: Getting error with xpu:n format. Use only "xpu" with set_device
+        # device_name = "xpu:" + str(localrank)
+        device_name = "xpu"
+        torch.xpu.set_device(localrank)
 
     return device_name
 
