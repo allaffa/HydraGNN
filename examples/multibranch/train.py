@@ -134,7 +134,7 @@ if __name__ == "__main__":
 
     ##################################################################################################################
     # Always initialize for multi-rank training.
-    comm_size, rank = hydragnn.utils.distributed.setup_ddp_aurora()
+    comm_size, rank = hydragnn.utils.distributed.setup_ddp()
     ##################################################################################################################
 
     comm = MPI.COMM_WORLD
