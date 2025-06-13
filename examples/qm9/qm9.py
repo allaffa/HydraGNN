@@ -115,6 +115,12 @@ def main(mpnn_type=None, global_attn_engine=None, global_attn_type=None):
     scheduler = torch.optim.lr_scheduler.ReduceLROnPlateau(
         optimizer, mode="min", factor=0.5, patience=5, min_lr=0.00001
     )
+    
+    if hasattr(torch, 'xpu') and torch.xpu.is_available():
+        print("Using ipex.optimize wrapper")
+        import intel_extension_for_pytorch as ipex
+        model, optimizer = ipex.optimize(model, optimizer=optimizer)
+
 
     # Run training with the given model and qm9 datasets.
     writer = hydragnn.utils.model.model.get_summary_writer(log_name)

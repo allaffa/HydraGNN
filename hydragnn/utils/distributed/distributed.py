@@ -211,26 +211,6 @@ def setup_ddp(use_deepspeed=False):
     return world_size, world_rank
 
 
-def setup_ddp_aurora(use_deepspeed=False):
-    from mpi4py import MPI
-    import oneccl_bindings_for_pytorch as torch_ccl
-
-    # DDP: Set environmental variables used by PyTorch
-    SIZE = MPI.COMM_WORLD.Get_size()
-    RANK = MPI.COMM_WORLD.Get_rank()
-    LOCAL_RANK = os.environ.get("PALS_LOCAL_RANKID")
-    os.environ["RANK"] = str(RANK)
-    os.environ["WORLD_SIZE"] = str(SIZE)
-    MASTER_ADDR = socket.gethostname() if RANK == 0 else None
-    MASTER_ADDR = MPI.COMM_WORLD.bcast(MASTER_ADDR, root=0)
-    os.environ["MASTER_ADDR"] = f"{MASTER_ADDR}.hsn.cm.aurora.alcf.anl.gov"
-    os.environ["MASTER_PORT"] = str(2345)
-    # DDP: initialize distributed communication with nccl backend
-    dist.init_process_group(backend="ccl", init_method="env://")
-
-    return SIZE, RANK
-
-
 def get_device_list():
     # [MODIFIED for Intel XPU]
     if hasattr(torch, "xpu") and torch.xpu.is_available():
