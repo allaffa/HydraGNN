@@ -5,6 +5,11 @@ from mpi4py import MPI
 import argparse
 
 import torch
+try:
+    import intel_extension_for_pytorch as ipex
+    import oneccl_bindings_for_pytorch as torch_ccl
+except:
+    pass
 
 # FIX random seed
 random_state = 0
@@ -33,7 +38,7 @@ from scipy.interpolate import BSpline, make_interp_spline
 import adios2 as ad2
 
 import torch.distributed as dist
-from torch.distributed.device_mesh import init_device_mesh
+from torch.distributed.device_mesh import init_device_mesh, DeviceMesh
 from hydragnn.models import MultiTaskModelMP
 from contextlib import nullcontext
 
@@ -52,6 +57,13 @@ if __name__ == "__main__":
     parser.add_argument(
         "--inputfile", help="input file", type=str, default="gfm_multitasking.json"
     )
+    parser.add_argument("--mpnn_type", help="mpnn_type", default="EGNN")
+    parser.add_argument("--hidden_dim", type=int, help="hidden_dim", default=866)
+    parser.add_argument(
+        "--num_conv_layers", type=int, help="num_conv_layers", default=4
+    )
+    parser.add_argument("--num_headlayers", type=int, help="num_headlayers", default=3)
+    parser.add_argument("--dim_headlayers", type=int, help="dim_headlayers", default=889)
     parser.add_argument("--ddstore", action="store_true", help="ddstore dataset")
     parser.add_argument("--ddstore_width", type=int, help="ddstore width", default=None)
     parser.add_argument("--shmem", action="store_true", help="shmem")
@@ -106,6 +118,7 @@ if __name__ == "__main__":
     )
     parser.set_defaults(format="adios")
     args = parser.parse_args()
+    args.parameters = vars(args)
 
     graph_feature_names = ["energy"]
     graph_feature_dims = [1]
@@ -126,6 +139,35 @@ if __name__ == "__main__":
     var_config["node_feature_names"] = node_feature_names
     var_config["node_feature_dims"] = node_feature_dims
 
+    # Update the config dictionary with the suggested hyperparameters
+    config["NeuralNetwork"]["Architecture"]["mpnn_type"] = args.parameters[
+        "mpnn_type"
+    ]
+    config["NeuralNetwork"]["Architecture"]["hidden_dim"] = args.parameters[
+        "hidden_dim"
+    ]
+    config["NeuralNetwork"]["Architecture"]["num_conv_layers"] = args.parameters[
+        "num_conv_layers"
+    ]
+
+    dim_headlayers = [
+        args.parameters["dim_headlayers"]
+        for i in range(args.parameters["num_headlayers"])
+    ]
+
+    for head_type in config["NeuralNetwork"]["Architecture"]["output_heads"]:
+        num_branches = len(config["NeuralNetwork"]["Architecture"]["output_heads"][head_type])
+        for i in range(num_branches):
+            config["NeuralNetwork"]["Architecture"]["output_heads"][head_type][i][
+                "num_headlayers"
+            ] = args.parameters["num_headlayers"]
+            config["NeuralNetwork"]["Architecture"]["output_heads"][head_type][i][
+                "dim_headlayers"
+            ] = dim_headlayers
+
+    if args.parameters["mpnn_type"] not in ["EGNN", "SchNet", "DimeNet"]:
+        config["NeuralNetwork"]["Architecture"]["equivariance"] = False
+
     if args.batch_size is not None:
         config["NeuralNetwork"]["Training"]["batch_size"] = args.batch_size
 
@@ -136,6 +178,11 @@ if __name__ == "__main__":
     # Always initialize for multi-rank training.
     comm_size, rank = hydragnn.utils.distributed.setup_ddp()
     ##################################################################################################################
+
+    if rank == 0:
+        for k in os.environ:
+            if k in ["CCL_KVS_MODE", "CCL_KVS_CONNECTION_TIMEOUT", "FI_MR_CACHE_MONITOR"]:
+                print(f"env {k}: {os.environ[k]}")
 
     comm = MPI.COMM_WORLD
 
@@ -159,6 +206,10 @@ if __name__ == "__main__":
     timer = Timer("load_data")
     timer.start()
 
+    device = get_device()
+    device_type = str(device).split(":")[0]
+    print("device, device_type:", device, device_type)
+
     if args.format == "multi":
         ## Reading multiple datasets, which requires the following arguments:
         ## --multi_model_list: the list dataset/model names
@@ -167,10 +218,9 @@ if __name__ == "__main__":
             ndata_list = list()
             pna_deg_list = list()
             for model in modellist:
-                # fname = os.path.join(
-                #    os.path.dirname(__file__), "./dataset/%s.bp" % model
-                # )
-                fname = model
+                fname = os.path.join(
+                   os.path.dirname(__file__), "./dataset/%s-v3.bp" % model
+                )
                 with adios2_open(fname, "r", MPI.COMM_SELF) as f:
                     f.__next__()
                     ndata = f.read_attribute("trainset/ndata").item()
@@ -218,7 +268,7 @@ if __name__ == "__main__":
             ## task parallel with device mesh
             assert comm_size % len(modellist) == 0
             mesh_2d = init_device_mesh(
-                "cuda",
+                device_type,
                 (len(modellist), comm_size // len(modellist)),
                 mesh_dim_names=("dim1", "dim2"),
             )
@@ -243,7 +293,6 @@ if __name__ == "__main__":
                 dist.get_rank(group=dim1_group),
                 dist.get_rank(group=dim2_group),
             )
-            device = get_device()
 
             mycolor = dim1_group_rank  ## branch id
             mymodel = modellist[mycolor]
@@ -269,14 +318,26 @@ if __name__ == "__main__":
                     for _ in range(n):
                         subgroup_ranks.append(irank)
                         irank += 1
-                    if rank in subgroup_ranks:
-                        subgroup = dist.new_group(ranks=subgroup_ranks)
-                    else:
-                        subgroup = None
+                    # subgroup = dist.new_group(ranks=subgroup_ranks)
+                    # subgroup_list.append(subgroup)
+                    subgroup = DeviceMesh(device_type=device_type, mesh=subgroup_ranks)
                     subgroup_list.append(subgroup)
+                
 
                 branch_id = mycolor
-                branch_group = subgroup_list[mycolor]
+                # branch_group = subgroup_list[mycolor]
+                branch_group = subgroup_list[mycolor].get_group()
+
+                branch_rank = dist.get_rank(group=branch_group)
+                branch_world_size = dist.get_world_size(group=branch_group)
+                print("rank, branch rank, branch world size:", rank, branch_rank, branch_world_size)
+
+                dist.barrier(group=branch_group)
+                print(rank, "#1 check subgroup ... done.")
+                tensor = torch.tensor([rank], device=device)
+                dist.all_reduce(tensor, op=dist.ReduceOp.SUM, group=branch_group)
+                print(rank, "#2 check subgroup ... done.")
+
 
         local_comm = comm.Split(mycolor, rank)
         local_comm_rank = local_comm.Get_rank()
@@ -293,8 +354,7 @@ if __name__ == "__main__":
             "y",
             # "dataset_name",
         ]
-        # fname = os.path.join(os.path.dirname(__file__), "./dataset/%s.bp" % mymodel)
-        fname = mymodel
+        fname = os.path.join(os.path.dirname(__file__), "./dataset/%s-v3.bp" % mymodel)
         print("mymodel:", rank, mycolor, mymodel)
         trainset = AdiosDataset(
             fname,
@@ -317,10 +377,15 @@ if __name__ == "__main__":
             var_config=var_config,
             keys=common_variable_names,
         )
-
+        ## FIXME
+        for ds in [trainset, valset, testset]:
+            ds.tmp_dict = dict()
+            for i, name in enumerate(modellist):
+                ds.tmp_dict[name.lower()] = torch.tensor([[i]])
+            
         ## Set local set
         num_samples_list = list()
-        for dataset in [trainset, valset, testset]:
+        for i, dataset in enumerate([trainset, valset, testset]):
             rx = list(nsplit(range(len(dataset)), local_comm_size))[local_comm_rank]
             print(
                 f"{rank} {dataset.dataset_name} nsplit:",
@@ -330,14 +395,15 @@ if __name__ == "__main__":
             )
 
             if args.num_samples is not None:
-                if args.num_samples > len(rx):
+                num_samples = args.num_samples if i == 0 else max(args.num_samples // 10, 1)
+                if num_samples > len(rx):
                     print(
                         f"WARN: Requested num_samples is larger than available in {dataset.dataset_name}: {args.num_samples} {len(rx)}"
                     )
                     # args.oversampling = True
                     # args.oversampling_num_samples = args.num_samples
                 else:
-                    rx = rx[: args.num_samples]
+                    rx = rx[: num_samples]
 
             local_dataset_len = len(rx)
             local_dataset_min = comm.allreduce(local_dataset_len, op=MPI.MIN)
@@ -352,6 +418,7 @@ if __name__ == "__main__":
                     if args.oversampling_num_samples is not None
                     else local_dataset_max
                 )
+                oversampling_num_samples = oversampling_num_samples if i == 0 else max(oversampling_num_samples // 10, 1)
                 num_samples_list.append(oversampling_num_samples)
                 print(
                     f"Oversampling {oversampling_num_samples} samples: {oversampling_num_samples/local_dataset_len*100:.2f} (%)"
@@ -415,6 +482,11 @@ if __name__ == "__main__":
                 trainset.pna_deg = pna_deg
                 valset.pna_deg = pna_deg
                 testset.pna_deg = pna_deg
+        
+        ## FIXME: batch size exception
+        if mymodel == "OC2022":
+            config["NeuralNetwork"]["Training"]["batch_size"] = 4
+
     else:
         raise NotImplementedError("No supported format: %s" % (args.format))
 
@@ -463,30 +535,42 @@ if __name__ == "__main__":
     )
 
     learning_rate = config["NeuralNetwork"]["Training"]["Optimizer"]["learning_rate"]
-    optimizer = torch.optim.AdamW(model.parameters(), lr=learning_rate)
-    scheduler = torch.optim.lr_scheduler.ReduceLROnPlateau(
-        optimizer, mode="min", factor=0.5, patience=5, min_lr=0.00001
-    )
-    if hasattr(torch, 'xpu') and torch.xpu.is_available():
-        print("Using ipex.optimize wrapper")
-        import intel_extension_for_pytorch as ipex
-        model, optimizer = ipex.optimize(model, optimizer=optimizer)
+
     ## task parallel
     if args.task_parallel:
+        ## MultiTaskModelMP is created from the base model
+        ## It initializes encoder and decoder with DDP
         model = MultiTaskModelMP(model, branch_id, branch_group)
+        ## creating optimizer and scheduler after creating MultiTaskModelMP
+        optimizer = torch.optim.AdamW(model.parameters(), lr=learning_rate)
+        scheduler = torch.optim.lr_scheduler.ReduceLROnPlateau(
+            optimizer, mode="min", factor=0.5, patience=5, min_lr=0.00001
+        )
+        if hasattr(torch, 'xpu') and torch.xpu.is_available():
+            print("Using ipex.optimize wrapper")
+            model, optimizer = ipex.optimize(model, optimizer=optimizer)
     else:
+        optimizer = torch.optim.AdamW(model.parameters(), lr=learning_rate)
+        scheduler = torch.optim.lr_scheduler.ReduceLROnPlateau(
+            optimizer, mode="min", factor=0.5, patience=5, min_lr=0.00001
+        )
+        if hasattr(torch, 'xpu') and torch.xpu.is_available():
+            print("Using ipex.optimize wrapper")
+            model, optimizer = ipex.optimize(model, optimizer=optimizer)
+        ## Wrap the model with DDP
         model = hydragnn.utils.distributed.get_distributed_model(
             model, verbosity, find_unused_parameters=True
         )
 
     # Print details of neural network architecture
-    # print_model(model)
+    print_model(model)
 
     hydragnn.utils.model.load_existing_model_config(
         model, config["NeuralNetwork"]["Training"], optimizer=optimizer
     )
 
     ##################################################################################################################
+    comm.Barrier()
 
     if args.nosync:
         context = model.no_sync()
@@ -518,5 +602,12 @@ if __name__ == "__main__":
         if rank == eligible:
             gp.pr_file(os.path.join("logs", log_name, "gp_timing.p%d" % rank))
         gp.pr_summary_file(os.path.join("logs", log_name, "gp_timing.summary"))
+
+        with open(os.path.join("logs", log_name, f"gp_full.p{rank}"), "w") as f:
+            f.write("rank,label,count,wallclock\n")
+            for key, value_list in tr.__tracer_list__["GPTLTracer"].hist.items():
+                for count, wallclock in value_list:
+                    f.write(f"{rank},{key},{count},{wallclock}\n")
+
         gp.finalize()
     sys.exit(0)

@@ -1,4 +1,5 @@
 import torch
+import intel_extension_for_pytorch as ipex
 import torch.distributed as dist
 from torch.nn.parallel import DistributedDataParallel as DDP
 import torch.nn as nn
