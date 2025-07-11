@@ -38,12 +38,21 @@ try:
     class GPTLTracer(Tracer):
         def __init__(self, **kwargs):
             gp.initialize()
+            self.hist = dict()
+            self.last = dict()
 
         def start(self, name):
             gp.start(name)
 
         def stop(self, name):
             gp.stop(name)
+
+            count, wallclock = gp.query_raw(name)
+            if name not in self.hist:
+                self.hist[name] = list()
+                self.last[name] = 0.0
+            self.hist[name].append((count, wallclock - self.last[name]))
+            self.last[name] = wallclock
 
         def enable(self):
             gp.enable()
@@ -53,6 +62,8 @@ try:
 
         def reset(self):
             gp.reset()
+            self.hist = dict()
+            self.last = dict()
 
 
 except:

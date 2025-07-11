@@ -45,6 +45,16 @@ def read_node_list():
     return nodes, nodes_string
 
 
+def read_node_list_pbs():
+    pbs_nodefile = os.environ["PBS_NODEFILE"]
+    node_list = list()
+    with open(pbs_nodefile, 'r') as f:
+        for line in f:
+            node_list.append(line.split(".")[0])
+
+    return node_list, ",".join(node_list)
+
+
 def create_ds_config(job_id, mbs, gbs):
     config_file_name = f"ds_config_{job_id}.json"
     with open(config_file_name, "w") as writer:
