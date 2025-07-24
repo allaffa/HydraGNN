@@ -20,7 +20,7 @@ def find_json_files(url):
     return json_files
 
 
-indices = ["pascal", "pbe", "pbe_1d", "pbe_2d", "pbesol", "scan"]
+indices = ["pbe", "pbe_1d", "pbe_2d", "pbesol", "pbesol_ph", "pbesol_ph_2d", "phonon_benchmark", "scan"]
 
 url_root = "https://alexandria.icams.rub.de/data"  # Replace with the actual URL
 
