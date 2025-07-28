@@ -9,5 +9,6 @@ unzip 3905361.zip
 for file in *.xz; do
     [ -e "$file" ] || continue  # Skip if no .xz files exist
     xz -d $file
+    mv "${file%.xz}" "${file%.xz}.hdf5"  # mv to hdf5 naming
 done
 
