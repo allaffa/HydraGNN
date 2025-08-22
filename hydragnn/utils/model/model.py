@@ -200,7 +200,8 @@ def calculate_PNA_degree(loader, max_neighbours):
         deg = torch.zeros(max_neighbours + 1, dtype=torch.long)
         for data in iterate_tqdm(loader, 2, desc="Calculate PNA degree"):
             d = degree(data.edge_index[1], num_nodes=data.num_nodes, dtype=torch.long)
-            deg += torch.bincount(d, minlength=deg.numel())[: max_neighbours + 1]
+            # Optimized: use torch.bincount with proper minlength to avoid slice
+            deg += torch.bincount(d, minlength=max_neighbours + 1)[:max_neighbours + 1]
         return deg
 
 
@@ -225,7 +226,8 @@ def calculate_PNA_degree_dist(loader, max_neighbours):
     deg = torch.zeros(max_neighbours + 1, dtype=torch.long)
     for data in iterate_tqdm(loader, 2, desc="Calculate PNA degree"):
         d = degree(data.edge_index[1], num_nodes=data.num_nodes, dtype=torch.long)
-        deg += torch.bincount(d, minlength=deg.numel())[: max_neighbours + 1]
+        # Optimized: use proper minlength to avoid slice
+        deg += torch.bincount(d, minlength=max_neighbours + 1)[:max_neighbours + 1]
     deg = deg.to(get_device())
     dist.all_reduce(deg, op=dist.ReduceOp.SUM)
     deg = deg.detach().cpu()
@@ -254,7 +256,8 @@ def calculate_PNA_degree_mpi(loader, max_neighbours):
     deg = torch.zeros(max_neighbours + 1, dtype=torch.long)
     for data in iterate_tqdm(loader, 2, desc="Calculate PNA degree"):
         d = degree(data.edge_index[1], num_nodes=data.num_nodes, dtype=torch.long)
-        deg += torch.bincount(d, minlength=deg.numel())[: max_neighbours + 1]
+        # Optimized: use proper minlength to avoid slice
+        deg += torch.bincount(d, minlength=max_neighbours + 1)[:max_neighbours + 1]
     from mpi4py import MPI
 
     deg = MPI.COMM_WORLD.allreduce(deg.numpy(), op=MPI.SUM)

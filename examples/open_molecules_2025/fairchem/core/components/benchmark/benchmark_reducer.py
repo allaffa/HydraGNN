@@ -280,12 +280,11 @@ class JsonDFReducer(BenchmarkReducer):
             common_cols = [
                 col for col in results.columns if col in self.target_data.columns
             ]
-            metrics.update(
-                {
-                    f"{col},mae": (results[col] - self.target_data[col]).abs().mean()
-                    for col in common_cols
-                }
-            )
+            # Optimized: compute differences for all common columns at once
+            if common_cols:
+                diffs = results[common_cols] - self.target_data[common_cols]
+                mae_metrics = {f"{col},mae": diffs[col].abs().mean() for col in common_cols}
+                metrics.update(mae_metrics)
 
         if self.target_data_keys is not None:
             for target_name in self.target_data_keys:
