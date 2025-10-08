@@ -1,4 +1,4 @@
-torch==2.0.1 
+torch==2.8.0 
 torchvision 
 torchaudio
 e3nn==0.5.1
