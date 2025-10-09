@@ -3,8 +3,8 @@
 
 # Base scientific computing and utilities
 numpy==1.26.4
-scipy==1.16.2
-scikit-learn==1.7.2
+scipy==1.14.1
+scikit-learn==1.5.1
 
 # Deep learning frameworks
 torch==2.8.0
