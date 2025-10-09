@@ -21,6 +21,7 @@ tqdm==4.67.1
 # Development tools
 pytest==8.4.2
 black==21.5b1
+mendeleev==0.16.0
 
 # Optional but commonly used
 pandas==2.3.3
