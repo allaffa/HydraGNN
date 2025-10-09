@@ -1,6 +1,6 @@
 torch==2.8.0
-torchvision 
-torchaudio
+torchvision==0.21.0
+torchaudio==2.5.0
 e3nn==0.5.1
 torch-ema==0.3
 torchmetrics==1.4.0

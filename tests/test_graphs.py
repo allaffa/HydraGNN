@@ -190,7 +190,7 @@ def unittest_train_model(
         )
         assert (
             sample_mean_abs_error < thresholds[mpnn_type][1]
-        ), "MAE sample checking failed!"
+        ), f"MAE sample checking failed! MAE: {sample_mean_abs_error:.6f} >= threshold: {thresholds[mpnn_type][1]} for model: {mpnn_type}"
 
     # Check RMSE error
     error_str = str("{:.6f}".format(error)) + " < " + str(thresholds[mpnn_type][0])
