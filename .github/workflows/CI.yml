@@ -64,7 +64,11 @@ jobs:
           "basic-models",
           "global-attention", 
           "equivariant-models",
-          "specialized-models"
+          "specialized-models",
+          "equiformer-v2-graphs",
+          "equiformer-v2-examples-1",
+          "equiformer-v2-examples-2",
+          "equiformer-v2-deepspeed"
         ]
 
     steps:
@@ -102,13 +106,25 @@ jobs:
               python -m pytest -rfEP -W error -W ignore::DeprecationWarning -W ignore::UserWarning --tb=native -m "basic_models" tests/test_graphs.py
               ;;
             "global-attention")
-              python -m pytest -rfEP -W error -W ignore::DeprecationWarning -W ignore::UserWarning --tb=native -m "global_attention" tests/test_graphs.py
+              python -m pytest -rfEP -W error -W ignore::DeprecationWarning -W ignore::UserWarning --tb=native -m "global_attention and not equiformer_v2" tests/test_graphs.py
               ;;
             "equivariant-models")
               python -m pytest -rfEP -W error -W ignore::DeprecationWarning -W ignore::UserWarning --tb=native -m "equivariant_models" tests/test_graphs.py
               ;;
             "specialized-models")
               python -m pytest -rfEP -W error -W ignore::DeprecationWarning -W ignore::UserWarning --tb=native -m "specialized_models" tests/test_graphs.py
+              ;;
+            "equiformer-v2-graphs")
+              python -m pytest -rfEP -W error -W ignore::DeprecationWarning -W ignore::UserWarning --tb=native -m "equiformer_v2" tests/test_graphs.py
+              ;;
+            "equiformer-v2-examples-1")
+              python -m pytest -rfEP -W error -W ignore::DeprecationWarning -W ignore::UserWarning --tb=native -k "pytest_examples_energy_equiformer and (SAGE or GIN or GAT or MFC or PNA or PNAPlus)" tests/test_examples.py
+              ;;
+            "equiformer-v2-examples-2")
+              python -m pytest -rfEP -W error -W ignore::DeprecationWarning -W ignore::UserWarning --tb=native -k "pytest_examples_energy_equiformer and (SchNet or DimeNet or EGNN or PNAEq or PAINN)" tests/test_examples.py
+              ;;
+            "equiformer-v2-deepspeed")
+              python -m pytest -rfEP -W error -W ignore::DeprecationWarning -W ignore::UserWarning --tb=native -m "equiformer_v2" tests/test_deepspeed.py
               ;;
           esac
 

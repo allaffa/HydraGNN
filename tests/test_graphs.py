@@ -254,6 +254,7 @@ def pytest_train_model_lengths_gps_attention(
 
 # Test models that allow edge attributes with EquiformerV2 global attention
 @pytest.mark.global_attention
+@pytest.mark.equiformer_v2
 @pytest.mark.parametrize(
     "global_attn_engine",
     ["EquiformerV2"],

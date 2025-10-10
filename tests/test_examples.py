@@ -69,6 +69,7 @@ def pytest_examples_energy_gps(
 # Test examples with EquiformerV2 global attention
 # Note: MACE is excluded due to e3nn tensor dimension incompatibilities with global attention
 # Note: EquiformerV2 doesn't use global_attn_type parameter (it's ignored)
+@pytest.mark.equiformer_v2
 @pytest.mark.parametrize(
     "global_attn_engine",
     ["EquiformerV2"],
