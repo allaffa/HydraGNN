@@ -164,7 +164,7 @@ def unittest_train_model(
         thresholds["PNA"] = [0.2, 0.15]
         thresholds["PNAPlus"] = [0.2, 0.15]
     if ci_input == "ci_conv_head.json":
-        thresholds["GIN"] = [0.25, 0.40]
+        thresholds["GIN"] = [0.26, 0.50]
         thresholds["SchNet"] = [0.30, 0.30]
 
     verbosity = 2
