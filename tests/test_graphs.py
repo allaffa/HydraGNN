@@ -19,7 +19,7 @@ import shutil
 
 import hydragnn, tests
 from hydragnn.utils.input_config_parsing.config_utils import merge_config
-
+from mpi4py import MPI
 
 # Main unit test function called by pytest wrappers.
 def unittest_train_model(
@@ -124,6 +124,7 @@ def unittest_train_model(
                     tests.deterministic_graph_data(
                         data_path, number_configurations=num_samples
                     )
+    MPI.COMM_WORLD.Barrier()
 
     # Since the config file uses PNA already, test the file overload here.
     # All the other models need to use the locally modified dictionary.
