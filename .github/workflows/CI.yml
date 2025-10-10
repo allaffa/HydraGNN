@@ -118,10 +118,10 @@ jobs:
               python -m pytest -rfEP -W error -W ignore::DeprecationWarning -W ignore::UserWarning --tb=native -m "equiformer_v2" tests/test_graphs.py
               ;;
             "equiformer-v2-examples-1")
-              python -m pytest -rfEP -W error -W ignore::DeprecationWarning -W ignore::UserWarning --tb=native -k "pytest_examples_energy_equiformer and (SAGE or GIN or GAT or MFC or PNA or PNAPlus)" tests/test_examples.py
+              python -m pytest -rfEP -W error -W ignore::DeprecationWarning -W ignore::UserWarning --tb=native -m "equiformer_v2_examples_1" tests/test_examples.py
               ;;
             "equiformer-v2-examples-2")
-              python -m pytest -rfEP -W error -W ignore::DeprecationWarning -W ignore::UserWarning --tb=native -k "pytest_examples_energy_equiformer and (SchNet or DimeNet or EGNN or PNAEq or PAINN)" tests/test_examples.py
+              python -m pytest -rfEP -W error -W ignore::DeprecationWarning -W ignore::UserWarning --tb=native -m "equiformer_v2_examples_2" tests/test_examples.py
               ;;
             "equiformer-v2-deepspeed")
               python -m pytest -rfEP -W error -W ignore::DeprecationWarning -W ignore::UserWarning --tb=native -m "equiformer_v2" tests/test_deepspeed.py

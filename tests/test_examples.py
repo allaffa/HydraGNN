@@ -70,6 +70,7 @@ def pytest_examples_energy_gps(
 # Note: MACE is excluded due to e3nn tensor dimension incompatibilities with global attention
 # Note: EquiformerV2 doesn't use global_attn_type parameter (it's ignored)
 @pytest.mark.equiformer_v2
+@pytest.mark.equiformer_v2_examples_1
 @pytest.mark.parametrize(
     "global_attn_engine",
     ["EquiformerV2"],
@@ -83,6 +84,47 @@ def pytest_examples_energy_gps(
         "MFC",
         "PNA",
         "PNAPlus",
+    ],
+)
+@pytest.mark.parametrize("example", ["qm9", "md17"])
+@pytest.mark.mpi_skip()
+def pytest_examples_energy_equiformer_group1(example, mpnn_type, global_attn_engine):
+    path = os.path.join(os.path.dirname(__file__), "..", "examples", example)
+    file_path = os.path.join(path, example + ".py")
+    # Use sys.executable to get the current Python interpreter
+    python_executable = sys.executable
+
+    # Set up environment with PYTHONPATH
+    env = os.environ.copy()
+    hydragnn_root = os.path.join(os.path.dirname(__file__), "..")
+    env["PYTHONPATH"] = os.path.abspath(hydragnn_root)
+
+    # Add the --mpnn_type argument for the subprocess call
+    # Note: global_attn_type is not needed for EquiformerV2 as it's ignored
+    return_code = subprocess.call(
+        [
+            python_executable,
+            file_path,
+            "--mpnn_type",
+            mpnn_type,
+            "--global_attn_engine",
+            global_attn_engine,
+        ],
+        env=env,
+    )
+    assert return_code == 0
+
+
+# Test examples with EquiformerV2 global attention - Group 2
+@pytest.mark.equiformer_v2
+@pytest.mark.equiformer_v2_examples_2
+@pytest.mark.parametrize(
+    "global_attn_engine",
+    ["EquiformerV2"],
+)
+@pytest.mark.parametrize(
+    "mpnn_type",
+    [
         "SchNet",
         "DimeNet",
         "EGNN",
@@ -92,7 +134,31 @@ def pytest_examples_energy_gps(
 )
 @pytest.mark.parametrize("example", ["qm9", "md17"])
 @pytest.mark.mpi_skip()
-def pytest_examples_energy_equiformer(example, mpnn_type, global_attn_engine):
+def pytest_examples_energy_equiformer_group2(example, mpnn_type, global_attn_engine):
+    path = os.path.join(os.path.dirname(__file__), "..", "examples", example)
+    file_path = os.path.join(path, example + ".py")
+    # Use sys.executable to get the current Python interpreter
+    python_executable = sys.executable
+
+    # Set up environment with PYTHONPATH
+    env = os.environ.copy()
+    hydragnn_root = os.path.join(os.path.dirname(__file__), "..")
+    env["PYTHONPATH"] = os.path.abspath(hydragnn_root)
+
+    # Add the --mpnn_type argument for the subprocess call
+    # Note: global_attn_type is not needed for EquiformerV2 as it's ignored
+    return_code = subprocess.call(
+        [
+            python_executable,
+            file_path,
+            "--mpnn_type",
+            mpnn_type,
+            "--global_attn_engine",
+            global_attn_engine,
+        ],
+        env=env,
+    )
+    assert return_code == 0
     path = os.path.join(os.path.dirname(__file__), "..", "examples", example)
     file_path = os.path.join(path, example + ".py")
     # Use sys.executable to get the current Python interpreter
