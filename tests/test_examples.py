@@ -99,6 +99,12 @@ def pytest_examples_energy_equiformer_group1(example, mpnn_type, global_attn_eng
     hydragnn_root = os.path.join(os.path.dirname(__file__), "..")
     env["PYTHONPATH"] = os.path.abspath(hydragnn_root)
 
+    # Set environment variables to make tests faster for CI
+    env["CI_MODE"] = "1"  # Signal to examples that we're in CI mode
+    env["NUM_SAMPLES"] = "10"  # Use only 10 samples for CI testing
+    env["NUM_EPOCHS"] = "1"  # Use only 1 epoch for CI testing
+    env["HYDRAGNN_VERBOSITY"] = "0"  # Reduce verbosity for faster execution
+
     # Add the --mpnn_type argument for the subprocess call
     # Note: global_attn_type is not needed for EquiformerV2 as it's ignored
     return_code = subprocess.call(
@@ -111,6 +117,7 @@ def pytest_examples_energy_equiformer_group1(example, mpnn_type, global_attn_eng
             global_attn_engine,
         ],
         env=env,
+        timeout=300,  # 5 minute timeout per test
     )
     assert return_code == 0
 
@@ -145,6 +152,12 @@ def pytest_examples_energy_equiformer_group2(example, mpnn_type, global_attn_eng
     hydragnn_root = os.path.join(os.path.dirname(__file__), "..")
     env["PYTHONPATH"] = os.path.abspath(hydragnn_root)
 
+    # Set environment variables to make tests faster for CI
+    env["CI_MODE"] = "1"  # Signal to examples that we're in CI mode
+    env["NUM_SAMPLES"] = "10"  # Use only 10 samples for CI testing
+    env["NUM_EPOCHS"] = "1"  # Use only 1 epoch for CI testing
+    env["HYDRAGNN_VERBOSITY"] = "0"  # Reduce verbosity for faster execution
+
     # Add the --mpnn_type argument for the subprocess call
     # Note: global_attn_type is not needed for EquiformerV2 as it's ignored
     return_code = subprocess.call(
@@ -157,6 +170,7 @@ def pytest_examples_energy_equiformer_group2(example, mpnn_type, global_attn_eng
             global_attn_engine,
         ],
         env=env,
+        timeout=300,  # 5 minute timeout per test
     )
     assert return_code == 0
     path = os.path.join(os.path.dirname(__file__), "..", "examples", example)
