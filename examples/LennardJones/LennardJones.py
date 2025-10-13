@@ -124,6 +124,12 @@ if __name__ == "__main__":
     if args.batch_size is not None:
         config["NeuralNetwork"]["Training"]["batch_size"] = args.batch_size
 
+    # Respect environment variables for CI testing
+    if os.environ.get("NUM_EPOCHS"):
+        config["NeuralNetwork"]["Training"]["num_epoch"] = int(
+            os.environ.get("NUM_EPOCHS")
+        )
+
     ##################################################################################################################
     # Always initialize for multi-rank training.
     comm_size, rank = hydragnn.utils.distributed.setup_ddp()

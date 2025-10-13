@@ -50,6 +50,18 @@ def pytest_examples_energy_gps(
     file_path = os.path.join(path, example + ".py")
     # Use sys.executable to get the current Python interpreter
     python_executable = sys.executable
+
+    # Set up environment with PYTHONPATH
+    env = os.environ.copy()
+    hydragnn_root = os.path.join(os.path.dirname(__file__), "..")
+    env["PYTHONPATH"] = os.path.abspath(hydragnn_root)
+
+    # Set environment variables to make tests faster for CI
+    env["CI_MODE"] = "1"  # Signal to examples that we're in CI mode
+    env["NUM_SAMPLES"] = "10"  # Use only 10 samples for CI testing
+    env["NUM_EPOCHS"] = "1"  # Use only 1 epoch for CI testing
+    env["HYDRAGNN_VERBOSITY"] = "0"  # Reduce verbosity for faster execution
+
     # Add the --mpnn_type argument for the subprocess call
     return_code = subprocess.call(
         [
@@ -61,7 +73,9 @@ def pytest_examples_energy_gps(
             global_attn_engine,
             "--global_attn_type",
             global_attn_type,
-        ]
+        ],
+        env=env,
+        timeout=300,  # 5 minute timeout per test
     )
     assert return_code == 0
 
@@ -173,30 +187,6 @@ def pytest_examples_energy_equiformer_group2(example, mpnn_type, global_attn_eng
         timeout=300,  # 5 minute timeout per test
     )
     assert return_code == 0
-    path = os.path.join(os.path.dirname(__file__), "..", "examples", example)
-    file_path = os.path.join(path, example + ".py")
-    # Use sys.executable to get the current Python interpreter
-    python_executable = sys.executable
-
-    # Set up environment with PYTHONPATH
-    env = os.environ.copy()
-    hydragnn_root = os.path.join(os.path.dirname(__file__), "..")
-    env["PYTHONPATH"] = os.path.abspath(hydragnn_root)
-
-    # Add the --mpnn_type argument for the subprocess call
-    # Note: global_attn_type is not needed for EquiformerV2 as it's ignored
-    return_code = subprocess.call(
-        [
-            python_executable,
-            file_path,
-            "--mpnn_type",
-            mpnn_type,
-            "--global_attn_engine",
-            global_attn_engine,
-        ],
-        env=env,
-    )
-    assert return_code == 0
 
 
 # NOTE the grad forces example with LennardJones requires
@@ -220,8 +210,22 @@ def pytest_examples_grad_forces(example, mpnn_type):
     path = os.path.join(os.path.dirname(__file__), "..", "examples", example)
     file_path = os.path.join(path, example + ".py")
 
+    # Set up environment with PYTHONPATH
+    env = os.environ.copy()
+    hydragnn_root = os.path.join(os.path.dirname(__file__), "..")
+    env["PYTHONPATH"] = os.path.abspath(hydragnn_root)
+
+    # Set environment variables to make tests faster for CI
+    env["CI_MODE"] = "1"  # Signal to examples that we're in CI mode
+    env["NUM_EPOCHS"] = "1"  # Use only 1 epoch for CI testing
+    env["HYDRAGNN_VERBOSITY"] = "0"  # Reduce verbosity for faster execution
+
     # Add the --mpnn_type argument for the subprocess call
-    return_code = subprocess.call([sys.executable, file_path, "--mpnn_type", mpnn_type])
+    return_code = subprocess.call(
+        [sys.executable, file_path, "--mpnn_type", mpnn_type],
+        env=env,
+        timeout=300,  # 5 minute timeout per test
+    )
 
     # Check the file ran without error.
     assert return_code == 0
