@@ -5,6 +5,7 @@ from tests.test_graphs import unittest_train_model
 # Check if deepspeed is available
 try:
     import deepspeed
+
     deepspeed_available = True
 except ImportError:
     deepspeed_available = False
