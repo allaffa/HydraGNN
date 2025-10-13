@@ -23,7 +23,22 @@ import subprocess
 def pytest_examples(example, mpnn_type):
     path = os.path.join(os.path.dirname(__file__), "..", "examples", example)
     file_path = os.path.join(path, example + ".py")  # Assuming different model scripts
-    return_code = subprocess.call(["python", file_path, "--mpnn_type", mpnn_type])
+
+    # Set up environment with PYTHONPATH
+    env = os.environ.copy()
+    hydragnn_root = os.path.join(os.path.dirname(__file__), "..")
+    env["PYTHONPATH"] = os.path.abspath(hydragnn_root)
+
+    # Set environment variables to make tests faster for CI
+    env["CI_MODE"] = "1"  # Signal to examples that we're in CI mode
+    env["NUM_EPOCHS"] = "1"  # Use only 1 epoch for CI testing
+    env["HYDRAGNN_VERBOSITY"] = "0"  # Reduce verbosity for faster execution
+
+    return_code = subprocess.call(
+        ["python", file_path, "--mpnn_type", mpnn_type],
+        env=env,
+        timeout=300,  # 5 minute timeout per test
+    )
 
     # Check the file ran without error.
     assert return_code == 0
