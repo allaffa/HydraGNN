@@ -55,5 +55,13 @@ jobs:
           # FIXME: install
           export PYTHONPATH=$PYTHONPATH:~/HydraGNN
           pip list
-          python -m pytest -rfEP -W error -W ignore::DeprecationWarning -W ignore::UserWarning --tb=native
-          mpirun -n 2 --oversubscribe python -m pytest -rfEP -W error -W ignore::DeprecationWarning  -W ignore::UserWarning --tb=native --with-mpi
+          # Check if DeepSpeed is available
+          if python -c "import deepspeed" 2>/dev/null; then
+            echo "DeepSpeed available - running all tests"
+            python -m pytest -rfEP -W error -W ignore::DeprecationWarning -W ignore::UserWarning --tb=native
+            mpirun -n 2 --oversubscribe python -m pytest -rfEP -W error -W ignore::DeprecationWarning  -W ignore::UserWarning --tb=native --with-mpi
+          else
+            echo "DeepSpeed not available - skipping GPU/DeepSpeed tests"
+            python -m pytest -rfEP -W error -W ignore::DeprecationWarning -W ignore::UserWarning --tb=native -m "not gpu and not deepspeed"
+            mpirun -n 2 --oversubscribe python -m pytest -rfEP -W error -W ignore::DeprecationWarning  -W ignore::UserWarning --tb=native --with-mpi -m "not gpu and not deepspeed"
+          fi
