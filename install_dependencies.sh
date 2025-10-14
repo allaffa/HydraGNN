@@ -10,7 +10,7 @@ echo "Installing HydraGNN dependencies with consistent settings..."
 # Option 1: Install everything at once (recommended for most users)
 if [ "$1" == "all" ]; then
     echo "Installing all dependencies..."
-    pip install --no-build-isolation -v -r requirements.txt -c constraints.txt
+    pip install --no-build-isolation -v -r requirements.txt 
     
     # Add optional dependencies if requested
     if [ "$2" == "optional" ]; then
@@ -34,15 +34,15 @@ fi
 
 # Install base dependencies
 echo "Installing base dependencies..."
-pip install --no-build-isolation -v -r requirements-base.txt -c constraints.txt
+pip install --no-build-isolation -v -r requirements-base.txt 
 
 # Install PyTorch dependencies
 echo "Installing PyTorch dependencies..."
-pip install --no-build-isolation -v -r requirements-torch.txt -c constraints.txt
+pip install --no-build-isolation -v -r requirements-torch.txt 
 
 # Install PyTorch Geometric dependencies
 echo "Installing PyTorch Geometric dependencies..."
-pip install --no-build-isolation -v -r requirements-pyg.txt -c constraints.txt
+pip install --no-build-isolation -v -r requirements-pyg.txt 
 
 # Install development dependencies (optional)
 if [ "$1" == "dev" ]; then
