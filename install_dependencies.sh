@@ -7,6 +7,7 @@ set -e  # Exit on any error
 
 echo "Installing HydraGNN dependencies with consistent settings..."
 
+
 # Install base dependencies
 echo "Installing base dependencies..."
 pip install --no-build-isolation -v -r requirements-base.txt
@@ -20,13 +21,13 @@ echo "Installing PyTorch Geometric dependencies..."
 pip install --no-build-isolation -v -r requirements-pyg.txt
 
 # Install development dependencies (optional)
-if [ "$1" == "all" ] || [ "$1" == "dev" ]; then
+if [ "$1" == "dev" ]; then
     echo "Installing development dependencies..."
     pip install --no-build-isolation -v -r requirements-dev.txt
 fi
 
 # Install optional dependencies (optional)
-if [ "$1" == "all" ] || [ "$2" == "optional" ]; then
+if [ "$2" == "optional" ]; then
     echo "Installing optional dependencies..."
     pip install --no-build-isolation -v -r requirements-optional.txt
 fi
