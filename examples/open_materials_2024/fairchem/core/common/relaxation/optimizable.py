@@ -392,14 +392,14 @@ class OptimizableUnitCellBatch(OptimizableBatch):
         if mask is None:
             mask = torch.eye(3, device=self.device)
 
-        # TODO make sure mask is on GPU
+        # Ensure mask is on the correct device
         if mask.shape == (6,):
             self.mask = torch.tensor(
                 voigt_6_to_full_3x3_stress(mask.detach().cpu()),
                 device=self.device,
             )
         elif mask.shape == (3, 3):
-            self.mask = mask
+            self.mask = mask.to(device=self.device)  # Ensure mask is on GPU
         else:
             raise ValueError("shape of mask should be (3,3) or (6,)")
 

@@ -49,7 +49,9 @@ class AdsorptionReducer(JsonDFReducer):
         """This will just compute MAE of everything that is common in the results and target dataframes"""
         pred_cols = [col for col in results.columns if col != self.target_data_key]
         targets = results[self.target_data_key]
-        metrics = {
-            f"{col},mae": (results[col] - targets).abs().mean() for col in pred_cols
-        }
+        
+        # Optimized: compute differences for all columns at once, then take abs and mean
+        diffs = results[pred_cols].subtract(targets, axis=0)
+        metrics = {f"{col},mae": diffs[col].abs().mean() for col in pred_cols}
+        
         return pd.DataFrame([metrics], index=[run_name])
