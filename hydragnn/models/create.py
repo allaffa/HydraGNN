@@ -83,6 +83,8 @@ def create_model_config(
         config["Architecture"]["avg_num_neighbors"],
         config["Training"]["conv_checkpointing"],
         config["Architecture"].get("enable_interatomic_potential", False),
+        config["Architecture"].get("enable_power_grid_pinn", False),
+        config["Architecture"].get("lambda_physics", 0.1),  # Weight for physics loss
         verbosity,
         use_gpu,
     )
@@ -130,6 +132,8 @@ def create_model(
     avg_num_neighbors: int = None,
     conv_checkpointing: bool = False,
     enable_interatomic_potential: bool = False,
+    enable_power_grid_pinn: bool = False,
+    lambda_physics: float = 0.1,  # Weight for physics-informed loss
     verbosity: int = 0,
     use_gpu: bool = True,
 ):
@@ -644,6 +648,257 @@ def create_model(
                 return data
 
         enhanced_model = EnhancedModelWrapper(model)
+        model = enhanced_model
+
+    # Apply power grid PINN enhancement if requested (moved to after all model initializations)
+    elif enable_power_grid_pinn:
+        class EnhancedModelWrapper(torch.nn.Module):
+            def __init__(self, original_model, lambda_physics=0.1):
+                super().__init__()
+                self.model = original_model
+                self.lambda_physics = lambda_physics  # Weight for physics-informed loss
+                self._last_data = None  # Store data for loss calculation
+                self._last_physics_loss = 0.0  # Track physics loss for monitoring
+                self._last_supervised_loss = 0.0  # Track supervised loss for monitoring
+
+            def __getattr__(self, name):
+                try:
+                    return super().__getattr__(name)
+                except AttributeError:
+                    pass
+                try:
+                    return getattr(self.model, name)
+                except AttributeError:
+                    raise AttributeError(f"'{self.__class__.__name__}' object has no attribute '{name}'")
+
+            def forward(self, data):
+                # Store data for use in loss calculation
+                self._last_data = data
+                return self.model(data)
+            
+            def loss(self, pred, value, head_index):
+                # Compute standard supervised loss from base model
+                supervised_loss, tasks_loss = self.model.loss(pred, value, head_index)
+                
+                # Store for monitoring
+                self._last_supervised_loss = supervised_loss.item() if torch.is_tensor(supervised_loss) else supervised_loss
+                
+                # Add physics-informed loss if data is available
+                if self._last_data is not None and hasattr(self._last_data, 'true_P'):
+                    physics_loss = self.compute_power_flow_residual_loss(pred, self._last_data)
+                    self._last_physics_loss = physics_loss.item() if torch.is_tensor(physics_loss) else physics_loss
+                    total_loss = supervised_loss + self.lambda_physics * physics_loss
+                    return total_loss, tasks_loss
+                
+                self._last_physics_loss = 0.0
+                return supervised_loss, tasks_loss
+            
+            def get_loss_components(self):
+                """Return the last computed loss components for monitoring"""
+                return {
+                    'supervised_loss': self._last_supervised_loss,
+                    'physics_loss': self._last_physics_loss,
+                    'lambda_physics': self.lambda_physics,
+                    'weighted_physics_loss': self.lambda_physics * self._last_physics_loss
+                }
+
+            def compute_power_flow_residual_loss(self, pred, data):
+                # Get device from predictions (avoid self.device recursion issue)
+                device = pred[0].device
+                
+                # Extract known and predicted data
+                P_actual = data.true_P.to(device)  # Actual P values
+                Q_actual = data.true_Q.to(device)  # Actual Q values
+                V_predicted = pred[0].to(device)  # Predicted V values
+                theta_predicted = pred[1].to(device)  # Predicted theta values
+
+                # Extract edge information
+                edge_index = data.edge_index.to(device)  # [2, num_edges]
+                num_buses = data.x.size(0)
+
+                # Initialize power predictions (will accumulate contributions from all edges)
+                P_predicted = torch.zeros(num_buses, 1, device=device)
+                Q_predicted = torch.zeros(num_buses, 1, device=device)
+
+                # Compute power predictions based on edge connectivity
+                for k in range(edge_index.size(1)):  # Iterate over edges
+                    i = edge_index[0, k]  # Source bus
+                    j = edge_index[1, k]  # Target bus
+
+                    V_i = V_predicted[i]
+                    theta_i = theta_predicted[i]
+                    V_j = V_predicted[j]
+                    theta_j = theta_predicted[j]
+
+                    # Extract conductance (G_ij) and susceptance (B_ij) from edge attributes
+                    G_ij = data.edge_attr[k, 0].to(device)
+                    B_ij = data.edge_attr[k, 1].to(device)
+
+                    angle_diff = theta_i - theta_j
+
+                    # Increment predicted P and Q for bus i due to edge (i, j)
+                    P_predicted[i] += V_i * V_j * (G_ij * torch.cos(angle_diff) + B_ij * torch.sin(angle_diff))
+                    Q_predicted[i] += V_i * V_j * (G_ij * torch.sin(angle_diff) - B_ij * torch.cos(angle_diff))
+
+                    # For undirected graphs, update the contribution to bus j as well
+                    # This is not needed because each edge is counted twice in the adjacency matrix
+                    # P_predicted[j] += V_j * V_i * (G_ij * torch.cos(-angle_diff) + B_ij * torch.sin(-angle_diff))
+                    # Q_predicted[j] += V_j * V_i * (G_ij * torch.sin(-angle_diff) - B_ij * torch.cos(-angle_diff))
+
+                # Scale from per-unit to MW using system base power
+                P_predicted = P_predicted * data.per_unit_scaling_factor
+                Q_predicted = Q_predicted * data.per_unit_scaling_factor
+
+                # Compute residuals (difference between actual and predicted)
+                residual_P = P_actual - P_predicted
+                residual_Q = Q_actual - Q_predicted
+
+                # Compute physics-informed loss as MEAN squared residual (not L2 norm!)
+                # This makes it comparable in magnitude to supervised MAE loss
+                power_flow_loss = (torch.mean(torch.abs(residual_P)) + torch.mean(torch.abs(residual_Q))) / data.num_graphs
+
+                return power_flow_loss
+
+            def compute_power_flow_residual_with_picard_loss(self, pred, data):
+                # Extract known and predicted data
+                P_actual = data.true_P  # Actual P values
+                Q_actual = data.true_Q  # Actual Q values
+                V_predicted = pred[0]  # Predicted V values
+                theta_predicted = pred[1]  # Predicted theta values
+
+                # Extract edge information
+                edge_index = data.edge_index  # [2, num_edges]
+                num_buses = data.x.size(0)
+
+                # Initialize residuals
+                r_P = torch.zeros(num_buses, 1)
+                r_Q = torch.zeros(num_buses, 1)
+
+                # Corrective terms for voltage magnitude and angle
+                delta_V = torch.zeros_like(V_predicted)
+                delta_theta = torch.zeros_like(theta_predicted)
+
+                # Compute power predictions based on edge connectivity
+                for k in range(edge_index.size(1)):  # Iterate over edges
+                    i = edge_index[0, k]  # Source bus
+                    j = edge_index[1, k]  # Target bus
+
+                    V_i = V_predicted[i]
+                    theta_i = theta_predicted[i]
+                    V_j = V_predicted[j]
+                    theta_j = theta_predicted[j]
+
+                    # Extract conductance (G_ij) and susceptance (B_ij) from edge attributes
+                    G_ij = data.edge_attr[k, 0]
+                    B_ij = data.edge_attr[k, 1]
+
+                    angle_diff = theta_i - theta_j
+
+                    # Increment predicted P and Q for bus i due to edge (i, j)
+                    r_P[i] += (
+                        V_i
+                        * V_j
+                        * (G_ij * torch.cos(angle_diff) + B_ij * torch.sin(angle_diff))
+                    )
+                    r_Q[i] += (
+                        V_i
+                        * V_j
+                        * (G_ij * torch.sin(angle_diff) - B_ij * torch.cos(angle_diff))
+                    )
+
+                    # For undirected graphs, update the contribution to bus j as well
+                    # This is not needed because each edge is counted twice in the adjacency matrix
+                    # r_P[j] += V_j * V_i * (G_ij * torch.cos(-angle_diff) + B_ij * torch.sin(-angle_diff))
+                    # r_Q[j] += V_j * V_i * (G_ij * torch.sin(-angle_diff) - B_ij * torch.cos(-angle_diff))
+
+                    """
+                    # Update phase angle (theta)
+                    num_theta = V_j * (B_ij * torch.cos(angle_diff) - G_ij * torch.sin(angle_diff))
+                    denom_theta = V_j * (G_ij * torch.cos(angle_diff) + B_ij * torch.sin(angle_diff))
+                    delta_theta[i] += torch.atan2(num_theta, denom_theta)
+
+                    # Update voltage magnitude (V)
+                    num_V = V_j * (G_ij * torch.sin(angle_diff) - B_ij * torch.cos(angle_diff))
+                    denom_V = G_ij ** 2 + B_ij ** 2
+                    delta_V[i] += torch.sqrt(num_V / (denom_V + 1e-6))
+
+                    V_predicted[i] += delta_V[i]
+                    theta_predicted[i] += delta_theta[i]
+                    """
+
+                # Scale from per-unit to MW using system base power
+                r_P *= data.per_unit_scaling_factor
+                r_Q *= data.per_unit_scaling_factor
+
+                # Compute residuals
+                r_P = P_actual - r_P
+                r_Q = Q_actual - r_Q
+
+                power_flow_loss = (torch.norm(r_P) + torch.norm(r_Q)) / data.num_graphs
+
+                return power_flow_loss
+
+            def compute_power_true_flow_residual(self, pred, data):
+                # Extract known and predicted data
+                P_actual = data.true_P.to(self.device)  # Actual P values
+                Q_actual = data.true_Q.to(self.device)  # Actual Q values
+                true_V = data.y[0 : data.num_nodes].to(self.device)  # Predicted V values
+                true_theta = data.y[data.num_nodes :].to(self.device)  # Predicted theta values
+
+                # Extract edge information
+                edge_index = data.edge_index.to(self.device)  # [2, num_edges]
+                num_buses = data.x.size(0)
+
+                # Initialize residuals
+                r_P = torch.zeros(num_buses, 1).to(self.device)
+                r_Q = torch.zeros(num_buses, 1).to(self.device)
+
+                # Compute power predictions based on edge connectivity
+                for k in range(edge_index.size(1)):  # Iterate over edges
+                    i = edge_index[0, k]  # Source bus
+                    j = edge_index[1, k]  # Target bus
+
+                    V_i = true_V[i].to(self.device)
+                    theta_i = true_theta[i].to(self.device)
+                    V_j = true_V[j].to(self.device)
+                    theta_j = true_theta[j].to(self.device)
+
+                    # Extract conductance (G_ij) and susceptance (B_ij) from edge attributes
+                    G_ij = data.edge_attr[k, 0].to(self.device)
+                    B_ij = data.edge_attr[k, 1].to(self.device)
+
+                    angle_diff = (theta_i - theta_j).to(self.device)
+
+                    # Increment predicted P and Q for bus i due to edge (i, j)
+                    r_P[i] += (
+                        V_i
+                        * V_j
+                        * (G_ij * torch.cos(angle_diff) + B_ij * torch.sin(angle_diff))
+                    ).to(self.device)
+                    r_Q[i] += (
+                        V_i
+                        * V_j
+                        * (G_ij * torch.sin(angle_diff) - B_ij * torch.cos(angle_diff))
+                    ).to(self.device)
+
+                    # For undirected graphs, update the contribution to bus j as well
+                    # This is not needed because each edge is counted twice in the adjacency matrix
+                    # r_P[j] += V_j * V_i * (G_ij * torch.cos(-angle_diff) + B_ij * torch.sin(-angle_diff))
+                    # r_Q[j] += V_j * V_i * (G_ij * torch.sin(-angle_diff) - B_ij * torch.cos(-angle_diff))
+
+                # Scale from per-unit to MW using system base power
+                r_P *= data.per_unit_scaling_factor
+                r_Q *= data.per_unit_scaling_factor
+
+                # Compute residuals
+                r_P = P_actual - r_P
+                r_Q = Q_actual - r_Q
+
+                power_flow_loss = (torch.norm(r_P) + torch.norm(r_Q)) / data.num_graphs
+
+                return power_flow_loss
+
+        enhanced_model = EnhancedModelWrapper(model, lambda_physics=lambda_physics)
         model = enhanced_model
 
     if conv_checkpointing:
