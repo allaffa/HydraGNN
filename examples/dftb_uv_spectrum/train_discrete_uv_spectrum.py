@@ -14,13 +14,13 @@ import argparse
 from rdkit.Chem.rdmolfiles import MolFromPDBFile
 
 import hydragnn
-from hydragnn.utils.print.print_utils import print_distributed, iterate_tqdm, log
+from hydragnn.utils.print.print_utils import print_distributed, iterate_tqdm, log, setup_log
 from hydragnn.utils.profiling_and_tracing.time_utils import Timer
 from hydragnn.utils.descriptors_and_embeddings.smiles_utils import (
     get_node_attribute_name,
     generate_graphdata_from_rdkit_molecule,
 )
-from hydragnn.utils.distributed import get_device
+from hydragnn.utils.distributed import get_device, setup_ddp, get_distributed_model
 from hydragnn.preprocess.load_data import split_dataset
 from hydragnn.utils.datasets.distdataset import DistDataset
 from hydragnn.utils.datasets.pickledataset import (
@@ -28,11 +28,14 @@ from hydragnn.utils.datasets.pickledataset import (
     SimplePickleDataset,
 )
 from hydragnn.preprocess.graph_samples_checks_and_updates import gather_deg
+from hydragnn.utils.model import get_summary_writer, save_model, load_existing_model_config
+from hydragnn.utils.input_config_parsing.config_utils import update_config, save_config
+from hydragnn.utils.profiling_and_tracing.time_utils import print_timers
 
 import numpy as np
 
 try:
-    from hydragnn.utils.adiosdataset import AdiosWriter, AdiosDataset
+    from hydragnn.utils.datasets.adiosdataset import AdiosWriter, AdiosDataset
 except ImportError:
     pass
 
@@ -188,7 +191,7 @@ if __name__ == "__main__":
         config["NeuralNetwork"]["Training"]["batch_size"] = args.batch_size
     ##################################################################################################################
     # Always initialize for multi-rank training.
-    comm_size, rank = hydragnn.utils.setup_ddp()
+    comm_size, rank = setup_ddp()
     ##################################################################################################################
 
     comm = MPI.COMM_WORLD
@@ -201,8 +204,8 @@ if __name__ == "__main__":
     )
 
     log_name = "dftb_eV_fullx" if args.log is None else args.log
-    hydragnn.utils.setup_log(log_name)
-    writer = hydragnn.utils.get_summary_writer(log_name)
+    setup_log(log_name)
+    writer = get_summary_writer(log_name)
 
     log("Command: {0}\n".format(" ".join([x for x in sys.argv])), rank=0)
 
@@ -321,11 +324,11 @@ if __name__ == "__main__":
         trainset, valset, testset, config["NeuralNetwork"]["Training"]["batch_size"]
     )
 
-    config = hydragnn.utils.update_config(config, train_loader, val_loader, test_loader)
+    config = update_config(config, train_loader, val_loader, test_loader)
     ## Good to sync with everyone right after DDStore setup
     comm.Barrier()
 
-    hydragnn.utils.save_config(config, log_name)
+    save_config(config, log_name)
 
     timer.stop()
 
@@ -333,7 +336,7 @@ if __name__ == "__main__":
         config=config["NeuralNetwork"],
         verbosity=verbosity,
     )
-    model = hydragnn.utils.get_distributed_model(model, verbosity)
+    model = get_distributed_model(model, verbosity)
 
     learning_rate = config["NeuralNetwork"]["Training"]["Optimizer"]["learning_rate"]
     optimizer = torch.optim.AdamW(model.parameters(), lr=learning_rate)
@@ -341,7 +344,7 @@ if __name__ == "__main__":
         optimizer, mode="min", factor=0.5, patience=5, min_lr=0.00001
     )
 
-    hydragnn.utils.load_existing_model_config(
+    load_existing_model_config(
         model, config["NeuralNetwork"]["Training"], optimizer=optimizer
     )
 
@@ -361,8 +364,8 @@ if __name__ == "__main__":
         create_plots=False,
     )
 
-    hydragnn.utils.save_model(model, optimizer, log_name)
-    hydragnn.utils.print_timers(verbosity)
+    save_model(model, optimizer, log_name)
+    print_timers(verbosity)
     if writer is not None:
         writer.close()
 
