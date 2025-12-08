@@ -85,8 +85,8 @@ if __name__ == "__main__":
     hydragnn.utils.print.print_utils.setup_log(log_name)
     writer = hydragnn.utils.model.get_summary_writer(log_name)
     
-    # Load ADIOS datasets
-    opt = {"preload": False, "shmem": False, "ddstore": False, "ddstore_width": None}
+    # Load ADIOS datasets with preload to avoid concurrent file access issues
+    opt = {"preload": True, "shmem": False, "ddstore": False, "ddstore_width": None}
     fname = os.path.join(dirpwd, "dataset", f"{args.modelname}-v2.bp")
     
     trainset = AdiosDataset(fname, "trainset", comm, **opt, var_config=var_config)

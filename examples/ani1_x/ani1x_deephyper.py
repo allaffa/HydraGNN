@@ -49,6 +49,10 @@ def run(trial, dequed=None):
     # Set master address from dequeued node
     master_addr = f"HYDRAGNN_MASTER_ADDR={dequed[0]}"
     nodelist = ",".join(dequed)
+    
+    # ADIOS2 environment variables for concurrent reading
+    # Each trial needs its own engine to avoid conflicts
+    adios_env = f"ADIOS2_ENGINE_DEFAULT=BP4,ADIOS2_VERBOSE=0"
 
     # Build srun command for distributed training
     prefix = " ".join(
@@ -58,7 +62,7 @@ def run(trial, dequed=None):
             f"--ntasks-per-node=8 --gpus-per-node=8",
             f"--cpus-per-task {OMP_NUM_THREADS} --threads-per-core 1 --cpu-bind threads",
             f"--gpus-per-task=1 --gpu-bind=closest",
-            f"--export=ALL,{master_addr}",
+            f"--export=ALL,{master_addr},{adios_env}",
             f"--nodelist={nodelist}",
             f"--output {DEEPHYPER_LOG_DIR}/output_{SLURM_JOB_ID}_{trial.id}.txt",
             f"--error {DEEPHYPER_LOG_DIR}/error_{SLURM_JOB_ID}_{trial.id}.txt",
