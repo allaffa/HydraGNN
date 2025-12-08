@@ -143,8 +143,6 @@ if __name__ == "__main__":
         # random_state=42,
         # Location where to store the results
         log_dir=log_name,
-        # Number of threads used to update surrogate model of BO
-        n_jobs=OMP_NUM_THREADS,
     )
 
     timeout = None
