@@ -135,9 +135,9 @@ if __name__ == "__main__":
     )
 
     # Define the search method and scalarization
+    # Note: In newer DeepHyper API, evaluator is passed to search.search(), not CBO constructor
     search = CBO(
         problem,
-        evaluator,
         acq_func="UCB",
         multi_point_strategy="cl_min",  # Constant liar strategy
         # random_state=42,
@@ -148,7 +148,7 @@ if __name__ == "__main__":
     )
 
     timeout = None
-    results = search.search(max_evals=200, timeout=timeout)
+    results = search.search(max_evals=200, timeout=timeout, evaluator=evaluator)
 
     print(results)
     sys.exit(0)
