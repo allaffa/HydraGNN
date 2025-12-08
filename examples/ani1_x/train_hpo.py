@@ -62,6 +62,11 @@ if __name__ == "__main__":
     config["NeuralNetwork"]["Architecture"]["num_headlayers"] = args.num_headlayers
     config["NeuralNetwork"]["Architecture"]["dim_headlayers"] = args.dim_headlayers
     
+    # Check if SchNet with equivariance - deactivate edge_features if so
+    if args.mpnn_type == "SchNet" and config["NeuralNetwork"]["Architecture"].get("equivariance", False):
+        config["NeuralNetwork"]["Architecture"]["edge_features"] = []
+        info(f"SchNet with equivariance detected: disabling edge_features for this trial", logtype="warning")
+    
     # Variable config
     var_config = config["NeuralNetwork"]["Variables_of_interest"]
     var_config["graph_feature_names"] = ["energy"]
