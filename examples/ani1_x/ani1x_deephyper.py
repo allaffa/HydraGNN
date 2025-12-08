@@ -37,7 +37,7 @@ verbosity = config["Verbosity"]["level"]
 
 # Set dataset paths
 MODELNAME = "ANI1x"
-BP_PATH = os.path.join(DIRPWD, "dataset", f"{MODELNAME}.bp")
+BP_PATH = os.path.join(DIRPWD, "dataset", f"{MODELNAME}-v2.bp")
 
 # Variable config
 var_config = config["NeuralNetwork"]["Variables_of_interest"]
@@ -57,7 +57,7 @@ testset = AdiosDataset(BP_PATH, "testset", comm, **opt, var_config=var_config)
     trainset, valset, testset, config["NeuralNetwork"]["Training"]["batch_size"]
 )
 
-def run(trial):
+def run(trial, dequed=None):
     global config
     trial_config = json.loads(json.dumps(config))  # Deep copy
     comm_size, rank = hydragnn.utils.distributed.setup_ddp()
@@ -111,24 +111,54 @@ def run(trial):
     return -validation_loss.item()
 
 if __name__ == "__main__":
+
+    log_name = "ani1x_deephyper"
+
     from deephyper.hpo import HpProblem, CBO
     from deephyper.evaluator import Evaluator, ProcessPoolEvaluator, queued
+    from hydragnn.utils.hpo.deephyper import read_node_list
+
     problem = HpProblem()
     problem.add_hyperparameter((1, 4), "num_conv_layers")
     problem.add_hyperparameter((32, 512), "hidden_dim")
     problem.add_hyperparameter((1, 3), "num_headlayers")
     problem.add_hyperparameter((32, 256), "dim_headlayers")
     problem.add_hyperparameter(["EGNN", "PNA", "SchNet", "DimeNet", "MACE"], "mpnn_type")
-    parallel_evaluator = Evaluator.create(
+
+    # Create the node queue
+    queue, _ = read_node_list()
+    print("The queue:", queue, len(queue))
+    print("NNODES_PER_TRIAL", NNODES_PER_TRIAL)
+    print("NUM_CONCURRENT_TRIALS", NUM_CONCURRENT_TRIALS)
+    print("NGPUS_PER_TRIAL", NGPUS_PER_TRIAL)
+    print("NTOTGPUS", NTOTGPUS)
+    print(NTOTGPUS, NGPUS_PER_TRIAL, NTOTGPUS // NGPUS_PER_TRIAL, len(queue))
+
+    # Define the search space for hyperparameters
+    # define the evaluator to distribute the computation
+    evaluator = queued(ProcessPoolEvaluator)(
         run,
-        method="process",
+        num_workers=NUM_CONCURRENT_TRIALS,
+        queue=queue,
+        queue_pop_per_task=NNODES_PER_TRIAL,  # Remove the hard-coded value later
+    )
+
+    # Define the search method and scalarization
+    # search = CBO(problem, parallel_evaluator, random_state=42, log_dir=log_name)
+    search = CBO(
+        problem,
+        evaluator,
         acq_func="UCB",
         multi_point_strategy="cl_min",  # Constant liar strategy
-        method_kwargs={"num_workers": 1},
-        n_jobs=OMP_NUM_THREADS,
+        #random_state=42,
+        # Location where to store the results
+        log_dir=log_name,
+        # Number of threads used to update surrogate model of BO
+        #n_jobs=OMP_NUM_THREADS,
     )
-    search = CBO(problem, parallel_evaluator, random_state=42, log_dir="ani1x_hpo")
-    timeout = 1200
-    results = search.search(max_evals=10, timeout=timeout)
+
+    timeout = None
+    results = search.search(max_evals=200, timeout=timeout, evaluator=evaluator)
+
     print(results)
     sys.exit(0)
