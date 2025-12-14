@@ -17,6 +17,8 @@ import subprocess
 
 @pytest.mark.mpi_skip()
 def pytest_atomicdescriptors():
+    pytest.importorskip("mendeleev")
+
     file_path = os.path.join(
         os.path.dirname(__file__),
         "..",

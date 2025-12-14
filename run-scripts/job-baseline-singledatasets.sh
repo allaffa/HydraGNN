@@ -52,17 +52,17 @@ export datadir3=/lustre/orion/world-shared/lrn070/HydraGNN-sc25-comm/Alexandria-
 export datadir4=/lustre/orion/world-shared/lrn070/HydraGNN-sc25-comm/transition1x-v3.bp
 
 
-srun -N$SLURM_JOB_NUM_NODES -n$((SLURM_JOB_NUM_NODES*8)) -c7 --gpus-per-task=1 --gpu-bind=closest python -u ./examples/multibranch/train.py --log=GFM_baseline_data0 \
+srun -N$SLURM_JOB_NUM_NODES -n$((SLURM_JOB_NUM_NODES*8)) -c7 --gpus-per-task=1 --gpu-bind=closest python -u ./examples/homogeneous_graphs/multibranch/train.py --log=GFM_baseline_data0 \
 --inputfile=baseline_GFM260.json --num_samples=100000 --multi --ddstore --multi_model_list=$datadir0
 
-srun -N$SLURM_JOB_NUM_NODES -n$((SLURM_JOB_NUM_NODES*8)) -c7 --gpus-per-task=1 --gpu-bind=closest python -u ./examples/multibranch/train.py --log=GFM_baseline_data1 \
+srun -N$SLURM_JOB_NUM_NODES -n$((SLURM_JOB_NUM_NODES*8)) -c7 --gpus-per-task=1 --gpu-bind=closest python -u ./examples/homogeneous_graphs/multibranch/train.py --log=GFM_baseline_data1 \
 --inputfile=baseline_GFM260.json --num_samples=100000 --multi --ddstore --multi_model_list=$datadir1
 
-srun -N$SLURM_JOB_NUM_NODES -n$((SLURM_JOB_NUM_NODES*8)) -c7 --gpus-per-task=1 --gpu-bind=closest python -u ./examples/multibranch/train.py --log=GFM_baseline_data2 \
+srun -N$SLURM_JOB_NUM_NODES -n$((SLURM_JOB_NUM_NODES*8)) -c7 --gpus-per-task=1 --gpu-bind=closest python -u ./examples/homogeneous_graphs/multibranch/train.py --log=GFM_baseline_data2 \
 --inputfile=baseline_GFM260.json --num_samples=100000 --multi --ddstore --multi_model_list=$datadir2
 
-srun -N$SLURM_JOB_NUM_NODES -n$((SLURM_JOB_NUM_NODES*8)) -c7 --gpus-per-task=1 --gpu-bind=closest python -u ./examples/multibranch/train.py --log=GFM_baseline_data3 \
+srun -N$SLURM_JOB_NUM_NODES -n$((SLURM_JOB_NUM_NODES*8)) -c7 --gpus-per-task=1 --gpu-bind=closest python -u ./examples/homogeneous_graphs/multibranch/train.py --log=GFM_baseline_data3 \
 --inputfile=baseline_GFM260.json --num_samples=100000 --multi --ddstore --multi_model_list=$datadir3
 
-srun -N$SLURM_JOB_NUM_NODES -n$((SLURM_JOB_NUM_NODES*8)) -c7 --gpus-per-task=1 --gpu-bind=closest python -u ./examples/multibranch/train.py --log=GFM_baseline_data4 \
+srun -N$SLURM_JOB_NUM_NODES -n$((SLURM_JOB_NUM_NODES*8)) -c7 --gpus-per-task=1 --gpu-bind=closest python -u ./examples/homogeneous_graphs/multibranch/train.py --log=GFM_baseline_data4 \
 --inputfile=baseline_GFM260.json --num_samples=100000 --multi --ddstore --multi_model_list=$datadir4

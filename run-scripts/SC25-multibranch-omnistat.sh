@@ -59,7 +59,7 @@ export OMNISTAT_VICTORIA_DATADIR=/lustre/orion/${SLURM_JOB_ACCOUNT}/world-shared
 ${OMNISTAT_WRAPPER} usermode --start --interval 1 | tee omnistat_start.log
 
 # (2) Run the job
-srun -N$SLURM_JOB_NUM_NODES -n$((SLURM_JOB_NUM_NODES*8)) -c7 --gpus-per-task=1 --gpu-bind=closest python -u ./examples/multibranch/train.py --log=SC25_multibranch \
+srun -N$SLURM_JOB_NUM_NODES -n$((SLURM_JOB_NUM_NODES*8)) -c7 --gpus-per-task=1 --gpu-bind=closest python -u ./examples/homogeneous_graphs/multibranch/train.py --log=SC25_multibranch \
 --inputfile=multibranch_GFM260_SC25.json --multi --ddstore --multi_model_list=$datadir0,$datadir1,$datadir2,$datadir3,$datadir4
 
 # (3) Tear-down data collection and summarize results

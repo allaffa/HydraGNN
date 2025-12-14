@@ -615,7 +615,7 @@ scheduler = ReduceLROnPlateau(
 import hydragnn
 
 # Train with configuration file
-hydragnn.run_training("examples/lsms/lsms.json")
+hydragnn.run_training("examples/homogeneous_graphs/lsms/lsms.json")
 
 # Train with configuration dictionary
 config = {...}  # Configuration dictionary
@@ -740,7 +740,7 @@ Multi-branch training allows training on multiple datasets with different data d
 
 ```python
 # Run multi-branch training
-python examples/multibranch/train.py \
+python examples/homogeneous_graphs/multibranch/train.py \
     --multi \
     --multi_model_list=dataset1.bp,dataset2.bp,dataset3.bp \
     --inputfile=multibranch_config.json
@@ -828,7 +828,7 @@ run_hpo(config_file="hpo_config.json")
 
 ```bash
 # Navigate to LSMS example
-cd examples/lsms
+cd examples/homogeneous_graphs/lsms
 
 # Train on magnetic materials dataset
 python lsms.py --inputfile lsms.json
@@ -845,7 +845,7 @@ Configuration highlights:
 
 ```bash
 # Train on QM9 molecular dataset
-cd examples/qm9
+cd examples/homogeneous_graphs/qm9
 python qm9.py --inputfile qm9.json
 ```
 
@@ -860,7 +860,7 @@ Key features:
 
 ```bash
 # Train on multiple large datasets simultaneously
-cd examples/multibranch
+cd examples/homogeneous_graphs/multibranch
 
 # Run with SLURM on HPC systems
 sbatch SC25-multibranch-omnistat.sh

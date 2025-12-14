@@ -1,0 +1,58 @@
+# Minimal illustration of hetero_config: graph_type selects hetero stack, mpnn_type selects conv kernel
+Architecture:
+  graph_type: Hetero
+  mpnn_type: SAGE            # choices: PNA, GAT, SAGE, GIN, GCN
+  hetero_config:
+    node_types: [paper, author]
+    edge_types:
+      - [paper, cites, paper]
+      - [author, writes, paper]
+    node_input_dims: {paper: 8, author: 4}
+    edge_input_dims: {cites: 2, writes: 1}
+    node_output_map: [null, paper]
+    conv_type: ${Architecture.mpnn_type}
+    num_mp_layers: 3
+    transformer:
+      enabled: true
+      num_layers: 1
+      heads: 2
+      dropout: 0.1
+  input_dim: 0              # not used by HeteroStack, kept for schema parity
+  hidden_dim: 32
+  output_dim: [1, 4]        # graph head, paper-node head
+  output_type: [graph, node]
+  output_heads: {}
+  pe_dim: 0
+  global_attn_engine: null
+  global_attn_type: null
+  global_attn_heads: 0
+  activation_function: relu
+  task_weights: [1.0, 1.0]
+  num_conv_layers: 3
+  freeze_conv_layers: false
+  initial_bias: null
+  num_nodes: null
+  max_neighbours: null
+  edge_dim: null
+  pna_deg: null
+  num_before_skip: null
+  num_after_skip: null
+  num_radial: null
+  radial_type: null
+  distance_transform: null
+  basis_emb_size: null
+  int_emb_size: null
+  out_emb_size: null
+  envelope_exponent: null
+  num_spherical: null
+  num_gaussians: null
+  num_filters: null
+  radius: null
+  equivariance: false
+  correlation: null
+  max_ell: null
+  node_max_ell: null
+  avg_num_neighbors: null
+Training:
+  loss_function_type: MSELoss
+  conv_checkpointing: false

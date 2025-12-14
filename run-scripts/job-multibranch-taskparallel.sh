@@ -56,7 +56,7 @@ export SCOREP_EXPERIMENT_DIRECTORY=scorep-$SLURM_JOB_ID
 # SCOREP_OPT="-m scorep --verbose --keep-files --noinstrumenter --mpp=mpi"
 SCOREP_OPT=""
 
-#srun -N$SLURM_JOB_NUM_NODES -n$((SLURM_JOB_NUM_NODES*8)) -c7 --gpus-per-task=1 --gpu-bind=closest python -u ./examples/multibranch/train.py  --multi --ddstore --multi_model_list=ANI1x-v3,MPTrj-v3,OC2020-20M-v3,OC2022-v3,qm7x-v3
+#srun -N$SLURM_JOB_NUM_NODES -n$((SLURM_JOB_NUM_NODES*8)) -c7 --gpus-per-task=1 --gpu-bind=closest python -u ./examples/homogeneous_graphs/multibranch/train.py  --multi --ddstore --multi_model_list=ANI1x-v3,MPTrj-v3,OC2020-20M-v3,OC2022-v3,qm7x-v3
 
 export datadir0=/lustre/orion/world-shared/lrn070/HydraGNN-sc25-comm/ANI1x-v3.bp
 export datadir1=/lustre/orion/world-shared/lrn070/HydraGNN-sc25-comm/qm7x-v3.bp
@@ -65,8 +65,8 @@ export datadir3=/lustre/orion/world-shared/lrn070/HydraGNN-sc25-comm/Alexandria-
 export datadir4=/lustre/orion/world-shared/lrn070/HydraGNN-sc25-comm/transition1x-v3.bp
 
 
-#export datadir4=/lustre/orion/lrn070/world-shared/mlupopa/Supercomputing2025/HydraGNN/examples/open_catalyst_2020
-#export datadir5=/lustre/orion/lrn070/world-shared/mlupopa/Supercomputing2025/HydraGNN/examples/omat24
+#export datadir4=/lustre/orion/lrn070/world-shared/mlupopa/Supercomputing2025/HydraGNN/examples/homogeneous_graphs/open_catalyst_2020
+#export datadir5=/lustre/orion/lrn070/world-shared/mlupopa/Supercomputing2025/HydraGNN/examples/homogeneous_graphs/open_materials_2024
 
-srun -N$SLURM_JOB_NUM_NODES -n$((SLURM_JOB_NUM_NODES*8)) -c7 --gpus-per-task=1 --gpu-bind=closest python -u $SCOREP_OPT ./examples/multibranch/train.py --log=GFM_taskparallel-$SLURM_JOB_ID-NN$SLURM_JOB_NUM_NODES --everyone \
+srun -N$SLURM_JOB_NUM_NODES -n$((SLURM_JOB_NUM_NODES*8)) -c7 --gpus-per-task=1 --gpu-bind=closest python -u $SCOREP_OPT ./examples/homogeneous_graphs/multibranch/train.py --log=GFM_taskparallel-$SLURM_JOB_ID-NN$SLURM_JOB_NUM_NODES --everyone \
 --inputfile=multibranch_GFM260.json --num_samples=100000 --multi --ddstore --multi_model_list=$datadir0,$datadir1,$datadir2,$datadir3,$datadir4 --task_parallel --oversampling

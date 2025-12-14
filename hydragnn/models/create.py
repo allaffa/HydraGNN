@@ -16,25 +16,29 @@ from typing import List, Union
 
 import torch_scatter
 
-from hydragnn.models.Base import Base
-from hydragnn.models.GINStack import GINStack
-from hydragnn.models.PNAStack import PNAStack
-from hydragnn.models.PNAPlusStack import PNAPlusStack
-from hydragnn.models.GATStack import GATStack
-from hydragnn.models.MFCStack import MFCStack
-from hydragnn.models.CGCNNStack import CGCNNStack
-from hydragnn.models.SAGEStack import SAGEStack
-from hydragnn.models.SCFStack import SCFStack
-from hydragnn.models.DIMEStack import DIMEStack
-from hydragnn.models.EGCLStack import EGCLStack
-from hydragnn.models.PNAEqStack import PNAEqStack
-from hydragnn.models.PAINNStack import PAINNStack
-from hydragnn.models.MACEStack import MACEStack
+from hydragnn.models.homogeneous import (
+    Base,
+    CGCNNStack,
+    DIMEStack,
+    EGCLStack,
+    GATStack,
+    GINStack,
+    MACEStack,
+    MFCStack,
+    PAINNStack,
+    PNAEqStack,
+    PNAPlusStack,
+    PNAStack,
+    SAGEStack,
+    SCFStack,
+)
+from hydragnn.models.heterogeneous import HeteroBase
 
 # InteratomicPotential functionality is now implemented via wrapper composition
 
 from hydragnn.utils.distributed import get_device
 from hydragnn.utils.profiling_and_tracing.time_utils import Timer
+from hydragnn.utils.model import loss_function_selection
 
 
 def create_model_config(
@@ -42,8 +46,20 @@ def create_model_config(
     verbosity: int = 0,
     use_gpu: bool = True,
 ):
+    # graph_type selects the stack (homogeneous vs heterogeneous); mpnn_type selects the conv kernel.
+    graph_type = config["Architecture"].get(
+        "graph_type", config["Architecture"].get("mpnn_type")
+    )
+
+    hetero_config = config["Architecture"].get("hetero_config")
+    if hetero_config is not None and "conv_type" not in hetero_config:
+        hetero_config = {
+            **hetero_config,
+            "conv_type": config["Architecture"].get("mpnn_type", "SAGE"),
+        }
+
     return create_model(
-        config["Architecture"]["mpnn_type"],
+        graph_type,
         config["Architecture"]["input_dim"],
         config["Architecture"]["hidden_dim"],
         config["Architecture"]["output_dim"],
@@ -85,6 +101,7 @@ def create_model_config(
         config["Architecture"].get("enable_interatomic_potential", False),
         verbosity,
         use_gpu,
+        hetero_config,
     )
 
 
@@ -132,6 +149,7 @@ def create_model(
     enable_interatomic_potential: bool = False,
     verbosity: int = 0,
     use_gpu: bool = True,
+    hetero_config: dict = None,
 ):
     timer = Timer("create_model")
     timer.start()
@@ -514,6 +532,42 @@ def create_model(
             initial_bias=initial_bias,
             num_conv_layers=num_conv_layers,
             num_nodes=num_nodes,
+        )
+
+    elif mpnn_type == "Hetero":
+        assert (
+            hetero_config is not None
+        ), "Hetero mpnn_type requires Architecture.hetero_config section."
+
+        required_keys = [
+            "node_types",
+            "edge_types",
+            "node_input_dims",
+            "node_output_map",
+        ]
+        missing = [k for k in required_keys if k not in hetero_config]
+        if missing:
+            raise ValueError(f"hetero_config missing required fields: {missing}")
+
+        metadata = {
+            "node_types": hetero_config["node_types"],
+            "edge_types": [tuple(et) for et in hetero_config["edge_types"]],
+            "node_input_dims": hetero_config["node_input_dims"],
+            "edge_input_dims": hetero_config.get("edge_input_dims", {}),
+        }
+
+        model = HeteroBase(
+            metadata=metadata,
+            hidden_dim=hidden_dim,
+            output_dim=output_dim,
+            output_type=output_type,
+            node_output_map=hetero_config.get("node_output_map"),
+            conv_type=hetero_config.get("conv_type", "SAGE"),
+            num_mp_layers=hetero_config.get("num_mp_layers", num_conv_layers),
+            transformer_cfg=hetero_config.get("transformer", {}),
+            pna_deg=pna_deg,
+            loss_function=loss_function_selection(loss_function_type),
+            loss_weights=task_weights,
         )
     else:
         raise ValueError("Unknown mpnn_type: {0}".format(mpnn_type))

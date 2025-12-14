@@ -17,7 +17,7 @@ import pytest
 @pytest.mark.mpi_skip()
 def pytest_config(config_file):
 
-    config_file = os.path.join("examples", config_file)
+    config_file = os.path.join("examples", "homogeneous_graphs", config_file)
     with open(config_file, "r") as f:
         config = json.load(f)
 

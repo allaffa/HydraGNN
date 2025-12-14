@@ -13,6 +13,14 @@ import os
 import pytest
 import pdb
 import subprocess
+import sys
+
+
+def _example_env():
+    env = os.environ.copy()
+    repo_root = os.path.abspath(os.path.join(os.path.dirname(__file__), ".."))
+    env["PYTHONPATH"] = repo_root + os.pathsep + env.get("PYTHONPATH", "")
+    return env
 
 
 @pytest.mark.parametrize(
@@ -39,12 +47,14 @@ import subprocess
 @pytest.mark.parametrize("example", ["qm9", "md17"])
 @pytest.mark.mpi_skip()
 def pytest_examples_energy(example, mpnn_type, global_attn_engine, global_attn_type):
-    path = os.path.join(os.path.dirname(__file__), "..", "examples", example)
+    path = os.path.join(
+        os.path.dirname(__file__), "..", "examples", "homogeneous_graphs", example
+    )
     file_path = os.path.join(path, example + ".py")
     # Add the --mpnn_type argument for the subprocess call
     return_code = subprocess.call(
         [
-            "python",
+            sys.executable,
             file_path,
             "--mpnn_type",
             mpnn_type,
@@ -52,7 +62,8 @@ def pytest_examples_energy(example, mpnn_type, global_attn_engine, global_attn_t
             global_attn_engine,
             "--global_attn_type",
             global_attn_type,
-        ]
+        ],
+        env=_example_env(),
     )
 
     # Check the file ran without error.
@@ -77,11 +88,15 @@ def pytest_examples_energy(example, mpnn_type, global_attn_engine, global_attn_t
 @pytest.mark.parametrize("example", ["LennardJones"])
 @pytest.mark.mpi_skip()
 def pytest_examples_grad_forces(example, mpnn_type):
-    path = os.path.join(os.path.dirname(__file__), "..", "examples", example)
+    path = os.path.join(
+        os.path.dirname(__file__), "..", "examples", "homogeneous_graphs", example
+    )
     file_path = os.path.join(path, example + ".py")
 
     # Add the --mpnn_type argument for the subprocess call
-    return_code = subprocess.call(["python", file_path, "--mpnn_type", mpnn_type])
+    return_code = subprocess.call(
+        [sys.executable, file_path, "--mpnn_type", mpnn_type], env=_example_env()
+    )
 
     # Check the file ran without error.
     assert return_code == 0

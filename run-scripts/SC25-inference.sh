@@ -70,7 +70,7 @@ for datadir in "${datadirs[@]}"; do
     echo "                     with logdir: ${logdir}"
     srun -N$SLURM_JOB_NUM_NODES -n$((SLURM_JOB_NUM_NODES * 8)) \
          -c7 --gpus-per-task=1 --gpu-bind=closest \
-         python -u ./examples/multibranch/inference.py \
+         python -u ./examples/homogeneous_graphs/multibranch/inference.py \
          --log="${logdir}" --multi --ddstore --multi_model_list="${datadir}" >> "${OUTPUT_FILE}" 2>&1 
   done
 done

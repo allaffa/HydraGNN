@@ -10,6 +10,7 @@
 ##############################################################################
 
 import pickle
+from torch_geometric.data import HeteroData
 from sklearn.model_selection import StratifiedShuffleSplit
 
 import torch
@@ -126,6 +127,11 @@ class SerializedDataLoader:
             _ = pickle.load(f)
             _ = pickle.load(f)
             dataset = pickle.load(f)
+
+        # If the dataset is already a list of HeteroData, return directly without
+        # applying homogeneous graph transforms.
+        if len(dataset) > 0 and isinstance(dataset[0], HeteroData):
+            return dataset
 
         rotational_invariance = NormalizeRotation(max_points=-1, sort=False)
         if self.rotational_invariance:

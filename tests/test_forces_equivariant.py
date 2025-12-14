@@ -13,6 +13,14 @@ import os
 import pytest
 
 import subprocess
+import sys
+
+
+def _example_env():
+    env = os.environ.copy()
+    repo_root = os.path.abspath(os.path.join(os.path.dirname(__file__), ".."))
+    env["PYTHONPATH"] = repo_root + os.pathsep + env.get("PYTHONPATH", "")
+    return env
 
 
 @pytest.mark.parametrize("example", ["LennardJones"])
@@ -21,9 +29,13 @@ import subprocess
 )
 @pytest.mark.mpi_skip()
 def pytest_examples(example, mpnn_type):
-    path = os.path.join(os.path.dirname(__file__), "..", "examples", example)
+    path = os.path.join(
+        os.path.dirname(__file__), "..", "examples", "homogeneous_graphs", example
+    )
     file_path = os.path.join(path, example + ".py")  # Assuming different model scripts
-    return_code = subprocess.call(["python", file_path, "--mpnn_type", mpnn_type])
+    return_code = subprocess.call(
+        [sys.executable, file_path, "--mpnn_type", mpnn_type], env=_example_env()
+    )
 
     # Check the file ran without error.
     assert return_code == 0

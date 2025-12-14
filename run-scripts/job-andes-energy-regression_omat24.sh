@@ -18,7 +18,7 @@ export PYTHONPATH=/lustre/orion/lrn070/world-shared/mlupopa/ADIOS_andes/adios2-i
 
 export PYTHONPATH=$PWD:$PYTHONPATH
 
-cd examples/open_materials_2024
+cd examples/homogeneous_graphs/open_materials_2024
 
 ln -snf ../multidataset/energy_linear_regression.py .
 ln -snf ../multidataset/energy_per_atom_linear_regression.py .

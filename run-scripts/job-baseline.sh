@@ -52,6 +52,6 @@ export datadir3=/lustre/orion/world-shared/lrn070/HydraGNN-sc25-comm/Alexandria-
 export datadir4=/lustre/orion/world-shared/lrn070/HydraGNN-sc25-comm/transition1x-v3.bp
 
 
-srun -N$SLURM_JOB_NUM_NODES -n$((SLURM_JOB_NUM_NODES*8)) -c7 --gpus-per-task=1 --gpu-bind=closest python -u ./examples/multibranch/train.py --log=GFM_baseline \
+srun -N$SLURM_JOB_NUM_NODES -n$((SLURM_JOB_NUM_NODES*8)) -c7 --gpus-per-task=1 --gpu-bind=closest python -u ./examples/homogeneous_graphs/multibranch/train.py --log=GFM_baseline \
 --inputfile=baseline_GFM260.json --num_samples=100000 --multi --ddstore --multi_model_list=$datadir0,$datadir1,$datadir2,$datadir3,$datadir4
 
