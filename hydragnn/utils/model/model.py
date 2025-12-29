@@ -64,16 +64,20 @@ def save_model(model, optimizer, name, path="./logs/", use_deepspeed=False):
     """Save both model and optimizer state in a single checkpoint file"""
     if not use_deepspeed:
         _, world_rank = get_comm_size_and_rank()
-        if hasattr(optimizer, "consolidate_state_dict"):
-            optimizer.consolidate_state_dict()
 
         from hydragnn.models import MultiTaskModelMP
 
         use_multitask = isinstance(model, MultiTaskModelMP)
         if use_multitask:
             eligible = model.head_pg_rank == 0
+            consolidation_rank = model.head_pg_rank
         else:
             eligible = world_rank == 0
+            consolidation_rank = 0
+
+        # ZeRO optimizer needs a prior consolidation on the rank that will save the state.
+        if hasattr(optimizer, "consolidate_state_dict") and dist.is_initialized():
+            optimizer.consolidate_state_dict(to=consolidation_rank)
 
         use_fsdp = bool(int(os.getenv("HYDRAGNN_USE_FSDP", "0")))
         if use_fsdp:
@@ -99,18 +103,19 @@ def save_model(model, optimizer, name, path="./logs/", use_deepspeed=False):
                 model, StateDictType.FULL_STATE_DICT, model_cfg, optim_cfg
             ):
                 model_state_dict = model.state_dict()
-                if use_multitask:
-                    ## MultiTaskModelMP uses standard optimizer
-                    optimizer_state_dict = optimizer.state_dict()
+                if eligible:
+                    if use_multitask:
+                        ## MultiTaskModelMP uses standard optimizer
+                        optimizer_state_dict = optimizer.state_dict()
+                    else:
+                        optimizer_state_dict = FSDP.optim_state_dict(
+                            model, optimizer
+                        )
                 else:
-                    optimizer_state_dict = (
-                        FSDP.optim_state_dict(model, optimizer)
-                        if not use_multitask
-                        else optimizer.state_dict()
-                    )
+                    optimizer_state_dict = None
         else:
             model_state_dict = model.state_dict()
-            optimizer_state_dict = optimizer.state_dict()
+            optimizer_state_dict = optimizer.state_dict() if eligible else None
 
         if eligible:
             epoch = os.getenv("HYDRAGNN_EPOCH", None)  ## str or None
@@ -140,7 +145,9 @@ def save_model(model, optimizer, name, path="./logs/", use_deepspeed=False):
                 if os.path.lexists(link):
                     os.remove(link)
                 os.symlink(fname, link)
-        dist.barrier()
+
+        if dist.is_initialized():
+            dist.barrier()
     else:
         model.save_checkpoint(os.path.join(path, name), name)
 
