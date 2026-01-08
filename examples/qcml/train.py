@@ -217,7 +217,7 @@ class QCMLDataset(AbstractBaseDataset):
                 self.dataset.append(data_object)
             else:
                 print(
-                    f"L2-norm of force tensor exceeds threshold {self.forces_norm_threshold} - atomistic structure: {data}",
+                    f"L2-norm of force tensor exceeds threshold {self.forces_norm_threshold} - atomistic structure: {data_object}",
                     flush=True,
                 )
 
