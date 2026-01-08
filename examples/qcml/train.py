@@ -55,7 +55,7 @@ import h5py
 # No authentication necessary
 # ===========================
 # Alternatively, see https://cloud.google.com/docs/authentication/gcloud.
-os.system("gcloud config set auth/disable_credentials True")
+#os.system("gcloud config set auth/disable_credentials True")
 
 
 def info(*args, logtype="info", sep=" "):
@@ -144,92 +144,100 @@ class QCMLDataset(AbstractBaseDataset):
             # The sample is a match if its index is not -1
             return is_in_table != -1
 
-        # Filter the dataset using the lookup table
-        filtered_dataset = force_field_ds_with_ids.filter(filter_by_id)
+        try:
+            # Filter the dataset using the lookup table
+            filtered_dataset = force_field_ds_with_ids.filter(filter_by_id)
 
-        # Iterate through the filtered dataset and collect the results
-        for index, element in iterate_tqdm(
-            filtered_dataset, verbosity_level=2, desc="Load"
-        ):
+            # Iterate through the filtered dataset and collect the results
+            for index, element in iterate_tqdm(
+                filtered_dataset, verbosity_level=2, desc="Load"
+            ):
 
-            tensorflow_atomic_numbers = element["atomic_numbers"].numpy()
-            atomic_numbers = (
-                torch.from_numpy(tensorflow_atomic_numbers).to(torch.int32).unsqueeze(1)
-            )
-            natoms = torch.IntTensor([atomic_numbers.shape[0]])
+                try:
 
-            tensorflow_pos = element["positions"].numpy()
-            pos = torch.from_numpy(tensorflow_pos).to(torch.float32)
+                    tensorflow_atomic_numbers = element["atomic_numbers"].numpy()
+                    atomic_numbers = (
+                        torch.from_numpy(tensorflow_atomic_numbers).to(torch.int32).unsqueeze(1)
+                    )
+                    natoms = torch.IntTensor([atomic_numbers.shape[0]])
 
-            tensorflow_energy_float = element["pbe0_energy"].numpy()
-            tensorflow_energy = np.array([tensorflow_energy_float])
-            energy = torch.from_numpy(tensorflow_energy).to(torch.float32)
-            energy_per_atom = energy.detach().clone() / natoms
+                    tensorflow_pos = element["positions"].numpy()
+                    pos = torch.from_numpy(tensorflow_pos).to(torch.float32)
 
-            tensorflow_forces = element["pbe0_forces"].numpy()
-            forces = torch.from_numpy(tensorflow_forces).to(torch.float32)
+                    tensorflow_energy_float = element["pbe0_energy"].numpy()
+                    tensorflow_energy = np.array([tensorflow_energy_float])
+                    energy = torch.from_numpy(tensorflow_energy).to(torch.float32)
+                    energy_per_atom = energy.detach().clone() / natoms
 
-            cell = torch.eye(3, dtype=torch.float32)
-            pbc = torch.tensor([False, False, False], dtype=torch.bool)
+                    tensorflow_forces = element["pbe0_forces"].numpy()
+                    forces = torch.from_numpy(tensorflow_forces).to(torch.float32)
 
-            x = torch.cat([atomic_numbers, pos, forces], dim=1)
+                    cell = torch.eye(3, dtype=torch.float32)
+                    pbc = torch.tensor([False, False, False], dtype=torch.bool)
 
-            # Calculate chemical composition
-            atomic_number_list = atomic_numbers.tolist()
-            assert len(atomic_number_list) == natoms
-            ## 118: number of atoms in the periodic table
-            hist, _ = np.histogram(atomic_number_list, bins=range(1, 118 + 2))
-            chemical_composition = torch.tensor(hist).unsqueeze(1).to(torch.float32)
-            pos_list = pos.tolist()
-            atomic_number_list_int = [int(item[0]) for item in atomic_number_list]
+                    x = torch.cat([atomic_numbers, pos, forces], dim=1)
 
-            data_object = Data(
-                dataset_name="qcml",
-                natoms=natoms,
-                pos=pos,
-                cell=cell,  # even if not needed, cell needs to be defined because ADIOS requires consistency across datasets
-                pbc=pbc,  # even if not needed, pbc needs to be defined because ADIOS requires consistency across datasets
-                # edge_index=None,
-                # edge_attr=None,
-                atomic_numbers=atomic_numbers,  # Reshaping atomic_numbers to Nx1 tensor
-                chemical_composition=chemical_composition,
-                # smiles_string=smiles_string,
-                x=x,
-                energy=energy,
-                energy_per_atom=energy_per_atom,
-                forces=forces,
-                graph_attr=graph_attr,
-            )
+                    # Calculate chemical composition
+                    atomic_number_list = atomic_numbers.tolist()
+                    assert len(atomic_number_list) == natoms
+                    ## 118: number of atoms in the periodic table
+                    hist, _ = np.histogram(atomic_number_list, bins=range(1, 118 + 2))
+                    chemical_composition = torch.tensor(hist).unsqueeze(1).to(torch.float32)
+                    pos_list = pos.tolist()
+                    atomic_number_list_int = [int(item[0]) for item in atomic_number_list]
 
-            if self.energy_per_atom:
-                data_object.y = data_object.energy_per_atom
-            else:
-                data_object.y = data_object.energy
+                    data_object = Data(
+                        dataset_name="qcml",
+                        natoms=natoms,
+                        pos=pos,
+                        cell=cell,  # even if not needed, cell needs to be defined because ADIOS requires consistency across datasets
+                        pbc=pbc,  # even if not needed, pbc needs to be defined because ADIOS requires consistency across datasets
+                        # edge_index=None,
+                        # edge_attr=None,
+                        atomic_numbers=atomic_numbers,  # Reshaping atomic_numbers to Nx1 tensor
+                        chemical_composition=chemical_composition,
+                        # smiles_string=smiles_string,
+                        x=x,
+                        energy=energy,
+                        energy_per_atom=energy_per_atom,
+                        forces=forces,
+                        graph_attr=graph_attr,
+                    )
 
-            data_object = self.radius_graph(data_object)
+                    if self.energy_per_atom:
+                        data_object.y = data_object.energy_per_atom
+                    else:
+                        data_object.y = data_object.energy
 
-            # Build edge attributes
-            data_object = transform_coordinates(data_object)
+                    data_object = self.radius_graph(data_object)
 
-            # Default edge_shifts for when radius_graph_pbc is not activated
-            data_object.edge_shifts = torch.zeros(
-                (data_object.edge_index.size(1), 3), dtype=torch.float32
-            )
+                    # Build edge attributes
+                    data_object = transform_coordinates(data_object)
 
-            # FIXME: PBC from bool --> int32 to be accepted by ADIOS
-            data_object.pbc = data_object.pbc.int()
+                    # Default edge_shifts for when radius_graph_pbc is not activated
+                    data_object.edge_shifts = torch.zeros(
+                        (data_object.edge_index.size(1), 3), dtype=torch.float32
+                    )
 
-            # LPE
-            if self.graphgps_transform is not None:
-                data_object = self.graphgps_transform(data_object)
+                    # FIXME: PBC from bool --> int32 to be accepted by ADIOS
+                    data_object.pbc = data_object.pbc.int()
 
-            if self.check_forces_values(data_object.forces):
-                self.dataset.append(data_object)
-            else:
-                print(
-                    f"L2-norm of force tensor exceeds threshold {self.forces_norm_threshold} - atomistic structure: {data}",
-                    flush=True,
-                )
+                    # LPE
+                    if self.graphgps_transform is not None:
+                        data_object = self.graphgps_transform(data_object)
+
+                    if self.check_forces_values(data_object.forces):
+                        self.dataset.append(data_object)
+                    else:
+                        print(
+                            f"L2-norm of force tensor exceeds threshold {self.forces_norm_threshold} - atomistic structure: {data_object}",
+                            flush=True,
+                        )
+                except ValueError as e:
+                    print(f"ValueError occurred: {e}", flush=True)
+
+        except ValueError as e:
+            print(f"ValueError occurred: {e}", flush=True)
 
         random.shuffle(self.dataset)
 
@@ -369,6 +377,8 @@ if __name__ == "__main__":
             stratify_splitting=False,
         )
         print(rank, "Local splitting: ", len(trainset), len(valset), len(testset))
+
+        comm.Barrier()
 
         deg = gather_deg(trainset)
         config["pna_deg"] = deg
