@@ -109,6 +109,10 @@ class QCMLDataset(AbstractBaseDataset):
             assert torch.distributed.is_initialized()
             self.world_size = torch.distributed.get_world_size()
             self.rank = torch.distributed.get_rank()
+        else:
+            # Single-rank fallback keeps slicing logic simple
+            self.world_size = 1
+            self.rank = 0
 
         # Threshold for atomic forces in eV/angstrom
         self.forces_norm_threshold = 1000.0
@@ -117,40 +121,26 @@ class QCMLDataset(AbstractBaseDataset):
 
     def convert_tensorflow_data_objects_to_graphs(self):
 
-        force_field_ds = tfds.load(
-            "qcml/dft_force_field", split="full", data_dir=LOCAL_DATA_DIR
+        # Build once to know dataset size and avoid reading past shard limits
+        builder = tfds.builder("qcml/dft_force_field", data_dir=LOCAL_DATA_DIR)
+        # Reuse existing local data; avoid network re-downloads on HPC runs
+        builder.download_and_prepare(
+            download_config=tfds.download.DownloadConfig(try_download=False)
         )
+        N = builder.info.splits["full"].num_examples
 
-        # Enumerate the dataset to add an index (ID) to each element
-        # The elements become tuples of (id, element)
-        force_field_ds_with_ids = force_field_ds.enumerate()
-
-        N = force_field_ds.cardinality()
         start, end = balanced_block(self.rank, self.world_size, N)
+        if start == end:
+            return
 
-        list_samples_ids = [int(i) for i in range(start, end)]
-
-        # Convert the list of IDs into a lookup table for efficient filtering
-        keys_tensor = tf.constant(list_samples_ids, dtype=tf.int64)
-        table = tf.lookup.StaticHashTable(
-            tf.lookup.KeyValueTensorInitializer(keys_tensor, keys_tensor),
-            default_value=-1,
+        split_spec = f"full[{start}:{end}]"
+        force_field_ds = builder.as_dataset(
+            split=split_spec,
+            shuffle_files=False,
         )
 
-        # Define the filter function
-        def filter_by_id(index, element):
-            # Lookup the index in the table; it will return -1 if not found
-            is_in_table = table.lookup(index)
-            # The sample is a match if its index is not -1
-            return is_in_table != -1
-
-        # Filter the dataset using the lookup table
-        filtered_dataset = force_field_ds_with_ids.filter(filter_by_id)
-
-        # Iterate through the filtered dataset and collect the results
-        for index, element in iterate_tqdm(
-            filtered_dataset, verbosity_level=2, desc="Load"
-        ):
+        # Iterate through the per-rank slice and collect the results
+        for element in iterate_tqdm(force_field_ds, verbosity_level=2, desc="Load"):
 
             tensorflow_atomic_numbers = element["atomic_numbers"].numpy()
             atomic_numbers = (
