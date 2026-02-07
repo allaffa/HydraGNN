@@ -172,6 +172,11 @@ print("torch_geometric =", torch_geometric.__version__)
 print("xpu available =", hasattr(torch, "xpu") and torch.xpu.is_available())
 PY
 
+CC=gcc CXX=g++ pip_retry --no-build-isolation --verbose git+https://github.com/rusty1s/pytorch_scatter.git
+CC=gcc CXX=g++ pip_retry --no-build-isolation --verbose git+https://github.com/rusty1s/pytorch_sparse.git
+CC=gcc CXX=g++ pip_retry --no-build-isolation --verbose git+https://github.com/rusty1s/pytorch_cluster.git
+CC=gcc CXX=g++ pip_retry --no-build-isolation --verbose git+https://github.com/rusty1s/pytorch_spline_conv.git
+
 # ============================================================
 # Additional python deps (NO torch install here!)
 # ============================================================
@@ -183,6 +188,8 @@ pip_retry ase h5py lmdb
 pip_retry mendeleev
 pip_retry rdkit jarvis-tools pymatgen || true
 pip_retry igraph || true
+pip_retry vesin==0.4.2
+pip_retry e3nn openequivariance --verbose
 
 # ============================================================
 # Install HydraGNN (editable)
