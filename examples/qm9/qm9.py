@@ -23,6 +23,15 @@ num_samples = 1000
 charge = 0.0
 spin = 1.0
 
+import intel_extension_for_pytorch as ipex
+
+print(f"GPU availability: {torch.xpu.is_available()}")
+print(f'Number of tiles = {torch.xpu.device_count()}')
+current_tile = torch.xpu.current_device()
+print(f'Current tile = {current_tile}')
+print(f'Current device ID = {torch.xpu.device(current_tile)}')
+print(f'Device properties = {torch.xpu.get_device_properties()}')
+
 # Update each sample prior to loading.
 def qm9_pre_transform(data, transform):
     # LPE
