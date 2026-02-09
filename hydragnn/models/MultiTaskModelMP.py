@@ -11,6 +11,7 @@ from contextlib import contextmanager
 from torch.distributed.fsdp import FullyShardedDataParallel as FSDP
 from torch.distributed.fsdp.api import ShardingStrategy
 from torch.optim import Optimizer
+from hydragnn.utils.distributed.distributed import ensure_contiguous_parameters
 
 
 def average_gradients(model, group):
@@ -250,6 +251,9 @@ class MultiTaskModelMP(nn.Module):
         fsdp_strategy = os.getenv("HYDRAGNN_FSDP_STRATEGY", "FULL_SHARD")
         sharding_strategy = eval(f"ShardingStrategy.{fsdp_strategy}")
         print("MultiTaskModelMP FSDP:", use_fsdp, "Sharding:", sharding_strategy)
+
+        ensure_contiguous_parameters(self.encoder)
+        ensure_contiguous_parameters(self.decoder)
 
         if use_fsdp:
             self.encoder = FSDP(

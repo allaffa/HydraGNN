@@ -329,6 +329,16 @@ def is_model_distributed(model):
     return isinstance(model, torch.nn.parallel.distributed.DistributedDataParallel)
 
 
+def ensure_contiguous_parameters(model):
+    """Ensure parameters are contiguous before wrapping with DDP/FSDP."""
+    with torch.no_grad():
+        for _, param in model.named_parameters(recurse=True):
+            if param is None or param.is_sparse:
+                continue
+            if not param.is_contiguous():
+                param.set_(param.contiguous())
+
+
 def get_distributed_model(
     model,
     verbosity=0,
@@ -345,6 +355,7 @@ def get_distributed_model(
     )
 
     if dist.is_initialized():
+        ensure_contiguous_parameters(model)
         if device_name == "cpu":
             ddp_kwargs = {
                 "find_unused_parameters": find_unused_parameters,
