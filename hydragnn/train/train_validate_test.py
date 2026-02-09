@@ -917,12 +917,10 @@ def test(
                         graph_energy_peratom_true = graph_energy_true / ncount
 
                         forces_true = data.forces.float()
+                        energy_sum = graph_energy_pred.sum()
                         forces_pred = torch.autograd.grad(
-                            graph_energy_pred,
+                            energy_sum,
                             data.pos,
-                            grad_outputs=torch.ones_like(graph_energy_pred),
-                            retain_graph=graph_energy_pred.requires_grad,
-                            # Retain graph only if needed (it will be needed during training, but not during validation/testing)
                             create_graph=True,
                         )[0].float()
                         assert (
