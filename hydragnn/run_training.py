@@ -102,15 +102,7 @@ def _(config: dict, use_deepspeed=False):
     )
 
     if not use_deepspeed:
-        model = get_distributed_model(
-            model,
-            config["Verbosity"]["level"],
-            sync_batch_norm=config["NeuralNetwork"]["Architecture"]["SyncBatchNorm"],
-        )
-        print_peak_memory(
-            config["Verbosity"]["level"],
-            "Max memory allocated after creating distributed model",
-        )
+        model = model.to(dtype=param_dtype)
 
         optimizer = select_optimizer(
             model, config["NeuralNetwork"]["Training"]["Optimizer"]
@@ -132,8 +124,17 @@ def _(config: dict, use_deepspeed=False):
             model, config["NeuralNetwork"]["Training"], optimizer=optimizer
         )
 
-        model = model.to(dtype=param_dtype)
         _cast_optimizer_state(optimizer, param_dtype)
+
+        model = get_distributed_model(
+            model,
+            config["Verbosity"]["level"],
+            sync_batch_norm=config["NeuralNetwork"]["Architecture"]["SyncBatchNorm"],
+        )
+        print_peak_memory(
+            config["Verbosity"]["level"],
+            "Max memory allocated after creating distributed model",
+        )
 
     else:
         assert deepspeed_available, "deepspeed package not installed"

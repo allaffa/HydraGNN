@@ -447,22 +447,16 @@ def distributed_model_wrapper(
             optimizer=optimizer,  # optimizer is managed by deepspeed
         )  # scheduler is not managed by deepspeed because it is per-epoch instead of per-step
     else:
-        # Auto-detect EnhancedModelWrapper and enable find_unused_parameters to avoid DDP gradient stride warnings
+        # Auto-detect EnhancedModelWrapper for DDP configuration hints.
         enhanced_model_detected = (
             hasattr(model, "__class__")
             and "EnhancedModelWrapper" in model.__class__.__name__
         )
 
-        if enhanced_model_detected:
-            print_distributed(
-                verbosity,
-                f"EnhancedModelWrapper detected: {model.__class__.__name__}",
-            )
-            print_distributed(
-                verbosity,
-                "Applying DDP optimizations: find_unused_parameters=True, gradient_as_bucket_view=False",
-            )
-            find_unused_parameters = True
+        # Allow explicit override via environment variable.
+        find_unused_env = os.getenv("HYDRAGNN_FIND_UNUSED_PARAMETERS")
+        if find_unused_env is not None:
+            find_unused_parameters = bool(int(find_unused_env))
 
         model = get_distributed_model(
             model,
