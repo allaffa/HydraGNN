@@ -15,8 +15,8 @@ import re
 import torch
 import torch.distributed as dist
 from torch.nn.parallel import DistributedDataParallel as DDP
-from torch.distributed.fsdp import FullyShardedDataParallel as FSDP, MixedPrecision
-from torch.distributed.fsdp import ShardingStrategy
+from torch.distributed.fsdp import fully_shard, MixedPrecisionPolicy
+from torch.distributed.device_mesh import DeviceMesh
 
 from hydragnn.utils.print.print_utils import print_distributed
 
@@ -319,6 +319,62 @@ def get_device_from_name(name: str):
         return torch.device("cpu")
 
 
+def _get_fsdp2_device_type():
+    if torch.cuda.is_available():
+        return "cuda"
+    if hasattr(torch, "xpu") and torch.xpu.is_available():
+        return "xpu"
+    return "cpu"
+
+
+def _normalize_precision(precision):
+    if precision is None:
+        return None
+    prec = str(precision).lower()
+    aliases = {
+        "bfloat16": "bf16",
+        "float16": "fp16",
+        "float32": "fp32",
+        "float": "fp32",
+        "float64": "fp64",
+        "double": "fp64",
+    }
+    return aliases.get(prec, prec)
+
+
+def _get_fsdp2_mp_policy(precision):
+    prec = _normalize_precision(precision)
+    if prec in (None, "fp32"):
+        return None
+    if prec == "bf16":
+        return MixedPrecisionPolicy(
+            param_dtype=torch.bfloat16,
+            reduce_dtype=torch.bfloat16,
+            output_dtype=torch.bfloat16,
+            cast_forward_inputs=True,
+        )
+    if prec == "fp16":
+        return MixedPrecisionPolicy(
+            param_dtype=torch.float16,
+            reduce_dtype=torch.float16,
+            output_dtype=torch.float16,
+            cast_forward_inputs=True,
+        )
+    if prec == "fp64":
+        return MixedPrecisionPolicy(
+            param_dtype=torch.float64,
+            reduce_dtype=torch.float64,
+            output_dtype=torch.float64,
+            cast_forward_inputs=True,
+        )
+    return None
+
+
+def _build_fsdp2_mesh(process_group=None):
+    ranks = dist.get_process_group_ranks(process_group)
+    return DeviceMesh(_get_fsdp2_device_type(), mesh=ranks)
+
+
 def get_device(use_gpu=True, rank_per_model=1, verbosity_level=0):
 
     name = get_device_name(use_gpu, rank_per_model, verbosity_level)
@@ -335,6 +391,7 @@ def get_distributed_model(
     sync_batch_norm=False,
     find_unused_parameters=False,
     enhanced_model=False,
+    precision=None,
 ):
     device_name = get_device_name(verbosity_level=verbosity)
     print(
@@ -369,14 +426,30 @@ def get_distributed_model(
 
         ## check if FSDP is to be used
         use_fsdp = bool(int(os.getenv("HYDRAGNN_USE_FSDP", "0")))
-        ## List of ShardingStrategy: FULL_SHARD, SHARD_GRAD_OP, NO_SHARD, HYBRID_SHARD, HYBRID_SHARD_ZERO2
         fsdp_strategy = os.getenv("HYDRAGNN_FSDP_STRATEGY", "FULL_SHARD")
-        sharding_strategy = eval(f"ShardingStrategy.{fsdp_strategy}")
-        print("Using FSDP:", use_fsdp, "Sharding:", sharding_strategy)
+        if use_fsdp and fsdp_strategy != "FULL_SHARD":
+            print_distributed(
+                verbosity,
+                "FSDP2 only supports FULL_SHARD; ignoring HYDRAGNN_FSDP_STRATEGY=",
+                fsdp_strategy,
+            )
+        print("Using FSDP2:", use_fsdp)
 
         if use_fsdp:
-            print_distributed(verbosity, "Using FSDP wrapper")
-            model = FSDP(model, sharding_strategy=sharding_strategy)
+            print_distributed(verbosity, "Using FSDP2 fully_shard wrapper")
+            if dist.is_initialized():
+                print_distributed(
+                    verbosity,
+                    f"FSDP2 active on rank {dist.get_rank()}: {model.__class__.__name__}",
+                )
+            mesh = _build_fsdp2_mesh()
+            mp_policy = _get_fsdp2_mp_policy(precision)
+            model = fully_shard(
+                model,
+                mesh=mesh,
+                reshard_after_forward=True,
+                mp_policy=mp_policy,
+            )
         else:
             model = DDP(model, **ddp_kwargs)
 
@@ -393,6 +466,7 @@ def distributed_model_wrapper(
     config=None,
     zero_opt=False,
     bf16=False,
+    precision=None,
 ):
 
     if hasattr(torch, "xpu") and torch.xpu.is_available():
@@ -459,6 +533,7 @@ def distributed_model_wrapper(
             sync_batch_norm=sync_batch_norm,
             find_unused_parameters=find_unused_parameters,
             enhanced_model=enhanced_model_detected,
+            precision=precision,
         )
 
     return model, optimizer
