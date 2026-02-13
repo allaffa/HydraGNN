@@ -52,7 +52,9 @@ class DistDataset(AbstractBaseDataset):
             # Using libfabric. Need a map each rank to a network interface
             iface = system = os.getenv("FABRIC_IFACE", None)
             if iface is None:
-                system = os.getenv("LMOD_SYSTEM_NAME", "none")
+                system = os.getenv("LMOD_SYSTEM_NAME", None)
+                if system is None and os.getenv("PBS_O_HOST", "none")[:6] == "aurora":
+                    system = "aurora"
                 if system == "frontier":
                     gpu_id = int(os.getenv("SLURM_LOCALID", "0"))
                     os.environ["FABRIC_IFACE"] = f"hsn{gpu_id//2}"
@@ -60,7 +62,9 @@ class DistDataset(AbstractBaseDataset):
                     gpu_id = int(os.getenv("SLURM_LOCALID", "0"))
                     os.environ["FABRIC_IFACE"] = f"hsn{gpu_id}"
                 elif system == "aurora":
-                    ## FIMXE
+                    gpu_id = int(os.getenv("PALS_LOCAL_RANKID", "0"))
+                    os.environ["FABRIC_IFACE"] = f"hsn{gpu_id//2}"
+                else:
                     pass
 
             print("FABRIC_IFACE:", os.environ["FABRIC_IFACE"])
