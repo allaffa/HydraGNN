@@ -136,7 +136,7 @@ def setup_ddp(use_deepspeed=False):
     elif dist.is_nccl_available() and torch.cuda.is_available():
         backend = "nccl"
     elif hasattr(torch, "xpu") and torch.xpu.is_available():
-        backend = "ccl"
+        backend = "xccl"
     elif torch.distributed.is_gloo_available():
         backend = "gloo"
     else:
@@ -165,7 +165,6 @@ def setup_ddp(use_deepspeed=False):
     elif os.getenv("PBS_O_HOST") is not None:
         if os.environ["PBS_O_HOST"][-19:] == "aurora.alcf.anl.gov":
             from mpi4py import MPI
-            import oneccl_bindings_for_pytorch as torch_ccl
 
             RANK = MPI.COMM_WORLD.Get_rank()
             MASTER_ADDR = socket.gethostname() if RANK == 0 else None
@@ -176,7 +175,7 @@ def setup_ddp(use_deepspeed=False):
             master_addr = parse_slurm_nodelist(os.environ["PBS_O_HOST"])[0]
 
     try:
-        if backend in ["nccl", "gloo", "ccl"]:
+        if backend in ["nccl", "gloo", "xccl"]:
             os.environ["MASTER_ADDR"] = master_addr
             os.environ["MASTER_PORT"] = master_port
             os.environ["WORLD_SIZE"] = str(world_size)

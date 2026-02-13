@@ -437,6 +437,29 @@ class AdiosDataset(AbstractBaseDataset):
             ddstore_width if ddstore_width is not None else self.comm_size
         )
         if self.use_ddstore:
+            ddstore_method = int(os.getenv("HYDRAGNN_DDSTORE_METHOD", "0"))
+            print("DDStore method:", ddstore_method)
+            if ddstore_method == 1:
+                # Using libfabric. Need a map each rank to a network interface
+                iface = system = os.getenv("FABRIC_IFACE", None)
+                if iface is None:
+                    system = os.getenv("LMOD_SYSTEM_NAME", "none")
+                    print("System detected:", system)
+                    if system == "frontier":
+                        gpu_id = int(os.getenv("SLURM_LOCALID", "0"))
+                        os.environ["FABRIC_IFACE"] = f"hsn{gpu_id//2}"
+                    elif system == "perlmutter":
+                        gpu_id = int(os.getenv("SLURM_LOCALID", "0"))
+                        os.environ["FABRIC_IFACE"] = f"hsn{gpu_id}"
+                    elif system == "aurora":
+                        gpu_id = int(os.getenv("OMPI_COMM_WORLD_LOCAL_RANK", "0"))
+                        os.environ["FABRIC_IFACE"] = f"hsn{gpu_id//2}"
+                    else:
+                        gpu_id = int(os.getenv("OMPI_COMM_WORLD_LOCAL_RANK", "0"))
+                        os.environ["FABRIC_IFACE"] = f"hsn{gpu_id//2}"
+
+                print("FABRIC_IFACE:", os.environ["FABRIC_IFACE"])
+
             self.ddstore_comm = self.comm.Split(
                 self.rank // self.ddstore_width, self.rank
             )
@@ -447,7 +470,7 @@ class AdiosDataset(AbstractBaseDataset):
                 self.ddstore_comm_rank,
                 self.ddstore_comm_size,
             )
-            self.ddstore = dds.PyDDStore(self.ddstore_comm)
+            self.ddstore = dds.PyDDStore(self.ddstore_comm, method=ddstore_method)
 
         self.subset = None
         self.subset_istart = subset_istart
