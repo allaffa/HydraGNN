@@ -34,6 +34,7 @@ from torch_geometric.transforms import RadiusGraph
 from hydragnn.models.create import create_model_config
 from hydragnn.train.train_validate_test import (
     resolve_precision,
+    move_batch_to_device,
     get_autocast_and_scaler,
 )
 from hydragnn.utils.distributed import get_device
@@ -460,11 +461,7 @@ def main():
         is_warmup = batch_idx < num_warmup
 
         batch = Batch.from_data_list(batch_list)
-        for key, val in batch.items():
-            if isinstance(val, torch.Tensor) and torch.is_floating_point(val):
-                batch[key] = val.to(device=device, dtype=param_dtype)
-            elif isinstance(val, torch.Tensor):
-                batch[key] = val.to(device=device)
+        batch = move_batch_to_device(batch, param_dtype)
         batch.pos.requires_grad_(True)
 
         timer_start()
