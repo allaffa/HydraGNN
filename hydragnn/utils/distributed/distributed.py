@@ -230,6 +230,16 @@ def setup_ddp(use_deepspeed=False):
                 ## Setting LOCAL_RANK complicts with DeviceMesh when using the srun "--gpus-per-task=1" option
                 # os.environ["LOCAL_RANK"] = str(get_local_rank())
 
+            # Set the CUDA device for this rank BEFORE init_process_group so
+            # that the NCCL communicator created by init_process_group (comm '0')
+            # uses the correct per-rank GPU.  Without this, all ranks may use
+            # CUDA device 0, causing FSDP v2's per-rank device keys to mismatch
+            # comm '0' and trigger a new comm ('1') → store-key deadlock.
+            if backend == "nccl" and torch.cuda.is_available():
+                local_rank = get_local_rank()
+                if local_rank < torch.cuda.device_count():
+                    torch.cuda.set_device(local_rank)
+
             if (backend == "gloo") and ("GLOO_SOCKET_IFNAME" not in os.environ):
                 ifname = find_ifname(master_addr)
                 if ifname is not None:
@@ -393,6 +403,7 @@ def is_model_distributed(model):
     return isinstance(model, torch.nn.parallel.distributed.DistributedDataParallel)
 
 
+
 def get_distributed_model(
     model,
     verbosity=0,
@@ -447,7 +458,7 @@ def get_distributed_model(
         if use_fsdp:
             if fsdp_version == 1:
                 print_distributed(verbosity, "Using FSDP v1 wrapper")
-                model = FSDP(model, sharding_strategy=sharding_strategy)
+                model = FSDP(model, sharding_strategy=sharding_strategy, use_orig_params=True)
             else:
                 if fsdp_strategy not in ["FULL_SHARD", "SHARD_GRAD_OP"]:
                     raise ValueError(
