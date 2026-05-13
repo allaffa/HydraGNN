@@ -192,12 +192,21 @@ pip_retry vesin==0.4.2
 # ============================================================
 banner "Install CUDA PyTorch (Before PyG)"
 
-# Match cudatoolkit/12.9 => cu129 wheels
+# Pinned to torch 2.11.0+cu129 — newer than HydraGNN's lower-bound requirements,
+# fully compatible with HydraGNN, matches Perlmutter's cudatoolkit/12.9 module,
+# and gives best A100 (sm_80) performance. Phase-2 (matsim) installs HydraGNN
+# with --no-deps so this pin is preserved.
+TORCH_VERSION="${TORCH_VERSION:-2.11.0}"
+TORCHVISION_VERSION="${TORCHVISION_VERSION:-0.26.0}"
+TORCHAUDIO_VERSION="${TORCHAUDIO_VERSION:-2.11.0}"
 TORCH_CUDA_TAG="${TORCH_CUDA_TAG:-cu129}"
 PYTORCH_INDEX_URL="https://download.pytorch.org/whl/${TORCH_CUDA_TAG}"
 
-subbanner "Install PyTorch from ${PYTORCH_INDEX_URL}"
-pip_retry --index-url "${PYTORCH_INDEX_URL}" torch torchvision
+subbanner "Install PyTorch ${TORCH_VERSION} from ${PYTORCH_INDEX_URL}"
+pip_retry --index-url "${PYTORCH_INDEX_URL}" \
+  "torch==${TORCH_VERSION}" \
+  "torchvision==${TORCHVISION_VERSION}" \
+  "torchaudio==${TORCHAUDIO_VERSION}"
 assert_numpy_1264
 
 python - <<'PY'
@@ -227,14 +236,28 @@ cd "$PYG_PERLMUTTER"
 subbanner "Uninstall any existing PyG components to avoid mixing wheels/source"
 pip uninstall -y pyg-lib torch-sparse torch-scatter torch-cluster torch-spline-conv torch-geometric >/dev/null 2>&1 || true
 
-subbanner "Build/install PyG compiled deps from source (no wheels)"
+subbanner "Build/install PyG compiled deps from source (no wheels) at HydraGNN-pinned versions"
 # Note: torch-scatter built for you already; torch-sparse previously failed due to old GCC.
 # With gcc-native/13.2 + CC/CXX forced, torch-sparse should compile.
+# Versions are pinned to HydraGNN's requirements-pyg.txt to keep the entire
+# pipeline on a single, consistent dependency stack.
+TORCH_SCATTER_VERSION="${TORCH_SCATTER_VERSION:-2.1.2}"
+TORCH_SPARSE_VERSION="${TORCH_SPARSE_VERSION:-0.6.18}"
+TORCH_CLUSTER_VERSION="${TORCH_CLUSTER_VERSION:-1.6.3}"
+TORCH_SPLINE_CONV_VERSION="${TORCH_SPLINE_CONV_VERSION:-1.2.2}"
+TORCH_GEOMETRIC_VERSION="${TORCH_GEOMETRIC_VERSION:-2.6.1}"
 
-pip_retry --no-binary :all: --no-build-isolation torch-scatter
-pip_retry --no-binary :all: --no-build-isolation torch-sparse
-pip_retry --no-binary :all: --no-build-isolation torch-cluster
-pip_retry --no-binary :all: --no-build-isolation torch-spline-conv
+# --no-cache-dir is critical: pip's wheel cache may contain extensions built
+# against a previously installed torch version and silently reuse them, causing
+# undefined-symbol ABI errors at runtime.
+pip cache remove 'torch_scatter*'    >/dev/null 2>&1 || true
+pip cache remove 'torch_sparse*'     >/dev/null 2>&1 || true
+pip cache remove 'torch_cluster*'    >/dev/null 2>&1 || true
+pip cache remove 'torch_spline_conv*' >/dev/null 2>&1 || true
+pip_retry --no-cache-dir --no-binary :all: --no-build-isolation "torch-scatter==${TORCH_SCATTER_VERSION}"
+pip_retry --no-cache-dir --no-binary :all: --no-build-isolation "torch-sparse==${TORCH_SPARSE_VERSION}"
+pip_retry --no-cache-dir --no-binary :all: --no-build-isolation "torch-cluster==${TORCH_CLUSTER_VERSION}"
+pip_retry --no-cache-dir --no-binary :all: --no-build-isolation "torch-spline-conv==${TORCH_SPLINE_CONV_VERSION}"
 
 # pyg-lib is optional; many HydraGNN workloads run without it.
 BUILD_PYG_LIB="${BUILD_PYG_LIB:-0}"
@@ -246,11 +269,14 @@ else
 fi
 
 subbanner "Install torch-geometric (pure python wrapper package)"
-pip_retry torch-geometric
+pip_retry "torch-geometric==${TORCH_GEOMETRIC_VERSION}"
 assert_numpy_1264
 
-subbanner "Install e3nn and openequivariance"
-pip_retry e3nn openequivariance --verbose
+subbanner "Install e3nn (HydraGNN-pinned) and openequivariance"
+E3NN_VERSION="${E3NN_VERSION:-0.5.1}"
+TORCH_EMA_VERSION="${TORCH_EMA_VERSION:-0.3}"
+TORCHMETRICS_VERSION="${TORCHMETRICS_VERSION:-1.4.0}"
+pip_retry "e3nn==${E3NN_VERSION}" "torch-ema==${TORCH_EMA_VERSION}" "torchmetrics==${TORCHMETRICS_VERSION}" openequivariance --verbose
 assert_numpy_1264
 
 subbanner "PyG import sanity check"
