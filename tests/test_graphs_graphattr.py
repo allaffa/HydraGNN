@@ -20,18 +20,6 @@ from hydragnn.preprocess import graph_samples_checks_and_updates as gscu
 from hydragnn.preprocess import serialized_dataset_loader as sdl
 from hydragnn.utils.datasets import pickledataset, distdataset, adiosdataset
 
-from tests.uma_optional import uma_available
-
-# UMA depends on optional backbone dependencies (see requirements-optional);
-# skip it when those deps are unavailable so CI does not error.
-UMA_PARAM = pytest.param(
-    "UMA",
-    marks=pytest.mark.skipif(
-        not uma_available(),
-        reason="UMA optional dependencies are not installed",
-    ),
-)
-
 
 torch.manual_seed(97)
 
@@ -253,7 +241,7 @@ def unittest_train_model_graphattr(
         "PAINN",
         "MACE",
         "AllScAIP",
-        UMA_PARAM,
+        "UMA",
     ],
 )
 @pytest.mark.parametrize("ci_input", ["ci.json", "ci_multihead.json"])
