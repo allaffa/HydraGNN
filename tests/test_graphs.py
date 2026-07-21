@@ -21,6 +21,18 @@ import hydragnn, tests
 from hydragnn.utils.input_config_parsing.config_utils import merge_config
 from mpi4py import MPI
 
+from tests.uma_optional import uma_available
+
+# UMA depends on optional backbone dependencies (see requirements-optional).
+# Wrap it as a parametrization that skips when those deps are unavailable so
+# CI -- which installs only the core requirements -- does not error.
+UMA_PARAM = pytest.param(
+    "UMA",
+    marks=pytest.mark.skipif(
+        not uma_available(),
+        reason="UMA optional dependencies are not installed",
+    ),
+)
 
 # Main unit test function called by pytest wrappers.
 def unittest_train_model(
@@ -234,7 +246,7 @@ def unittest_train_model(
         "PAINN",
         "MACE",
         "AllScAIP",
-        "UMA",
+        UMA_PARAM,
     ],
 )
 @pytest.mark.parametrize("ci_input", ["ci.json", "ci_multihead.json"])
@@ -280,7 +292,7 @@ def pytest_train_mace_model_lengths(mpnn_type, overwrite_data=False):
 
 # Test across equivariant models
 @pytest.mark.parametrize(
-    "mpnn_type", ["EGNN", "SchNet", "PNAEq", "PAINN", "MACE", "UMA"]
+    "mpnn_type", ["EGNN", "SchNet", "PNAEq", "PAINN", "MACE", UMA_PARAM]
 )
 def pytest_train_equivariant_model(mpnn_type, overwrite_data=False):
     unittest_train_model(
