@@ -9,3 +9,15 @@ serialized_dataset/
 exporter.log
 *.doc
 *.docx
+
+# Local Frontier installation environment
+/HydraGNN-Installation-Frontier/
+
+# Frontier/Slurm job output
+/job-opf-*.out
+
+# Local experiment logs
+/run_logs/
+
+# OPF crash dump
+/examples/opf/core
