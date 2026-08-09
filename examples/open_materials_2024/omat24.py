@@ -199,6 +199,10 @@ class OMat2024(AbstractBaseDataset):
 
             energy_per_atom = energy.detach().clone() / natoms
             forces = torch.as_tensor(atoms.get_forces(), dtype=torch.float32)
+            stress = torch.as_tensor(
+                atoms.get_stress(apply_constraint=False, voigt=False),
+                dtype=torch.float32,
+            )
 
             chemical_formula = atoms.get_chemical_formula()
 
@@ -260,6 +264,7 @@ class OMat2024(AbstractBaseDataset):
                 energy=energy,
                 energy_per_atom=energy_per_atom,
                 forces=forces,
+                stress=stress,
                 graph_attr=graph_attr,
             )
 
@@ -285,7 +290,7 @@ class OMat2024(AbstractBaseDataset):
 
             # Skip samples that still contain self-loops
             if should_skip_self_loops(data_object, context="omat24"):
-                continue
+                return
 
             # Default edge_shifts for when radius_graph_pbc is not activated
             if not hasattr(data_object, "edge_shifts"):

@@ -83,6 +83,14 @@ charge = 0.0  # neutral
 spin = 1.0  # singlet
 graph_attr = torch.tensor([charge, spin], dtype=torch.float32)
 
+GPA_PER_EV_PER_ANGSTROM_CUBED = 160.21766208
+
+
+def convert_vasp_stress_kbar_to_ev_per_angstrom_cubed(stress):
+    """Convert VASP's compressive-positive kbar stress to ASE convention."""
+    stress = torch.as_tensor(stress, dtype=torch.float32)
+    return -0.1 * stress / GPA_PER_EV_PER_ANGSTROM_CUBED
+
 
 class MPTrjDataset(AbstractBaseDataset):
     def __init__(
@@ -197,6 +205,9 @@ class MPTrjDataset(AbstractBaseDataset):
                 energy = torch.tensor(total_energy, dtype=torch.float32).unsqueeze(0)
                 energy_per_atom = energy.detach().clone() / natoms
                 forces = torch.tensor(forces, dtype=torch.float32)
+                stress = convert_vasp_stress_kbar_to_ev_per_angstrom_cubed(
+                    stresses
+                )
                 x = torch.cat([atomic_numbers, pos, forces], dim=1)
 
                 # Calculate chemical composition
@@ -221,7 +232,7 @@ class MPTrjDataset(AbstractBaseDataset):
                     x=x,
                     energy=energy,
                     energy_per_atom=energy_per_atom,
-                    # stress=torch.tensor(stresses, dtype=torch.float32),
+                    stress=stress,
                     # magmom=torch.tensor(magmom, dtype=torch.float32),
                     forces=forces,
                     graph_attr=graph_attr,
