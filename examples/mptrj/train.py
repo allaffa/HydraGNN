@@ -205,9 +205,7 @@ class MPTrjDataset(AbstractBaseDataset):
                 energy = torch.tensor(total_energy, dtype=torch.float32).unsqueeze(0)
                 energy_per_atom = energy.detach().clone() / natoms
                 forces = torch.tensor(forces, dtype=torch.float32)
-                stress = convert_vasp_stress_kbar_to_ev_per_angstrom_cubed(
-                    stresses
-                )
+                stress = convert_vasp_stress_kbar_to_ev_per_angstrom_cubed(stresses)
                 x = torch.cat([atomic_numbers, pos, forces], dim=1)
 
                 # Calculate chemical composition
