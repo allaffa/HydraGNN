@@ -1,11 +1,10 @@
 #!/bin/bash
 #SBATCH -A LRN070
-#SBATCH -J HydraGNN
-#SBATCH -o job-hydragnn-grid-%j.out
-#SBATCH -e job-hydragnn-grid-%j.out
-#SBATCH -t 01:00:00
-#SBATCH -p batch 
-#SBATCH -q debug
+#SBATCH -J OPF118-SVD-RPE-PRE
+#SBATCH -o job-opf118-svd-rpe-pre-%j.out
+#SBATCH -e job-opf118-svd-rpe-pre-%j.out
+#SBATCH -t 02:00:00
+#SBATCH -p batch
 #SBATCH -N 8
 ##SBATCH -C nvme
 ##SBATCH -S 1
@@ -79,6 +78,10 @@ cd $HYDRAGNN_ROOT/examples/opf
 srun --export=ALL,HYDRAGNN_DIAG=1,HYDRAGNN_DIAG_RANK=1 \
   -N$SLURM_JOB_NUM_NODES -n$((SLURM_JOB_NUM_NODES*8)) -c7 \
   --gpus-per-task=1 --gpu-bind=closest \
-  python -u train_opf_solution_heterogeneous.py --num_groups all --preonly --hdf5 --modelname "case500" --data_root "/lustre/orion/lrn070/proj-shared/ndelingat/HydraGNN/examples/opf/dataset/" --case_name  \
-  pglib_opf_case500_goc #pglib_opf_case2000_goc #pglib_opf_case4661_sdet pglib_opf_case6470_rte pglib_opf_case10000_goc pglib_opf_case13659_pegase
-
+  python -u train_opf_solution_heterogeneous.py \
+  --inputfile configs/opf_heterosage_case118_svd_rpe.json \
+  --num_groups all \
+  --preonly --hdf5 \
+  --modelname case118_svd_rpe \
+  --data_root "${HYDRAGNN_ROOT}/examples/opf/dataset" \
+  --case_name pglib_opf_case118_ieee
