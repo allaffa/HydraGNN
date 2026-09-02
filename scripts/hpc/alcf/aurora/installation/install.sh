@@ -554,15 +554,30 @@ PY
 # Install HydraGNN (editable)
 # ============================================================
 banner "Install HydraGNN (editable)"
-HYDRAGNN_SRC="${HYDRAGNN_SRC:-${PWD}/HydraGNN}"
+SCRIPT_DIR="$(cd "$(dirname "${BASH_SOURCE[0]}")" && pwd)"
+HYDRAGNN_SRC="${HYDRAGNN_SRC:-$(cd "${SCRIPT_DIR}/../../../../.." && pwd)}"
+FAIRCHEM_CORE_VERSION="${FAIRCHEM_CORE_VERSION:-2.22.0}"
 echo "HYDRAGNN_SRC = $HYDRAGNN_SRC"
 
 if [[ -d "$HYDRAGNN_SRC" ]]; then
-  pip_retry -e "$HYDRAGNN_SRC"
+  pip_retry --no-deps -e "$HYDRAGNN_SRC"
 else
-  echo "⚠️  HydraGNN source directory not found at: $HYDRAGNN_SRC"
-  echo "    Export HYDRAGNN_SRC=/path/to/HydraGNN and rerun the HydraGNN install step."
+  echo "❌ HydraGNN source directory not found at: $HYDRAGNN_SRC" >&2
+  exit 1
 fi
+
+banner "Install model dependencies after HydraGNN"
+pip_retry -r "$HYDRAGNN_SRC/requirements-specific-models.txt"
+pip_retry "fairchem-core==${FAIRCHEM_CORE_VERSION}"
+
+python - <<'PY'
+import fairchem.core
+import hydragnn
+import torch
+print("HydraGNN:", hydragnn.__file__)
+print("FAIR-Chem:", fairchem.core.__file__)
+print("PyTorch:", torch.__version__)
+PY
 
 # ============================================================
 # Final summary / activation instructions
@@ -593,6 +608,8 @@ To ensure ADIOS2 runtime is visible in new shells:
   export ADIOS2_DIR=$ADIOS2_INSTALL
   export PATH=$ADIOS2_INSTALL/bin:\$PATH
   export LD_LIBRARY_PATH=$ADIOS2_INSTALL/${ADIOS2_LIBDIR}:\$LD_LIBRARY_PATH
+
+For gated UMA checkpoints, authenticate with huggingface-cli or set HF_TOKEN.
 EOF
 
 echo "✅ Aurora HydraGNN environment setup complete!"

@@ -373,6 +373,29 @@ GPTL_DIR=$VENV_PATH CC=cc CXX=CC pip_retry . --no-build-isolation --verbose
 popd >/dev/null
 
 # ============================================================
+# HydraGNN, then model-specific dependencies
+# ============================================================
+banner "Install HydraGNN (editable)"
+SCRIPT_DIR="$(cd "$(dirname "${BASH_SOURCE[0]}")" && pwd)"
+HYDRAGNN_SRC="${HYDRAGNN_SRC:-$(cd "${SCRIPT_DIR}/../../../../.." && pwd)}"
+FAIRCHEM_CORE_VERSION="${FAIRCHEM_CORE_VERSION:-2.22.0}"
+
+python -m pip install --no-deps -e "$HYDRAGNN_SRC"
+
+banner "Install model dependencies after HydraGNN"
+pip_retry -r "$HYDRAGNN_SRC/requirements-specific-models.txt"
+pip_retry "fairchem-core==${FAIRCHEM_CORE_VERSION}"
+
+python - <<'PY'
+import fairchem.core
+import hydragnn
+import torch
+print("HydraGNN:", hydragnn.__file__)
+print("FAIR-Chem:", fairchem.core.__file__)
+print("PyTorch:", torch.__version__)
+PY
+
+# ============================================================
 # Final Summary
 # ============================================================
 banner "Final Summary"
@@ -401,6 +424,8 @@ MPI4PY:              $MPI4PY_PERLMUTTER
 ADIOS2:              $ADIOS2_PERLMUTTER
 DDStore:             $DDSTORE_PERLMUTTER
 DeepHyper:           $DEEPHYPER_PERLMUTTER
+
+For gated UMA checkpoints, authenticate with huggingface-cli or set HF_TOKEN.
 EOF
 
 echo "✅ HydraGNN-Installation-Perlmutter environment setup complete!"

@@ -90,7 +90,7 @@ fi
 # Installation root
 # ============================================================
 banner "Set Base Installation Directory"
-INSTALL_ROOT="${PWD}/HydraGNN-Installation-Frontier-ROCm713"
+INSTALL_ROOT="${INSTALL_ROOT:-${PWD}/HydraGNN-Installation-Frontier-ROCm713}"
 mkdir -p "$INSTALL_ROOT"
 echo "All installation components will be contained in: $INSTALL_ROOT"
 cd "$INSTALL_ROOT"
