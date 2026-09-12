@@ -38,7 +38,10 @@ from hydragnn.utils.datasets.pickledataset import (
     SimplePickleWriter,
     SimplePickleDataset,
 )
-from hydragnn.utils.materials import normalize_stress, validate_materials_sample
+from hydragnn.utils.materials import (
+    canonicalize_stress,
+    validate_materials_sample,
+)
 from hydragnn.preprocess.graph_samples_checks_and_updates import gather_deg
 from hydragnn.preprocess.graph_samples_checks_and_updates import (
     RadiusGraph,
@@ -197,7 +200,7 @@ class MPTrjDataset(AbstractBaseDataset):
                 energy = torch.tensor(total_energy, dtype=torch.float32).unsqueeze(0)
                 energy_per_atom = energy.detach().clone() / natoms
                 forces = torch.tensor(forces, dtype=torch.float32)
-                stress = normalize_stress(
+                stress = canonicalize_stress(
                     stresses,
                     source_unit="kbar",
                     source_sign="compression_positive",

@@ -15,7 +15,7 @@ from torch_geometric.data import Data
 
 from hydragnn.utils.materials import (
     check_stress_against_energy_strain,
-    normalize_stress,
+    canonicalize_stress,
     validate_materials_sample,
 )
 from hydragnn.utils.materials.preprocessing import (
@@ -36,8 +36,8 @@ def _sample(**updates):
     return Data(**values)
 
 
-def test_normalize_vasp_kbar_stress_and_expand_voigt():
-    stress = normalize_stress(
+def test_canonicalize_vasp_kbar_stress_and_expand_voigt():
+    stress = canonicalize_stress(
         [10.0, 20.0, 30.0, 4.0, 5.0, 6.0],
         source_unit="kbar",
         source_sign="compression_positive",
@@ -54,9 +54,9 @@ def test_normalize_vasp_kbar_stress_and_expand_voigt():
     torch.testing.assert_close(stress, expected)
 
 
-def test_normalize_stress_preserves_ase_convention():
+def test_canonicalize_stress_preserves_ase_convention():
     stress = torch.tensor([[1.0, 0.2, 0.0], [0.2, 2.0, 0.3], [0.0, 0.3, 3.0]])
-    output = normalize_stress(
+    output = canonicalize_stress(
         stress,
         source_unit="ev_per_angstrom_cubed",
         source_sign="tension_positive",
@@ -125,9 +125,9 @@ def test_energy_strain_check_reports_ambiguous_zero_stress():
         ),
     ],
 )
-def test_normalize_stress_rejects_malformed_input(stress, message):
+def test_canonicalize_stress_rejects_malformed_input(stress, message):
     with pytest.raises(ValueError, match=message):
-        normalize_stress(
+        canonicalize_stress(
             stress,
             source_unit="gpa",
             source_sign="tension_positive",

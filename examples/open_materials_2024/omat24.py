@@ -26,7 +26,10 @@ from hydragnn.preprocess.graph_samples_checks_and_updates import (
     gather_deg,
 )
 from hydragnn.utils.distributed import nsplit
-from hydragnn.utils.materials import normalize_stress, validate_materials_sample
+from hydragnn.utils.materials import (
+    canonicalize_stress,
+    validate_materials_sample,
+)
 from utils import balance_load
 
 # transform_coordinates = Spherical(norm=False, cat=False)
@@ -199,7 +202,7 @@ class OMat2024(AbstractBaseDataset):
 
             energy_per_atom = energy.detach().clone() / natoms
             forces = torch.as_tensor(atoms.get_forces(), dtype=torch.float32)
-            stress = normalize_stress(
+            stress = canonicalize_stress(
                 atoms.get_stress(apply_constraint=False, voigt=False),
                 source_unit="ev_per_angstrom_cubed",
                 source_sign="tension_positive",

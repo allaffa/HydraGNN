@@ -12,13 +12,13 @@
 from .preprocessing import (
     StressEnergyStrainCheck,
     check_stress_against_energy_strain,
-    normalize_stress,
+    canonicalize_stress,
     validate_materials_sample,
 )
 
 __all__ = [
     "StressEnergyStrainCheck",
     "check_stress_against_energy_strain",
-    "normalize_stress",
+    "canonicalize_stress",
     "validate_materials_sample",
 ]

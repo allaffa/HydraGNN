@@ -1,8 +1,8 @@
 # Materials preprocessing utilities
 
-HydraGNN normalizes material stresses to full symmetric `3 x 3` tensors in
+HydraGNN canonicalizes material stresses as full symmetric `3 x 3` tensors in
 eV/Å³ with tensile stress positive. Dataset adapters must state their source
-unit and sign convention when calling `normalize_stress`; this prevents unit
+unit and sign convention when calling `canonicalize_stress`; this prevents unit
 or sign assumptions from being hidden in individual example loaders.
 
 `validate_materials_sample` checks the common atomistic schema before scalable
@@ -52,4 +52,4 @@ errors can reverse the numerical derivative. The preferred convention is
 evidence for one structure rather than proof of dataset-wide metadata. Check
 multiple structures with appreciable stress and multiple strain steps before
 changing a dataset conversion, then pass the verified convention explicitly to
-`normalize_stress`.
+`canonicalize_stress`.

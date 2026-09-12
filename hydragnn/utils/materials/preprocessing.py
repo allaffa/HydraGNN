@@ -47,14 +47,14 @@ def _voigt_to_full(stress: torch.Tensor) -> torch.Tensor:
     )
 
 
-def normalize_stress(
+def canonicalize_stress(
     stress,
     *,
     source_unit: StressUnit,
     source_sign: StressSign,
     dtype: torch.dtype = torch.float32,
 ) -> torch.Tensor:
-    """Return a symmetric 3x3 stress tensor in eV/Å³, positive in tension.
+    """Convert stress to a symmetric 3x3 tensor in eV/Å³, positive in tension.
 
     One-dimensional input uses ASE's Voigt ordering
     ``[xx, yy, zz, yz, xz, xy]``. Full tensors must already be symmetric;
