@@ -70,6 +70,10 @@ pip install -r requirements-pyg.txt
 pip install -r requirements-optional.txt
 ```
 
+Anderson acceleration is an optional optimizer wrapper. Install it after the
+machine-specific PyTorch stack with `pip install -r requirements-aadl.txt`,
+then configure `Training.Optimizer.AADL`. See [AADL integration](docs/aadl.md).
+
 `pyg-lib` is built from source in CI because its binary wheels are hosted
 separately from PyPI. The official
 [`pyg-lib` installation documentation](https://github.com/pyg-team/pyg-lib#installation)

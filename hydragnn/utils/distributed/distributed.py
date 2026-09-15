@@ -586,7 +586,19 @@ class HydraPostLocalSGDOptimizer(PostLocalSGDOptimizer):
         )
         if parameters_were_averaged:
             _synchronize_optimizer_state(self)
+            _reset_aadl_history_after_parameter_sync(self.optim)
         return loss
+
+
+def _reset_aadl_history_after_parameter_sync(optimizer):
+    """Discard rank-local Anderson history after parameters are averaged."""
+    if not hasattr(optimizer, "acc_param_hist"):
+        return
+    try:
+        from AADL import reset_acceleration_history
+    except ImportError as error:
+        raise RuntimeError("AADL-wrapped optimizer lost its AADL installation") from error
+    reset_acceleration_history(optimizer)
 
 
 def configure_local_sgd(model, optimizer, config, *, use_deepspeed=False, verbosity=0):
@@ -695,6 +707,7 @@ def synchronize_local_sgd_parameters(optimizer):
     utils.average_parameters_or_parameter_groups(optimizer.param_groups, process_group)
     if isinstance(optimizer, HydraPostLocalSGDOptimizer):
         _synchronize_optimizer_state(optimizer)
+        _reset_aadl_history_after_parameter_sync(optimizer.optim)
     optimizer._hydragnn_last_forced_sync_step = averager.step
     return True
 

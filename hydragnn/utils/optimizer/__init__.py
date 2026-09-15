@@ -8,4 +8,4 @@
 #                                                                            #
 # SPDX-License-Identifier: BSD-3-Clause                                      #
 ##############################################################################
-from .optimizer import select_optimizer
+from .optimizer import configure_aadl, select_optimizer

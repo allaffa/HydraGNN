@@ -19,6 +19,44 @@ except:
     deepspeed_available = False
 
 
+def configure_aadl(optimizer, config):
+    """Optionally attach AADL to an optimizer selected by HydraGNN.
+
+    AADL wraps the optimizer's existing ``step`` method, so the optimizer type,
+    state dict, scheduler, AMP scaler, and DDP gradient communication remain
+    owned by PyTorch/HydraGNN.
+    """
+    aadl_config = config.get("AADL")
+    if aadl_config is None:
+        return optimizer
+    if not isinstance(aadl_config, dict):
+        raise TypeError("Optimizer.AADL must be an object")
+    enabled = aadl_config.get("enabled", False)
+    if not isinstance(enabled, bool):
+        raise TypeError("Optimizer.AADL.enabled must be a boolean")
+    if not enabled:
+        return optimizer
+    options = {key: value for key, value in aadl_config.items() if key != "enabled"}
+    # HydraGNN performs backward before optimizer.step and therefore cannot
+    # supply AADL's reevaluation closure. Preserve that established loop and
+    # make the lack of loss safeguarding explicit in the resulting config.
+    if options.get("safeguard", False):
+        raise ValueError(
+            "HydraGNN AADL integration does not support safeguard=true because "
+            "the training loop does not provide an optimizer closure"
+        )
+    options["safeguard"] = False
+    try:
+        import AADL
+    except ImportError as error:
+        raise ImportError(
+            "Optimizer.AADL is enabled but AADL is not installed; "
+            "install requirements-aadl.txt"
+        ) from error
+    AADL.accelerate(optimizer, **options)
+    return optimizer
+
+
 def select_standard_optimizer(model, config):
     optimizer = None
 
@@ -118,6 +156,7 @@ def select_optimizer(model, config):
         use_zero = config["use_zero_redundancy"]
 
     if use_zero:
-        return select_zero_redundancy_optimizer(model, config)
+        optimizer = select_zero_redundancy_optimizer(model, config)
     else:
-        return select_standard_optimizer(model, config)
+        optimizer = select_standard_optimizer(model, config)
+    return configure_aadl(optimizer, config)

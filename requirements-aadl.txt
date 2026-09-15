@@ -1,0 +1,3 @@
+# Optional optimizer acceleration. Install after the machine-specific PyTorch
+# stack so pip does not replace CUDA/ROCm/XPU wheels.
+AADL @ git+https://github.com/ORNL/AADL.git@master
