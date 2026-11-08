@@ -1,0 +1,402 @@
+{
+  "H2O": {
+    "fp32": {
+      "head_mode": "single",
+      "mlp_loaded": false,
+      "selected_branch_id": 8,
+      "selected_branch_name": "branch-8",
+      "evaluated_branch_ids": [
+        8
+      ],
+      "precision": "fp32",
+      "device": "cpu",
+      "parameter_dtype": "torch.float32",
+      "number_of_branches": 16,
+      "branch_output_order": [
+        "branch-0",
+        "branch-1",
+        "branch-2",
+        "branch-3",
+        "branch-4",
+        "branch-5",
+        "branch-6",
+        "branch-7",
+        "branch-8",
+        "branch-9",
+        "branch-10",
+        "branch-11",
+        "branch-12",
+        "branch-13",
+        "branch-14",
+        "branch-15"
+      ],
+      "checkpoint_sha256": {
+        "hydragNN": "8532b03296a8ab4cfc3b37beb6d57b2091a50807b155fac93cb1882253d32867"
+      },
+      "state_dict_prefix_normalization": "Repeated leading 'module.' prefixes removed; strict key match then enforced",
+      "radius_angstrom": 5.0,
+      "max_neighbours": 20,
+      "model_eval_mode": true,
+      "all_model_parameters_frozen": true
+    },
+    "fp64": {
+      "head_mode": "single",
+      "mlp_loaded": false,
+      "selected_branch_id": 8,
+      "selected_branch_name": "branch-8",
+      "evaluated_branch_ids": [
+        8
+      ],
+      "precision": "fp64",
+      "device": "cpu",
+      "parameter_dtype": "torch.float64",
+      "number_of_branches": 16,
+      "branch_output_order": [
+        "branch-0",
+        "branch-1",
+        "branch-2",
+        "branch-3",
+        "branch-4",
+        "branch-5",
+        "branch-6",
+        "branch-7",
+        "branch-8",
+        "branch-9",
+        "branch-10",
+        "branch-11",
+        "branch-12",
+        "branch-13",
+        "branch-14",
+        "branch-15"
+      ],
+      "checkpoint_sha256": {
+        "hydragNN": "8532b03296a8ab4cfc3b37beb6d57b2091a50807b155fac93cb1882253d32867"
+      },
+      "state_dict_prefix_normalization": "Repeated leading 'module.' prefixes removed; strict key match then enforced",
+      "radius_angstrom": 5.0,
+      "max_neighbours": 20,
+      "model_eval_mode": true,
+      "all_model_parameters_frozen": true
+    }
+  },
+  "CH4": {
+    "fp32": {
+      "head_mode": "single",
+      "mlp_loaded": false,
+      "selected_branch_id": 8,
+      "selected_branch_name": "branch-8",
+      "evaluated_branch_ids": [
+        8
+      ],
+      "precision": "fp32",
+      "device": "cpu",
+      "parameter_dtype": "torch.float32",
+      "number_of_branches": 16,
+      "branch_output_order": [
+        "branch-0",
+        "branch-1",
+        "branch-2",
+        "branch-3",
+        "branch-4",
+        "branch-5",
+        "branch-6",
+        "branch-7",
+        "branch-8",
+        "branch-9",
+        "branch-10",
+        "branch-11",
+        "branch-12",
+        "branch-13",
+        "branch-14",
+        "branch-15"
+      ],
+      "checkpoint_sha256": {
+        "hydragNN": "8532b03296a8ab4cfc3b37beb6d57b2091a50807b155fac93cb1882253d32867"
+      },
+      "state_dict_prefix_normalization": "Repeated leading 'module.' prefixes removed; strict key match then enforced",
+      "radius_angstrom": 5.0,
+      "max_neighbours": 20,
+      "model_eval_mode": true,
+      "all_model_parameters_frozen": true
+    },
+    "fp64": {
+      "head_mode": "single",
+      "mlp_loaded": false,
+      "selected_branch_id": 8,
+      "selected_branch_name": "branch-8",
+      "evaluated_branch_ids": [
+        8
+      ],
+      "precision": "fp64",
+      "device": "cpu",
+      "parameter_dtype": "torch.float64",
+      "number_of_branches": 16,
+      "branch_output_order": [
+        "branch-0",
+        "branch-1",
+        "branch-2",
+        "branch-3",
+        "branch-4",
+        "branch-5",
+        "branch-6",
+        "branch-7",
+        "branch-8",
+        "branch-9",
+        "branch-10",
+        "branch-11",
+        "branch-12",
+        "branch-13",
+        "branch-14",
+        "branch-15"
+      ],
+      "checkpoint_sha256": {
+        "hydragNN": "8532b03296a8ab4cfc3b37beb6d57b2091a50807b155fac93cb1882253d32867"
+      },
+      "state_dict_prefix_normalization": "Repeated leading 'module.' prefixes removed; strict key match then enforced",
+      "radius_angstrom": 5.0,
+      "max_neighbours": 20,
+      "model_eval_mode": true,
+      "all_model_parameters_frozen": true
+    }
+  },
+  "Si": {
+    "fp32": {
+      "head_mode": "single",
+      "mlp_loaded": false,
+      "selected_branch_id": 7,
+      "selected_branch_name": "branch-7",
+      "evaluated_branch_ids": [
+        7
+      ],
+      "precision": "fp32",
+      "device": "cpu",
+      "parameter_dtype": "torch.float32",
+      "number_of_branches": 16,
+      "branch_output_order": [
+        "branch-0",
+        "branch-1",
+        "branch-2",
+        "branch-3",
+        "branch-4",
+        "branch-5",
+        "branch-6",
+        "branch-7",
+        "branch-8",
+        "branch-9",
+        "branch-10",
+        "branch-11",
+        "branch-12",
+        "branch-13",
+        "branch-14",
+        "branch-15"
+      ],
+      "checkpoint_sha256": {
+        "hydragNN": "8532b03296a8ab4cfc3b37beb6d57b2091a50807b155fac93cb1882253d32867"
+      },
+      "state_dict_prefix_normalization": "Repeated leading 'module.' prefixes removed; strict key match then enforced",
+      "radius_angstrom": 5.0,
+      "max_neighbours": 20,
+      "model_eval_mode": true,
+      "all_model_parameters_frozen": true
+    },
+    "fp64": {
+      "head_mode": "single",
+      "mlp_loaded": false,
+      "selected_branch_id": 7,
+      "selected_branch_name": "branch-7",
+      "evaluated_branch_ids": [
+        7
+      ],
+      "precision": "fp64",
+      "device": "cpu",
+      "parameter_dtype": "torch.float64",
+      "number_of_branches": 16,
+      "branch_output_order": [
+        "branch-0",
+        "branch-1",
+        "branch-2",
+        "branch-3",
+        "branch-4",
+        "branch-5",
+        "branch-6",
+        "branch-7",
+        "branch-8",
+        "branch-9",
+        "branch-10",
+        "branch-11",
+        "branch-12",
+        "branch-13",
+        "branch-14",
+        "branch-15"
+      ],
+      "checkpoint_sha256": {
+        "hydragNN": "8532b03296a8ab4cfc3b37beb6d57b2091a50807b155fac93cb1882253d32867"
+      },
+      "state_dict_prefix_normalization": "Repeated leading 'module.' prefixes removed; strict key match then enforced",
+      "radius_angstrom": 5.0,
+      "max_neighbours": 20,
+      "model_eval_mode": true,
+      "all_model_parameters_frozen": true
+    }
+  },
+  "MgO": {
+    "fp32": {
+      "head_mode": "single",
+      "mlp_loaded": false,
+      "selected_branch_id": 2,
+      "selected_branch_name": "branch-2",
+      "evaluated_branch_ids": [
+        2
+      ],
+      "precision": "fp32",
+      "device": "cpu",
+      "parameter_dtype": "torch.float32",
+      "number_of_branches": 16,
+      "branch_output_order": [
+        "branch-0",
+        "branch-1",
+        "branch-2",
+        "branch-3",
+        "branch-4",
+        "branch-5",
+        "branch-6",
+        "branch-7",
+        "branch-8",
+        "branch-9",
+        "branch-10",
+        "branch-11",
+        "branch-12",
+        "branch-13",
+        "branch-14",
+        "branch-15"
+      ],
+      "checkpoint_sha256": {
+        "hydragNN": "8532b03296a8ab4cfc3b37beb6d57b2091a50807b155fac93cb1882253d32867"
+      },
+      "state_dict_prefix_normalization": "Repeated leading 'module.' prefixes removed; strict key match then enforced",
+      "radius_angstrom": 5.0,
+      "max_neighbours": 20,
+      "model_eval_mode": true,
+      "all_model_parameters_frozen": true
+    },
+    "fp64": {
+      "head_mode": "single",
+      "mlp_loaded": false,
+      "selected_branch_id": 2,
+      "selected_branch_name": "branch-2",
+      "evaluated_branch_ids": [
+        2
+      ],
+      "precision": "fp64",
+      "device": "cpu",
+      "parameter_dtype": "torch.float64",
+      "number_of_branches": 16,
+      "branch_output_order": [
+        "branch-0",
+        "branch-1",
+        "branch-2",
+        "branch-3",
+        "branch-4",
+        "branch-5",
+        "branch-6",
+        "branch-7",
+        "branch-8",
+        "branch-9",
+        "branch-10",
+        "branch-11",
+        "branch-12",
+        "branch-13",
+        "branch-14",
+        "branch-15"
+      ],
+      "checkpoint_sha256": {
+        "hydragNN": "8532b03296a8ab4cfc3b37beb6d57b2091a50807b155fac93cb1882253d32867"
+      },
+      "state_dict_prefix_normalization": "Repeated leading 'module.' prefixes removed; strict key match then enforced",
+      "radius_angstrom": 5.0,
+      "max_neighbours": 20,
+      "model_eval_mode": true,
+      "all_model_parameters_frozen": true
+    }
+  },
+  "Al": {
+    "fp32": {
+      "head_mode": "single",
+      "mlp_loaded": false,
+      "selected_branch_id": 7,
+      "selected_branch_name": "branch-7",
+      "evaluated_branch_ids": [
+        7
+      ],
+      "precision": "fp32",
+      "device": "cpu",
+      "parameter_dtype": "torch.float32",
+      "number_of_branches": 16,
+      "branch_output_order": [
+        "branch-0",
+        "branch-1",
+        "branch-2",
+        "branch-3",
+        "branch-4",
+        "branch-5",
+        "branch-6",
+        "branch-7",
+        "branch-8",
+        "branch-9",
+        "branch-10",
+        "branch-11",
+        "branch-12",
+        "branch-13",
+        "branch-14",
+        "branch-15"
+      ],
+      "checkpoint_sha256": {
+        "hydragNN": "8532b03296a8ab4cfc3b37beb6d57b2091a50807b155fac93cb1882253d32867"
+      },
+      "state_dict_prefix_normalization": "Repeated leading 'module.' prefixes removed; strict key match then enforced",
+      "radius_angstrom": 5.0,
+      "max_neighbours": 20,
+      "model_eval_mode": true,
+      "all_model_parameters_frozen": true
+    },
+    "fp64": {
+      "head_mode": "single",
+      "mlp_loaded": false,
+      "selected_branch_id": 7,
+      "selected_branch_name": "branch-7",
+      "evaluated_branch_ids": [
+        7
+      ],
+      "precision": "fp64",
+      "device": "cpu",
+      "parameter_dtype": "torch.float64",
+      "number_of_branches": 16,
+      "branch_output_order": [
+        "branch-0",
+        "branch-1",
+        "branch-2",
+        "branch-3",
+        "branch-4",
+        "branch-5",
+        "branch-6",
+        "branch-7",
+        "branch-8",
+        "branch-9",
+        "branch-10",
+        "branch-11",
+        "branch-12",
+        "branch-13",
+        "branch-14",
+        "branch-15"
+      ],
+      "checkpoint_sha256": {
+        "hydragNN": "8532b03296a8ab4cfc3b37beb6d57b2091a50807b155fac93cb1882253d32867"
+      },
+      "state_dict_prefix_normalization": "Repeated leading 'module.' prefixes removed; strict key match then enforced",
+      "radius_angstrom": 5.0,
+      "max_neighbours": 20,
+      "model_eval_mode": true,
+      "all_model_parameters_frozen": true
+    }
+  }
+}

@@ -1,0 +1,302 @@
+{
+  "status": "passed",
+  "head_mode": "single",
+  "single_head_selection": {
+    "H2O": {
+      "branch_id": 8,
+      "dataset": "OMol25"
+    },
+    "CH4": {
+      "branch_id": 8,
+      "dataset": "OMol25"
+    },
+    "Si": {
+      "branch_id": 7,
+      "dataset": "OMat24"
+    },
+    "MgO": {
+      "branch_id": 2,
+      "dataset": "MPTrj"
+    },
+    "Al": {
+      "branch_id": 7,
+      "dataset": "OMat24"
+    }
+  },
+  "technical_validation_passed": true,
+  "scientific_convergence_claim": false,
+  "note": "The pilot is a software validation only; a 10-step limit is not a full-convergence result.",
+  "water_precision_results": {
+    "fp32": {
+      "single_point_energy_ev": -0.9936702251434326,
+      "force_maximum_ev_per_angstrom": 2.1389224713528483,
+      "branch_weights": [
+        0.0,
+        0.0,
+        0.0,
+        0.0,
+        0.0,
+        0.0,
+        0.0,
+        0.0,
+        1.0,
+        0.0,
+        0.0,
+        0.0,
+        0.0,
+        0.0,
+        0.0,
+        0.0
+      ],
+      "branch_energies_ev": [
+        -0.9936702251434326
+      ],
+      "evaluated_branch_ids": [
+        8
+      ],
+      "graph_edges": 6,
+      "finite_difference_check": {
+        "precision": "fp32",
+        "atom_index_zero_based": 0,
+        "cartesian_axis": "z",
+        "autograd_force_ev_per_angstrom": -2.1387407779693604,
+        "step_results": [
+          {
+            "step_angstrom": 0.01,
+            "finite_difference_force_ev_per_angstrom": -2.1449804306030273,
+            "autograd_force_ev_per_angstrom": -2.1387407779693604,
+            "absolute_error_ev_per_angstrom": 0.006239652633666992,
+            "relative_error": 0.002908955505907722,
+            "same_neighbor_topology": true
+          },
+          {
+            "step_angstrom": 0.005,
+            "finite_difference_force_ev_per_angstrom": -2.1405935287475586,
+            "autograd_force_ev_per_angstrom": -2.1387407779693604,
+            "absolute_error_ev_per_angstrom": 0.0018527507781982422,
+            "relative_error": 0.0008655313366672978,
+            "same_neighbor_topology": true
+          },
+          {
+            "step_angstrom": 0.0025,
+            "finite_difference_force_ev_per_angstrom": -2.1390914916992188,
+            "autograd_force_ev_per_angstrom": -2.1387407779693604,
+            "absolute_error_ev_per_angstrom": 0.00035071372985839844,
+            "relative_error": 0.00016395452518947837,
+            "same_neighbor_topology": true
+          }
+        ],
+        "best_absolute_error_ev_per_angstrom": 0.00035071372985839844,
+        "acceptance_tolerance_ev_per_angstrom": 0.01,
+        "neighbor_topology_stable": true,
+        "passed": true
+      },
+      "pilot_relaxation": {
+        "precision": "fp32",
+        "head_mode": "single",
+        "selected_branch_id": 8,
+        "status": "converged",
+        "converged": true,
+        "force_tolerance_ev_per_angstrom": 0.05,
+        "maximum_steps": 10,
+        "steps_taken": 3,
+        "total_calculation_time_seconds": 0.020280082942917943,
+        "initial_energy_ev": -0.9936702251434326,
+        "final_energy_ev": -1.0511693954467773,
+        "final_maximum_force_ev_per_angstrom": 0.03644573843953454,
+        "final_rms_force_ev_per_angstrom": 0.019902048131582483,
+        "initial_branch_weights_json": "[0.0, 0.0, 0.0, 0.0, 0.0, 0.0, 0.0, 0.0, 1.0, 0.0, 0.0, 0.0, 0.0, 0.0, 0.0, 0.0]",
+        "final_branch_weights_json": "[0.0, 0.0, 0.0, 0.0, 0.0, 0.0, 0.0, 0.0, 1.0, 0.0, 0.0, 0.0, 0.0, 0.0, 0.0, 0.0]",
+        "graph_edges_final": 6,
+        "trajectory_csv": "trajectory.csv",
+        "trajectory_file": "trajectory.traj",
+        "error": null
+      },
+      "graph_rebuild_count": 12,
+      "graph_matches_latest_positions": true,
+      "precision_provenance": {
+        "head_mode": "single",
+        "mlp_loaded": false,
+        "selected_branch_id": 8,
+        "selected_branch_name": "branch-8",
+        "evaluated_branch_ids": [
+          8
+        ],
+        "precision": "fp32",
+        "device": "cpu",
+        "parameter_dtype": "torch.float32",
+        "number_of_branches": 16,
+        "branch_output_order": [
+          "branch-0",
+          "branch-1",
+          "branch-2",
+          "branch-3",
+          "branch-4",
+          "branch-5",
+          "branch-6",
+          "branch-7",
+          "branch-8",
+          "branch-9",
+          "branch-10",
+          "branch-11",
+          "branch-12",
+          "branch-13",
+          "branch-14",
+          "branch-15"
+        ],
+        "checkpoint_sha256": {
+          "hydragNN": "8532b03296a8ab4cfc3b37beb6d57b2091a50807b155fac93cb1882253d32867"
+        },
+        "state_dict_prefix_normalization": "Repeated leading 'module.' prefixes removed; strict key match then enforced",
+        "radius_angstrom": 5.0,
+        "max_neighbours": 20,
+        "model_eval_mode": true,
+        "all_model_parameters_frozen": true
+      }
+    },
+    "fp64": {
+      "single_point_energy_ev": -0.9936652594900346,
+      "force_maximum_ev_per_angstrom": 2.138924962838605,
+      "branch_weights": [
+        0.0,
+        0.0,
+        0.0,
+        0.0,
+        0.0,
+        0.0,
+        0.0,
+        0.0,
+        1.0,
+        0.0,
+        0.0,
+        0.0,
+        0.0,
+        0.0,
+        0.0,
+        0.0
+      ],
+      "branch_energies_ev": [
+        -0.9936652594900346
+      ],
+      "evaluated_branch_ids": [
+        8
+      ],
+      "graph_edges": 6,
+      "finite_difference_check": {
+        "precision": "fp64",
+        "atom_index_zero_based": 0,
+        "cartesian_axis": "z",
+        "autograd_force_ev_per_angstrom": -2.138743267748737,
+        "step_results": [
+          {
+            "step_angstrom": 0.01,
+            "finite_difference_force_ev_per_angstrom": -2.1448580638712187,
+            "autograd_force_ev_per_angstrom": -2.138743267748737,
+            "absolute_error_ev_per_angstrom": 0.006114796122481891,
+            "relative_error": 0.0028509094496655864,
+            "same_neighbor_topology": true
+          },
+          {
+            "step_angstrom": 0.005,
+            "finite_difference_force_ev_per_angstrom": -2.1397982422263206,
+            "autograd_force_ev_per_angstrom": -2.138743267748737,
+            "absolute_error_ev_per_angstrom": 0.0010549744775838477,
+            "relative_error": 0.000493025209931108,
+            "same_neighbor_topology": true
+          },
+          {
+            "step_angstrom": 0.0025,
+            "finite_difference_force_ev_per_angstrom": -2.1386746822914304,
+            "autograd_force_ev_per_angstrom": -2.138743267748737,
+            "absolute_error_ev_per_angstrom": 6.858545730636934e-05,
+            "relative_error": 3.206811137204097e-05,
+            "same_neighbor_topology": true
+          }
+        ],
+        "best_absolute_error_ev_per_angstrom": 6.858545730636934e-05,
+        "acceptance_tolerance_ev_per_angstrom": 0.001,
+        "neighbor_topology_stable": true,
+        "passed": true
+      },
+      "pilot_relaxation": {
+        "precision": "fp64",
+        "head_mode": "single",
+        "selected_branch_id": 8,
+        "status": "converged",
+        "converged": true,
+        "force_tolerance_ev_per_angstrom": 0.05,
+        "maximum_steps": 10,
+        "steps_taken": 3,
+        "total_calculation_time_seconds": 0.01980904210358858,
+        "initial_energy_ev": -0.9936652594900346,
+        "final_energy_ev": -1.0511703722316814,
+        "final_maximum_force_ev_per_angstrom": 0.036448088911117324,
+        "final_rms_force_ev_per_angstrom": 0.019902389084957197,
+        "initial_branch_weights_json": "[0.0, 0.0, 0.0, 0.0, 0.0, 0.0, 0.0, 0.0, 1.0, 0.0, 0.0, 0.0, 0.0, 0.0, 0.0, 0.0]",
+        "final_branch_weights_json": "[0.0, 0.0, 0.0, 0.0, 0.0, 0.0, 0.0, 0.0, 1.0, 0.0, 0.0, 0.0, 0.0, 0.0, 0.0, 0.0]",
+        "graph_edges_final": 6,
+        "trajectory_csv": "trajectory.csv",
+        "trajectory_file": "trajectory.traj",
+        "error": null
+      },
+      "graph_rebuild_count": 12,
+      "graph_matches_latest_positions": true,
+      "precision_provenance": {
+        "head_mode": "single",
+        "mlp_loaded": false,
+        "selected_branch_id": 8,
+        "selected_branch_name": "branch-8",
+        "evaluated_branch_ids": [
+          8
+        ],
+        "precision": "fp64",
+        "device": "cpu",
+        "parameter_dtype": "torch.float64",
+        "number_of_branches": 16,
+        "branch_output_order": [
+          "branch-0",
+          "branch-1",
+          "branch-2",
+          "branch-3",
+          "branch-4",
+          "branch-5",
+          "branch-6",
+          "branch-7",
+          "branch-8",
+          "branch-9",
+          "branch-10",
+          "branch-11",
+          "branch-12",
+          "branch-13",
+          "branch-14",
+          "branch-15"
+        ],
+        "checkpoint_sha256": {
+          "hydragNN": "8532b03296a8ab4cfc3b37beb6d57b2091a50807b155fac93cb1882253d32867"
+        },
+        "state_dict_prefix_normalization": "Repeated leading 'module.' prefixes removed; strict key match then enforced",
+        "radius_angstrom": 5.0,
+        "max_neighbours": 20,
+        "model_eval_mode": true,
+        "all_model_parameters_frozen": true
+      }
+    }
+  },
+  "fp32_fp64_branch_weight_maximum_absolute_difference": null,
+  "checks": {
+    "checkpoint_hashes_verified": true,
+    "both_precisions_loaded_and_frozen": true,
+    "mlp_loaded": false,
+    "all_16_branches_evaluated": false,
+    "single_head_evaluated_only": true,
+    "branch_weights_or_selection_mask_sum_to_one": true,
+    "single_point_energy_and_forces_finite": true,
+    "finite_difference_force_check_passed": true,
+    "neighbor_topology_unchanged_in_finite_difference": true,
+    "graph_rebuilt_at_moving_geometry": true,
+    "ase_bfgs_executed_without_error": true,
+    "periodic_and_molecular_construction_implemented": true,
+    "branch_skipping_disabled": false,
+    "only_selected_branch_evaluated": true
+  }
+}

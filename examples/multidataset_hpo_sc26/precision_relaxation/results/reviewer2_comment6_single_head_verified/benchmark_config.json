@@ -1,0 +1,128 @@
+{
+  "description": "Controlled FP32 versus FP64 structural-relaxation benchmark using frozen HydraGNN and BranchWeightMLP checkpoints",
+  "systems": {
+    "H2O": {
+      "kind": "molecule",
+      "formula": "H2O",
+      "atom_count": 3,
+      "pbc": false
+    },
+    "CH4": {
+      "kind": "molecule",
+      "formula": "CH4",
+      "atom_count": 5,
+      "pbc": false
+    },
+    "Si": {
+      "kind": "bulk",
+      "symbol": "Si",
+      "crystal_structure": "diamond",
+      "lattice_constant_angstrom": 5.43,
+      "cubic": true,
+      "atom_count": 8,
+      "pbc": true
+    },
+    "MgO": {
+      "kind": "bulk",
+      "symbol": "MgO",
+      "crystal_structure": "rocksalt",
+      "lattice_constant_angstrom": 4.212,
+      "cubic": true,
+      "atom_count": 8,
+      "pbc": true
+    },
+    "Al": {
+      "kind": "bulk",
+      "symbol": "Al",
+      "crystal_structure": "fcc",
+      "lattice_constant_angstrom": 4.05,
+      "cubic": true,
+      "atom_count": 4,
+      "pbc": true
+    }
+  },
+  "initial_perturbation": {
+    "seed": 42,
+    "per_atom_displacement_magnitude_angstrom": [
+      0.03,
+      0.05
+    ],
+    "same_saved_coordinates_for_both_precisions": true
+  },
+  "inference": {
+    "branch_count": 16,
+    "branch_skipping": false,
+    "fused_energy_gradient": true,
+    "charge": 0.0,
+    "spin": 0.0,
+    "rebuild_graph_at_every_calculation": true
+  },
+  "branch_dataset_mapping": [
+    "Alexandria",
+    "ANI1x",
+    "MPTrj",
+    "OC2020",
+    "OC2022",
+    "OC25",
+    "ODAC23",
+    "OMat24",
+    "OMol25",
+    "OMol25-neutral",
+    "OMol25-non-neutral",
+    "OPoly2026",
+    "Nabla2DFT",
+    "QCML",
+    "QM7X",
+    "transition1x"
+  ],
+  "single_head_selection": {
+    "rule": "For each fixed composition, select the highest-weight branch from the already-validated FP64 fused single-point comparison, then run all relaxation steps using only that frozen head. The single-head runner does not load or invoke the MLP.",
+    "selected_heads": {
+      "H2O": {
+        "branch_id": 8,
+        "dataset": "OMol25"
+      },
+      "CH4": {
+        "branch_id": 8,
+        "dataset": "OMol25"
+      },
+      "Si": {
+        "branch_id": 7,
+        "dataset": "OMat24"
+      },
+      "MgO": {
+        "branch_id": 2,
+        "dataset": "MPTrj"
+      },
+      "Al": {
+        "branch_id": 7,
+        "dataset": "OMat24"
+      }
+    }
+  },
+  "relaxation": {
+    "optimizer": "ASE BFGS",
+    "force_convergence_tolerance_ev_per_angstrom": 0.05,
+    "maximum_steps": 200,
+    "cell_relaxation": false,
+    "pilot_maximum_steps": 10
+  },
+  "finite_difference_check": {
+    "system": "H2O",
+    "coordinate": "largest-magnitude autograd force component",
+    "central_difference_step_sizes_angstrom": [
+      0.01,
+      0.005,
+      0.0025
+    ],
+    "verify_neighbor_topology_unchanged": true,
+    "maximum_absolute_force_error_ev_per_angstrom": {
+      "fp32": 0.01,
+      "fp64": 0.001
+    }
+  },
+  "expected_checkpoint_sha256": {
+    "branch_weight_mlp": "c984b338ee947534bbdedf1fc4dd2aea92bb846e3302638d6719b1e3f5ca7ca8",
+    "hydragNN": "8532b03296a8ab4cfc3b37beb6d57b2091a50807b155fac93cb1882253d32867"
+  }
+}

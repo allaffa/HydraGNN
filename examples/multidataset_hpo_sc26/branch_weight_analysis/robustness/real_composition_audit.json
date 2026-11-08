@@ -1,0 +1,127 @@
+{
+  "status": "not available locally",
+  "required_archived_structures_for_encoding_check": 3,
+  "archived_structures_audited": 0,
+  "paths_checked": [
+    {
+      "path": "/lustre/orion/world-shared/lrn070/jyc/frontier/HydraGNN/examples/multidataset_hpo_sc26/dataset/Alexandria-v2.bp",
+      "exists": false,
+      "readable": false,
+      "source": "Adios dataset location inferred from run-4284444.log"
+    },
+    {
+      "path": "/lustre/orion/world-shared/lrn070/jyc/frontier/HydraGNN/examples/multidataset_hpo_sc26/dataset/ANI1x-v2.bp",
+      "exists": false,
+      "readable": false,
+      "source": "Adios dataset location inferred from run-4284444.log"
+    },
+    {
+      "path": "/lustre/orion/world-shared/lrn070/jyc/frontier/HydraGNN/examples/multidataset_hpo_sc26/dataset/MPTrj-v2.bp",
+      "exists": false,
+      "readable": false,
+      "source": "Adios dataset location inferred from run-4284444.log"
+    },
+    {
+      "path": "/lustre/orion/world-shared/lrn070/jyc/frontier/HydraGNN/examples/multidataset_hpo_sc26/dataset/OC2020-v2.bp",
+      "exists": false,
+      "readable": false,
+      "source": "Adios dataset location inferred from run-4284444.log"
+    },
+    {
+      "path": "/lustre/orion/world-shared/lrn070/jyc/frontier/HydraGNN/examples/multidataset_hpo_sc26/dataset/OC2022-v2.bp",
+      "exists": false,
+      "readable": false,
+      "source": "Adios dataset location inferred from run-4284444.log"
+    },
+    {
+      "path": "/lustre/orion/world-shared/lrn070/jyc/frontier/HydraGNN/examples/multidataset_hpo_sc26/dataset/OC25-v2.bp",
+      "exists": false,
+      "readable": false,
+      "source": "Adios dataset location inferred from run-4284444.log"
+    },
+    {
+      "path": "/lustre/orion/world-shared/lrn070/jyc/frontier/HydraGNN/examples/multidataset_hpo_sc26/dataset/ODAC23-v2.bp",
+      "exists": false,
+      "readable": false,
+      "source": "Adios dataset location inferred from run-4284444.log"
+    },
+    {
+      "path": "/lustre/orion/world-shared/lrn070/jyc/frontier/HydraGNN/examples/multidataset_hpo_sc26/dataset/OMat24-v2.bp",
+      "exists": false,
+      "readable": false,
+      "source": "Adios dataset location inferred from run-4284444.log"
+    },
+    {
+      "path": "/lustre/orion/world-shared/lrn070/jyc/frontier/HydraGNN/examples/multidataset_hpo_sc26/dataset/OMol25-v2.bp",
+      "exists": false,
+      "readable": false,
+      "source": "Adios dataset location inferred from run-4284444.log"
+    },
+    {
+      "path": "/lustre/orion/world-shared/lrn070/jyc/frontier/HydraGNN/examples/multidataset_hpo_sc26/dataset/OMol25-neutral-v2.bp",
+      "exists": false,
+      "readable": false,
+      "source": "Adios dataset location inferred from run-4284444.log"
+    },
+    {
+      "path": "/lustre/orion/world-shared/lrn070/jyc/frontier/HydraGNN/examples/multidataset_hpo_sc26/dataset/OMol25-non-neutral-v2.bp",
+      "exists": false,
+      "readable": false,
+      "source": "Adios dataset location inferred from run-4284444.log"
+    },
+    {
+      "path": "/lustre/orion/world-shared/lrn070/jyc/frontier/HydraGNN/examples/multidataset_hpo_sc26/dataset/OPoly2026-v2.bp",
+      "exists": false,
+      "readable": false,
+      "source": "Adios dataset location inferred from run-4284444.log"
+    },
+    {
+      "path": "/lustre/orion/world-shared/lrn070/jyc/frontier/HydraGNN/examples/multidataset_hpo_sc26/dataset/Nabla2DFT-v2.bp",
+      "exists": false,
+      "readable": false,
+      "source": "Adios dataset location inferred from run-4284444.log"
+    },
+    {
+      "path": "/lustre/orion/world-shared/lrn070/jyc/frontier/HydraGNN/examples/multidataset_hpo_sc26/dataset/QCML-v2.bp",
+      "exists": false,
+      "readable": false,
+      "source": "Adios dataset location inferred from run-4284444.log"
+    },
+    {
+      "path": "/lustre/orion/world-shared/lrn070/jyc/frontier/HydraGNN/examples/multidataset_hpo_sc26/dataset/QM7X-v2.bp",
+      "exists": false,
+      "readable": false,
+      "source": "Adios dataset location inferred from run-4284444.log"
+    },
+    {
+      "path": "/lustre/orion/world-shared/lrn070/jyc/frontier/HydraGNN/examples/multidataset_hpo_sc26/dataset/transition1x-v2.bp",
+      "exists": false,
+      "readable": false,
+      "source": "Adios dataset location inferred from run-4284444.log"
+    },
+    {
+      "path": "/Users/7ml/Documents/Codes/HydraGNN-v5.0/examples/multidataset_hpo_sc26/dataset",
+      "exists": false,
+      "readable": false,
+      "source": "local analysis checkout"
+    },
+    {
+      "path": "/Users/7ml/Documents/Codes/HydraGNN/examples/multidataset_hpo_sc26/dataset",
+      "exists": false,
+      "readable": false,
+      "source": "nearby local checkout"
+    }
+  ],
+  "run_log_dataset_directories": [
+    "/lustre/orion/world-shared/lrn070/jyc/frontier/HydraGNN/examples/multidataset_hpo_sc26/dataset"
+  ],
+  "relevant_data_reconstructable_from_local_metadata": false,
+  "available_metadata": [
+    "run logs mention ADIOS reads and trainset/valset/testset chemical_composition arrays, but contain no per-record vectors",
+    "dataset histogram script requires source datasets and reports missing paths"
+  ],
+  "documented_real_formulas_obtained": false,
+  "possible_without_calculations": "Yes, externally curated composition records can be obtained from public crystallographic/materials databases without running calculations, but none were downloaded or audited in this run. They would be real-composition probes, not evidence of training membership.",
+  "no_training_domain_labels_assigned": true,
+  "reason": "No checked ADIOS archives or other local structure files were present or readable; cluster storage roots are not mounted."
+}

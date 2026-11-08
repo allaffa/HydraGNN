@@ -1,0 +1,563 @@
+{
+  "scope": "second-round model robustness; synthetic inputs only; no training-domain classification",
+  "seed": 260508,
+  "first_round_composition_count": 195,
+  "size_series_composition_count": 22,
+  "substitution_path_point_count": 78,
+  "checkpoint_manifest": {
+    "mlp_checkpoint": "mlp_branch_weights.pt",
+    "mlp_sha256": "c984b338ee947534bbdedf1fc4dd2aea92bb846e3302638d6719b1e3f5ca7ca8",
+    "mlp_epoch": 207,
+    "hydragNN_checkpoint": "multidataset_hpo-BEST6-fp64/multidataset_hpo-BEST6-fp64_epoch_97.pk",
+    "backbone_sha256": "8532b03296a8ab4cfc3b37beb6d57b2091a50807b155fac93cb1882253d32867",
+    "mlp_hydragNN_pairing": "user-confirmed; MLP checkpoint does not embed base-checkpoint identity",
+    "git_commit": "590fcb910e4d88b8ed2ce1c7838a159b09365d54",
+    "input_dim": 118,
+    "hidden_dims": [
+      128,
+      64
+    ],
+    "output_branches": 16,
+    "parameter_dtype": "torch.float64",
+    "inference_precision": "float64; checkpoint parameter dtype preserved",
+    "backbone_forward_used": false,
+    "rechecked_for_robustness": true,
+    "architecture_discrepancy": null
+  },
+  "logit_diagnostics": {
+    "record_count": 217,
+    "first_round_count": 195,
+    "size_sensitivity_count": 22,
+    "all_logits_finite_fp64": true,
+    "all_logits_finite_fp32": true,
+    "max_softmax_exp_logsoftmax_abs_error_fp64": 1.1102230246251565e-16,
+    "max_softmax_exp_logsoftmax_abs_error_fp32": 5.960464477539063e-08,
+    "max_abs_logit_fp64_vs_fp32": 0.05423054029233754,
+    "max_abs_weight_fp64_vs_fp32": 0.0008816501463927429,
+    "fp64_exact_zero_count": 2588,
+    "fp32_exact_zero_count": 3012,
+    "fp64_threshold_counts": {
+      "1e-12": 3097,
+      "1e-08": 3119,
+      "0.0001": 3149,
+      "0.01": 3171
+    },
+    "fp32_threshold_counts": {
+      "1e-12": 3097,
+      "1e-08": 3119,
+      "0.0001": 3149,
+      "0.01": 3171
+    },
+    "entropy_method": "-sum(exp(log_softmax(logits)) * log_softmax(logits))",
+    "temperature_scaling_used": false
+  },
+  "size_sensitivity": {
+    "Nb-Ta binary alloy": {
+      "atom_counts": [
+        10,
+        20,
+        50,
+        100,
+        200
+      ],
+      "dominant_branches": [
+        "branch-7:OMat24",
+        "branch-2:MPTrj",
+        "branch-2:MPTrj",
+        "branch-15:transition1x",
+        "branch-15:transition1x"
+      ],
+      "maximum_js_vs_smallest_bits": 0.9577071808338584,
+      "maximum_tv_vs_smallest": 0.9894327968007264,
+      "maximum_weight_range": [
+        0.5321816936206364,
+        0.984637577817622
+      ],
+      "effective_branch_range": [
+        1.0924280127160755,
+        1.995859046262994
+      ],
+      "rank_change_range": [
+        0,
+        14
+      ]
+    },
+    "TiO2": {
+      "atom_counts": [
+        6,
+        30,
+        60,
+        120
+      ],
+      "dominant_branches": [
+        "branch-2:MPTrj",
+        "branch-4:OC2022",
+        "branch-4:OC2022",
+        "branch-4:OC2022"
+      ],
+      "maximum_js_vs_smallest_bits": 1.0,
+      "maximum_tv_vs_smallest": 1.0,
+      "maximum_weight_range": [
+        1.0,
+        1.0
+      ],
+      "effective_branch_range": [
+        1.0,
+        1.0
+      ],
+      "rank_change_range": [
+        0,
+        16
+      ]
+    },
+    "CH4": {
+      "atom_counts": [
+        5,
+        20,
+        50,
+        100
+      ],
+      "dominant_branches": [
+        "branch-8:OMol25",
+        "branch-8:OMol25",
+        "branch-8:OMol25",
+        "branch-8:OMol25"
+      ],
+      "maximum_js_vs_smallest_bits": 4.8807049989987936e-06,
+      "maximum_tv_vs_smallest": 9.761375631291913e-06,
+      "maximum_weight_range": [
+        0.9999902386243686,
+        1.0
+      ],
+      "effective_branch_range": [
+        1.0,
+        1.00012238656106
+      ],
+      "rank_change_range": [
+        0,
+        15
+      ]
+    },
+    "LiFePO4": {
+      "atom_counts": [
+        7,
+        14,
+        35,
+        70
+      ],
+      "dominant_branches": [
+        "branch-7:OMat24",
+        "branch-2:MPTrj",
+        "branch-2:MPTrj",
+        "branch-2:MPTrj"
+      ],
+      "maximum_js_vs_smallest_bits": 0.9999999999999977,
+      "maximum_tv_vs_smallest": 1.0,
+      "maximum_weight_range": [
+        1.0,
+        1.0
+      ],
+      "effective_branch_range": [
+        1.0,
+        1.0000000000000033
+      ],
+      "rank_change_range": [
+        0,
+        16
+      ]
+    },
+    "Nb-Ta-V-Hf-Zr multicomponent alloy": {
+      "atom_counts": [
+        10,
+        20,
+        50,
+        100,
+        200
+      ],
+      "dominant_branches": [
+        "branch-7:OMat24",
+        "branch-4:OC2022",
+        "branch-2:MPTrj",
+        "branch-7:OMat24",
+        "branch-7:OMat24"
+      ],
+      "maximum_js_vs_smallest_bits": 0.9994349946845228,
+      "maximum_tv_vs_smallest": 0.9999239349335902,
+      "maximum_weight_range": [
+        0.6048570528537502,
+        1.0
+      ],
+      "effective_branch_range": [
+        1.0,
+        2.213611667742679
+      ],
+      "rank_change_range": [
+        0,
+        14
+      ]
+    }
+  },
+  "substitution_paths": {
+    "Nb-Ta alloy (fixed 100 atoms)": {
+      "note": "binary alloy composition path",
+      "sample_count": 11,
+      "atom_counts": [
+        100
+      ],
+      "dominant_start": "branch-15:transition1x",
+      "dominant_end": "branch-15:transition1x",
+      "dominant_branch_changes": 0,
+      "largest_adjacent_js_bits": 0.02006946989190693,
+      "largest_adjacent_tv": 0.12947898897148843,
+      "top_five_branches": [
+        "branch-15:transition1x",
+        "branch-2:MPTrj",
+        "branch-7:OMat24",
+        "branch-8:OMol25",
+        "branch-4:OC2022"
+      ],
+      "largest_step_description": "step 2 of 10"
+    },
+    "Mo-W alloy (fixed 100 atoms)": {
+      "note": "binary alloy composition path",
+      "sample_count": 11,
+      "atom_counts": [
+        100
+      ],
+      "dominant_start": "branch-2:MPTrj",
+      "dominant_end": "branch-2:MPTrj",
+      "dominant_branch_changes": 0,
+      "largest_adjacent_js_bits": 0.01732345796590459,
+      "largest_adjacent_tv": 0.10314456914044344,
+      "top_five_branches": [
+        "branch-2:MPTrj",
+        "branch-15:transition1x",
+        "branch-8:OMol25",
+        "branch-7:OMat24",
+        "branch-4:OC2022"
+      ],
+      "largest_step_description": "step 1 of 10"
+    },
+    "Ti-Zr dioxide substitution (99 atoms)": {
+      "note": "33 cation sites exchanged; fixed O66; composition-space alloyed oxide probe",
+      "sample_count": 12,
+      "atom_counts": [
+        99
+      ],
+      "dominant_start": "branch-4:OC2022",
+      "dominant_end": "branch-4:OC2022",
+      "dominant_branch_changes": 0,
+      "largest_adjacent_js_bits": 0.0,
+      "largest_adjacent_tv": 0.0,
+      "top_five_branches": [
+        "branch-4:OC2022",
+        "branch-15:transition1x",
+        "branch-14:QM7X",
+        "branch-13:QCML",
+        "branch-12:Nabla2DFT"
+      ],
+      "largest_step_description": "step 1 of 11"
+    },
+    "Fe-Co monoxide substitution (100 atoms)": {
+      "note": "fixed-size composition-space oxide probe; mixed Fe/Co phase not asserted",
+      "sample_count": 11,
+      "atom_counts": [
+        100
+      ],
+      "dominant_start": "branch-4:OC2022",
+      "dominant_end": "branch-4:OC2022",
+      "dominant_branch_changes": 0,
+      "largest_adjacent_js_bits": 0.0,
+      "largest_adjacent_tv": 0.0,
+      "top_five_branches": [
+        "branch-4:OC2022",
+        "branch-15:transition1x",
+        "branch-14:QM7X",
+        "branch-13:QCML",
+        "branch-12:Nabla2DFT"
+      ],
+      "largest_step_description": "step 1 of 10"
+    },
+    "Organic C-H substitution probe (100 atoms)": {
+      "note": "abstract fixed-size C/H composition path; not a molecular series",
+      "sample_count": 11,
+      "atom_counts": [
+        100
+      ],
+      "dominant_start": "branch-8:OMol25",
+      "dominant_end": "branch-8:OMol25",
+      "dominant_branch_changes": 0,
+      "largest_adjacent_js_bits": 1.2376157129987991e-152,
+      "largest_adjacent_tv": 1.2376157129993045e-152,
+      "top_five_branches": [
+        "branch-8:OMol25",
+        "branch-15:transition1x",
+        "branch-14:QM7X",
+        "branch-13:QCML",
+        "branch-12:Nabla2DFT"
+      ],
+      "largest_step_description": "step 10 of 10"
+    },
+    "Organic C-H-N substitution probe (100 atoms)": {
+      "note": "abstract fixed-size C/H/N composition path; not a molecular series",
+      "sample_count": 11,
+      "atom_counts": [
+        100
+      ],
+      "dominant_start": "branch-8:OMol25",
+      "dominant_end": "branch-8:OMol25",
+      "dominant_branch_changes": 0,
+      "largest_adjacent_js_bits": 2.117260342035934e-91,
+      "largest_adjacent_tv": 2.1172603420359484e-91,
+      "top_five_branches": [
+        "branch-8:OMol25",
+        "branch-15:transition1x",
+        "branch-14:QM7X",
+        "branch-13:QCML",
+        "branch-12:Nabla2DFT"
+      ],
+      "largest_step_description": "step 8 of 10"
+    },
+    "Organic C-H-O substitution probe (100 atoms)": {
+      "note": "abstract fixed-size C/H/O composition path; not a molecular series",
+      "sample_count": 11,
+      "atom_counts": [
+        100
+      ],
+      "dominant_start": "branch-15:transition1x",
+      "dominant_end": "branch-8:OMol25",
+      "dominant_branch_changes": 1,
+      "largest_adjacent_js_bits": 1.0,
+      "largest_adjacent_tv": 1.0,
+      "top_five_branches": [
+        "branch-8:OMol25",
+        "branch-15:transition1x",
+        "branch-14:QM7X",
+        "branch-13:QCML",
+        "branch-12:Nabla2DFT"
+      ],
+      "largest_step_description": "step 3 of 10"
+    }
+  },
+  "similarity_controls": {
+    "matched": {
+      "within_small_distance_pair_count": 237,
+      "between_small_distance_pair_count": 165,
+      "within_large_distance_pair_count": 380,
+      "between_large_distance_pair_count": 14478,
+      "matched_pair_count": 1261,
+      "matched_common_distance_bins": [
+        1,
+        2,
+        3,
+        4,
+        5,
+        6,
+        7,
+        8,
+        9,
+        10,
+        11,
+        12,
+        13,
+        14,
+        15,
+        16,
+        17,
+        18,
+        19,
+        20
+      ],
+      "matched_mean_within_minus_between_js_bits": -0.15940284828615336,
+      "same_total_small_distance_mean_js_bits": 0.19539898127186575,
+      "same_total_large_distance_mean_js_bits": 0.8047346858320594,
+      "small_distance": {
+        "within_family": {
+          "pair_count": 237,
+          "mean_js_bits": 0.24280175194665496,
+          "mean_total_variation": 0.24608902648341696,
+          "dominant_branch_agreement_fraction": 0.7552742616033755
+        },
+        "between_families": {
+          "pair_count": 165,
+          "mean_js_bits": 0.127311365211714,
+          "mean_total_variation": 0.12777103627171377,
+          "dominant_branch_agreement_fraction": 0.8727272727272727
+        }
+      },
+      "large_distance": {
+        "within_family": {
+          "pair_count": 380,
+          "mean_js_bits": 0.3833863844218423,
+          "mean_total_variation": 0.467759417712358,
+          "dominant_branch_agreement_fraction": 0.4394736842105263
+        },
+        "between_families": {
+          "pair_count": 14478,
+          "mean_js_bits": 0.8157936963677607,
+          "mean_total_variation": 0.848461582711837,
+          "dominant_branch_agreement_fraction": 0.14711976792374637
+        }
+      },
+      "matched_composition_bootstrap_ci95": [
+        -0.24079681224596663,
+        -0.08274973695877501
+      ],
+      "matched_bootstrap_replicates": 500,
+      "matched_bootstrap_unit": "composition IDs; endpoints weighted by bootstrap multiplicity",
+      "same_stoichiometry_different_size_pair_count": 38,
+      "same_stoichiometry_different_size_mean_js": 0.49940144862141006
+    },
+    "permutation": {
+      "observed_spearman_rho": 0.2955789774666965,
+      "composition_level_bootstrap_ci95": [
+        0.22175768702362486,
+        0.3976716388700378
+      ],
+      "valid_bootstrap_replicates": 500,
+      "permutation_null_mean": -0.00017779745756592394,
+      "permutation_null_sd": 0.014807193853534475,
+      "permutation_null_95_interval": [
+        -0.027177720781457086,
+        0.030829583805951858
+      ],
+      "two_sided_permutation_p": 0.002,
+      "permutations": 499,
+      "valid_permutations": 499,
+      "bootstrap_replicates": 500,
+      "permutation_unit": "complete 16-branch weight vectors permuted among compositions within the 100-atom stratum",
+      "bootstrap_unit": "composition records sampled with replacement; pair distances recomputed",
+      "pair_count": 18915
+    },
+    "matching_design": "pair atomic-fraction L1 bins of width 0.1 on 100-atom first-round synthetic compositions"
+  },
+  "real_composition_audit": {
+    "status": "not available locally",
+    "required_archived_structures_for_encoding_check": 3,
+    "archived_structures_audited": 0,
+    "paths_checked": [
+      {
+        "path": "/lustre/orion/world-shared/lrn070/jyc/frontier/HydraGNN/examples/multidataset_hpo_sc26/dataset/Alexandria-v2.bp",
+        "exists": false,
+        "readable": false,
+        "source": "Adios dataset location inferred from run-4284444.log"
+      },
+      {
+        "path": "/lustre/orion/world-shared/lrn070/jyc/frontier/HydraGNN/examples/multidataset_hpo_sc26/dataset/ANI1x-v2.bp",
+        "exists": false,
+        "readable": false,
+        "source": "Adios dataset location inferred from run-4284444.log"
+      },
+      {
+        "path": "/lustre/orion/world-shared/lrn070/jyc/frontier/HydraGNN/examples/multidataset_hpo_sc26/dataset/MPTrj-v2.bp",
+        "exists": false,
+        "readable": false,
+        "source": "Adios dataset location inferred from run-4284444.log"
+      },
+      {
+        "path": "/lustre/orion/world-shared/lrn070/jyc/frontier/HydraGNN/examples/multidataset_hpo_sc26/dataset/OC2020-v2.bp",
+        "exists": false,
+        "readable": false,
+        "source": "Adios dataset location inferred from run-4284444.log"
+      },
+      {
+        "path": "/lustre/orion/world-shared/lrn070/jyc/frontier/HydraGNN/examples/multidataset_hpo_sc26/dataset/OC2022-v2.bp",
+        "exists": false,
+        "readable": false,
+        "source": "Adios dataset location inferred from run-4284444.log"
+      },
+      {
+        "path": "/lustre/orion/world-shared/lrn070/jyc/frontier/HydraGNN/examples/multidataset_hpo_sc26/dataset/OC25-v2.bp",
+        "exists": false,
+        "readable": false,
+        "source": "Adios dataset location inferred from run-4284444.log"
+      },
+      {
+        "path": "/lustre/orion/world-shared/lrn070/jyc/frontier/HydraGNN/examples/multidataset_hpo_sc26/dataset/ODAC23-v2.bp",
+        "exists": false,
+        "readable": false,
+        "source": "Adios dataset location inferred from run-4284444.log"
+      },
+      {
+        "path": "/lustre/orion/world-shared/lrn070/jyc/frontier/HydraGNN/examples/multidataset_hpo_sc26/dataset/OMat24-v2.bp",
+        "exists": false,
+        "readable": false,
+        "source": "Adios dataset location inferred from run-4284444.log"
+      },
+      {
+        "path": "/lustre/orion/world-shared/lrn070/jyc/frontier/HydraGNN/examples/multidataset_hpo_sc26/dataset/OMol25-v2.bp",
+        "exists": false,
+        "readable": false,
+        "source": "Adios dataset location inferred from run-4284444.log"
+      },
+      {
+        "path": "/lustre/orion/world-shared/lrn070/jyc/frontier/HydraGNN/examples/multidataset_hpo_sc26/dataset/OMol25-neutral-v2.bp",
+        "exists": false,
+        "readable": false,
+        "source": "Adios dataset location inferred from run-4284444.log"
+      },
+      {
+        "path": "/lustre/orion/world-shared/lrn070/jyc/frontier/HydraGNN/examples/multidataset_hpo_sc26/dataset/OMol25-non-neutral-v2.bp",
+        "exists": false,
+        "readable": false,
+        "source": "Adios dataset location inferred from run-4284444.log"
+      },
+      {
+        "path": "/lustre/orion/world-shared/lrn070/jyc/frontier/HydraGNN/examples/multidataset_hpo_sc26/dataset/OPoly2026-v2.bp",
+        "exists": false,
+        "readable": false,
+        "source": "Adios dataset location inferred from run-4284444.log"
+      },
+      {
+        "path": "/lustre/orion/world-shared/lrn070/jyc/frontier/HydraGNN/examples/multidataset_hpo_sc26/dataset/Nabla2DFT-v2.bp",
+        "exists": false,
+        "readable": false,
+        "source": "Adios dataset location inferred from run-4284444.log"
+      },
+      {
+        "path": "/lustre/orion/world-shared/lrn070/jyc/frontier/HydraGNN/examples/multidataset_hpo_sc26/dataset/QCML-v2.bp",
+        "exists": false,
+        "readable": false,
+        "source": "Adios dataset location inferred from run-4284444.log"
+      },
+      {
+        "path": "/lustre/orion/world-shared/lrn070/jyc/frontier/HydraGNN/examples/multidataset_hpo_sc26/dataset/QM7X-v2.bp",
+        "exists": false,
+        "readable": false,
+        "source": "Adios dataset location inferred from run-4284444.log"
+      },
+      {
+        "path": "/lustre/orion/world-shared/lrn070/jyc/frontier/HydraGNN/examples/multidataset_hpo_sc26/dataset/transition1x-v2.bp",
+        "exists": false,
+        "readable": false,
+        "source": "Adios dataset location inferred from run-4284444.log"
+      },
+      {
+        "path": "/Users/7ml/Documents/Codes/HydraGNN-v5.0/examples/multidataset_hpo_sc26/dataset",
+        "exists": false,
+        "readable": false,
+        "source": "local analysis checkout"
+      },
+      {
+        "path": "/Users/7ml/Documents/Codes/HydraGNN/examples/multidataset_hpo_sc26/dataset",
+        "exists": false,
+        "readable": false,
+        "source": "nearby local checkout"
+      }
+    ],
+    "run_log_dataset_directories": [
+      "/lustre/orion/world-shared/lrn070/jyc/frontier/HydraGNN/examples/multidataset_hpo_sc26/dataset"
+    ],
+    "relevant_data_reconstructable_from_local_metadata": false,
+    "available_metadata": [
+      "run logs mention ADIOS reads and trainset/valset/testset chemical_composition arrays, but contain no per-record vectors",
+      "dataset histogram script requires source datasets and reports missing paths"
+    ],
+    "documented_real_formulas_obtained": false,
+    "possible_without_calculations": "Yes, externally curated composition records can be obtained from public crystallographic/materials databases without running calculations, but none were downloaded or audited in this run. They would be real-composition probes, not evidence of training membership.",
+    "no_training_domain_labels_assigned": true,
+    "reason": "No checked ADIOS archives or other local structure files were present or readable; cluster storage roots are not mounted."
+  },
+  "branch_mapping_status": "verified",
+  "domain_proximity": "not supported; no accessible reference training compositions"
+}

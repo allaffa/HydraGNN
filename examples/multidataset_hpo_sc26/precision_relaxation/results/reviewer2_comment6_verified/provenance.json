@@ -1,0 +1,24 @@
+{
+  "repository_commit": "590fcb910e4d88b8ed2ce1c7838a159b09365d54",
+  "python_version": "3.14.4 (main, Apr  7 2026, 13:13:20) [Clang 21.0.0 (clang-2100.0.123.102)]",
+  "torch_version": "2.13.0",
+  "ase_version": "3.26.0",
+  "torch_geometric_version": "2.8.0",
+  "cuda_available": false,
+  "cuda_device_count": 0,
+  "checkpoint_paths": {
+    "hydragNN": "/Users/7ml/Documents/Codes/HydraGNN-v5.0/examples/multidataset_hpo_sc26/multidataset_hpo-BEST6-fp64/multidataset_hpo-BEST6-fp64_epoch_97.pk",
+    "branch_weight_mlp": "/Users/7ml/Documents/Codes/HydraGNN-v5.0/examples/multidataset_hpo_sc26/mlp_branch_weights.pt"
+  },
+  "checkpoint_sha256": {
+    "hydragNN": "8532b03296a8ab4cfc3b37beb6d57b2091a50807b155fac93cb1882253d32867",
+    "branch_weight_mlp": "c984b338ee947534bbdedf1fc4dd2aea92bb846e3302638d6719b1e3f5ca7ca8"
+  },
+  "expected_checkpoint_sha256": {
+    "branch_weight_mlp": "c984b338ee947534bbdedf1fc4dd2aea92bb846e3302638d6719b1e3f5ca7ca8",
+    "hydragNN": "8532b03296a8ab4cfc3b37beb6d57b2091a50807b155fac93cb1882253d32867"
+  },
+  "benchmark_config_sha256": "5b32b0f1fecf0522cfbac69e53e2231d9b5ae4ee76978d3859e084cb93489836",
+  "energy_units": "eV (inference output documented by inference_fused_write_adios.py)",
+  "force_units": "eV/angstrom (inference output documented by inference_fused_write_adios.py)"
+}

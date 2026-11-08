@@ -25,13 +25,16 @@ from ase.build import bulk, molecule
 from ase.geometry import find_mic, get_distances
 from ase.io import read, write
 from ase.io.trajectory import Trajectory
-from ase.optimize import BFGS
+from ase.optimize import BFGS, FIRE
+from ase.filters import UnitCellFilter
 
 from hydragnn_ase_calculator import (
     BACKBONE_SHA256,
     MLP_SHA256,
+    NUM_BRANCHES,
     FusedHydraGNNCalculator,
     load_fused_calculator,
+    load_single_head_calculator,
     sha256_file,
 )
 
@@ -44,6 +47,8 @@ INFERENCE_CONFIG = BENCHMARK_CONFIG["inference"]
 RELAXATION_CONFIG = BENCHMARK_CONFIG["relaxation"]
 PERTURBATION_CONFIG = BENCHMARK_CONFIG["initial_perturbation"]
 FD_CONFIG = BENCHMARK_CONFIG["finite_difference_check"]
+BRANCH_DATASETS = tuple(BENCHMARK_CONFIG["branch_dataset_mapping"])
+SINGLE_HEAD_CONFIG = BENCHMARK_CONFIG["single_head_selection"]
 SC26_DIR = HERE.parent
 REPO_ROOT = HERE.parents[2]
 LOGDIR = SC26_DIR / "multidataset_hpo-BEST6-fp64"
@@ -63,11 +68,17 @@ FD_STEPS = tuple(
     float(step)
     for step in FD_CONFIG["central_difference_step_sizes_angstrom"]
 )
+STRESS_FD_TOLERANCES = {
+    precision: float(value)
+    for precision, value in FD_CONFIG[
+        "maximum_absolute_stress_error_ev_per_angstrom3"
+    ].items()
+}
 
 if int(INFERENCE_CONFIG["branch_count"]) != 16:
     raise ValueError("This benchmark requires exactly 16 source-specific branches")
-if RELAXATION_CONFIG["cell_relaxation"]:
-    raise ValueError("This benchmark protocol requires fixed cells")
+if len(BRANCH_DATASETS) != int(INFERENCE_CONFIG["branch_count"]):
+    raise ValueError("Branch-to-dataset mapping does not match configured branch count")
 if BENCHMARK_CONFIG["expected_checkpoint_sha256"] != {
     "branch_weight_mlp": MLP_SHA256,
     "hydragNN": BACKBONE_SHA256,
@@ -296,28 +307,92 @@ def _finite_difference_check(
     }
 
 
+def _finite_difference_stress_check(
+    calculator: FusedHydraGNNCalculator,
+    atoms: Atoms,
+    *,
+    strain_step: float = float(FD_CONFIG["stress_strain_step"]),
+) -> dict[str, Any]:
+    if not np.all(atoms.pbc):
+        raise ValueError("Stress finite differences require a fully periodic structure")
+    baseline = calculator.evaluate_atoms(atoms)
+    plus = atoms.copy()
+    minus = atoms.copy()
+    plus_strain = np.eye(3)
+    minus_strain = np.eye(3)
+    plus_strain[0, 0] += strain_step
+    minus_strain[0, 0] -= strain_step
+    plus.set_cell(atoms.cell.array @ plus_strain, scale_atoms=True)
+    minus.set_cell(atoms.cell.array @ minus_strain, scale_atoms=True)
+    plus_result = calculator.evaluate_atoms(plus)
+    minus_result = calculator.evaluate_atoms(minus)
+    finite_difference_stress = (
+        plus_result["energy"] - minus_result["energy"]
+    ) / (2 * strain_step * atoms.get_volume())
+    autograd_stress = float(baseline["stress"][0])
+    absolute_error = abs(finite_difference_stress - autograd_stress)
+    tolerance = STRESS_FD_TOLERANCES[calculator.precision]
+    return {
+        "strain_component": "xx",
+        "strain_step": strain_step,
+        "finite_difference_stress_ev_per_angstrom3": float(finite_difference_stress),
+        "autograd_stress_ev_per_angstrom3": autograd_stress,
+        "absolute_error_ev_per_angstrom3": float(absolute_error),
+        "acceptance_tolerance_ev_per_angstrom3": tolerance,
+        "same_neighbor_topology": bool(
+            _same_edge_set(baseline, plus_result)
+            and _same_edge_set(baseline, minus_result)
+        ),
+        "passed": bool(absolute_error <= tolerance),
+    }
+
+
 def _state_row(
     atoms: Atoms,
     calculator: FusedHydraGNNCalculator,
     step: int,
     *,
     converged: bool,
+    optimization_target: Atoms | UnitCellFilter,
 ) -> dict[str, Any]:
     energy = float(atoms.get_potential_energy())
     forces = np.asarray(atoms.get_forces(), dtype=np.float64)
     if not np.isfinite(energy) or not np.isfinite(forces).all():
         raise FloatingPointError("Nonfinite energy or forces during relaxation")
     force_norms = np.linalg.norm(forces, axis=1)
+    stress = np.asarray(atoms.get_stress(voigt=False), dtype=np.float64)
+    optimizer_forces = np.asarray(
+        optimization_target.get_forces(), dtype=np.float64
+    )
     if calculator.last_branch_weights is None or calculator.last_branch_energies is None:
         raise RuntimeError("Calculator did not retain branch results")
     return {
         "step": int(step),
+        "head_mode": (
+            "single" if calculator.single_branch_id is not None else "fused"
+        ),
         "energy_ev": energy,
         "energy_ev_per_atom": energy / len(atoms),
         "maximum_force_ev_per_angstrom": float(force_norms.max()),
         "rms_force_ev_per_angstrom": float(np.sqrt(np.mean(forces**2))),
+        "maximum_optimization_force": float(
+            np.linalg.norm(optimizer_forces, axis=1).max()
+        ),
+        "stress_ev_per_angstrom3_json": json.dumps(stress.tolist()),
+        "maximum_absolute_stress_ev_per_angstrom3": float(np.abs(stress).max()),
+        "cell_angstrom_json": json.dumps(np.asarray(atoms.cell).tolist()),
         "coordinates_angstrom_json": json.dumps(atoms.positions.tolist()),
         "graph_edges": int(calculator.last_graph_edges),
+        "evaluated_branch_ids_json": json.dumps(
+            [calculator.single_branch_id]
+            if calculator.single_branch_id is not None
+            else list(range(calculator.num_branches))
+        ),
+        "branch_weight_semantics": (
+            "single_head_selection_mask"
+            if calculator.single_branch_id is not None
+            else "mlp_softmax"
+        ),
         "branch_weights_json": json.dumps(
             calculator.last_branch_weights.tolist(), allow_nan=False
         ),
@@ -332,10 +407,30 @@ def _run_relaxation(
     *,
     max_steps: int,
     force_tolerance: float,
+    relax_cell: bool = False,
+    optimizer_name: str = "bfgs",
+    optimizer_maxstep: float = 0.2,
+    hydrostatic_cell: bool = False,
 ) -> dict[str, Any]:
     output_dir.mkdir(parents=True, exist_ok=True)
     atoms.calc = calculator
-    log_path = output_dir / "bfgs.log"
+    if relax_cell and not np.all(atoms.pbc):
+        raise ValueError("Variable-cell relaxation requires periodicity in all directions")
+    if hydrostatic_cell and not relax_cell:
+        raise ValueError("Hydrostatic cell constraints require variable-cell relaxation")
+    optimizer_classes = {"bfgs": BFGS, "fire": FIRE}
+    if optimizer_name not in optimizer_classes:
+        raise ValueError(f"Unsupported optimizer {optimizer_name!r}")
+    optimization_target: Atoms | UnitCellFilter = (
+        UnitCellFilter(
+            atoms,
+            cell_factor=float(len(atoms)),
+            hydrostatic_strain=hydrostatic_cell,
+        )
+        if relax_cell
+        else atoms
+    )
+    log_path = output_dir / f"{optimizer_name}.log"
     trajectory_path = output_dir / "trajectory.traj"
     csv_path = output_dir / "trajectory.csv"
     rows: list[dict[str, Any]] = []
@@ -347,13 +442,29 @@ def _run_relaxation(
 
     with Trajectory(str(trajectory_path), mode="w", atoms=atoms) as trajectory:
         try:
-            initial_row = _state_row(atoms, calculator, 0, converged=False)
+            initial_row = _state_row(
+                atoms,
+                calculator,
+                0,
+                converged=False,
+                optimization_target=optimization_target,
+            )
             rows.append(initial_row)
             trajectory.write(atoms)
-            optimizer = BFGS(atoms, logfile=str(log_path))
+            optimizer = optimizer_classes[optimizer_name](
+                optimization_target,
+                logfile=str(log_path),
+                maxstep=optimizer_maxstep,
+            )
             optimizer.attach(
                 lambda: _record_optimizer_step(
-                    atoms, calculator, optimizer, rows, trajectory, force_tolerance
+                    atoms,
+                    calculator,
+                    optimization_target,
+                    optimizer,
+                    rows,
+                    trajectory,
+                    force_tolerance,
                 ),
                 interval=1,
             )
@@ -374,11 +485,19 @@ def _run_relaxation(
         finally:
             recorded_steps = max((int(row["step"]) for row in rows), default=0)
             steps_taken = max(steps_taken, recorded_steps)
-            if rows and not np.allclose(
-                np.asarray(json.loads(rows[-1]["coordinates_angstrom_json"])),
-                atoms.positions,
-                rtol=0,
-                atol=1e-12,
+            if rows and (
+                not np.allclose(
+                    np.asarray(json.loads(rows[-1]["coordinates_angstrom_json"])),
+                    atoms.positions,
+                    rtol=0,
+                    atol=1e-12,
+                )
+                or not np.allclose(
+                    np.asarray(json.loads(rows[-1]["cell_angstrom_json"])),
+                    atoms.cell.array,
+                    rtol=0,
+                    atol=1e-12,
+                )
             ):
                 trajectory.write(atoms)
 
@@ -391,6 +510,7 @@ def _run_relaxation(
                     calculator,
                     steps_taken,
                     converged=converged,
+                    optimization_target=optimization_target,
                 )
             )
         except Exception as caught:
@@ -403,9 +523,16 @@ def _run_relaxation(
     write(output_dir / "final.extxyz", final_geometry, format="extxyz")
     summary = {
         "precision": calculator.precision,
+        "head_mode": "single" if calculator.single_branch_id is not None else "fused",
+        "selected_branch_id": calculator.single_branch_id,
         "status": status,
         "converged": bool(converged and status == "converged"),
         "force_tolerance_ev_per_angstrom": force_tolerance,
+        "cell_relaxation": relax_cell,
+        "hydrostatic_cell": hydrostatic_cell,
+        "cell_factor": float(len(atoms)) if relax_cell else None,
+        "optimizer": optimizer_name,
+        "optimizer_maxstep_angstrom": optimizer_maxstep,
         "maximum_steps": max_steps,
         "steps_taken": steps_taken,
         "total_calculation_time_seconds": elapsed,
@@ -416,6 +543,12 @@ def _run_relaxation(
         ),
         "final_rms_force_ev_per_angstrom": (
             rows[-1]["rms_force_ev_per_angstrom"] if rows else None
+        ),
+        "final_maximum_optimization_force": (
+            rows[-1]["maximum_optimization_force"] if rows else None
+        ),
+        "final_maximum_absolute_stress_ev_per_angstrom3": (
+            rows[-1]["maximum_absolute_stress_ev_per_angstrom3"] if rows else None
         ),
         "initial_branch_weights_json": (
             rows[0]["branch_weights_json"] if rows else None
@@ -435,14 +568,15 @@ def _run_relaxation(
 def _record_optimizer_step(
     atoms: Atoms,
     calculator: FusedHydraGNNCalculator,
-    optimizer: BFGS,
+    optimization_target: Atoms | UnitCellFilter,
+    optimizer: BFGS | FIRE,
     rows: list[dict[str, Any]],
     trajectory: Trajectory,
     force_tolerance: float,
 ) -> None:
     if optimizer.get_number_of_steps() == 0:
         return
-    forces = np.asarray(atoms.get_forces(), dtype=np.float64)
+    forces = np.asarray(optimization_target.get_forces(), dtype=np.float64)
     max_force = float(np.linalg.norm(forces, axis=1).max())
     converged = bool(np.isfinite(max_force) and max_force < force_tolerance)
     rows.append(
@@ -451,6 +585,7 @@ def _record_optimizer_step(
             calculator,
             int(optimizer.get_number_of_steps()),
             converged=converged,
+            optimization_target=optimization_target,
         )
     )
     trajectory.write(atoms)
@@ -468,7 +603,10 @@ def _write_csv(path: Path, rows: list[dict[str, Any]]) -> None:
 def _single_point_comparison(
     output_dir: Path,
     initial_atoms: dict[str, Atoms],
-    calculators: dict[str, FusedHydraGNNCalculator],
+    calculators: dict[str, dict[str, FusedHydraGNNCalculator]],
+    *,
+    head_mode: str,
+    single_head_map: dict[str, dict[str, Any]],
 ) -> dict[str, Any]:
     rows: list[dict[str, Any]] = []
     results: dict[str, dict[str, dict[str, Any]]] = {}
@@ -476,10 +614,10 @@ def _single_point_comparison(
         results[system] = {}
         for precision in PRECISIONS:
             atoms = initial.copy()
-            atoms.calc = calculators[precision]
+            calculator = calculators[system][precision]
+            atoms.calc = calculator
             energy = float(atoms.get_potential_energy())
             forces = np.asarray(atoms.get_forces(), dtype=np.float64)
-            calculator = calculators[precision]
             if calculator.last_branch_weights is None or calculator.last_branch_energies is None:
                 raise RuntimeError(f"Missing branch outputs for {system}/{precision}")
             results[system][precision] = {
@@ -488,6 +626,7 @@ def _single_point_comparison(
                 "weights": calculator.last_branch_weights.copy(),
                 "branch_energies": calculator.last_branch_energies.copy(),
                 "edge_count": calculator.last_graph_edges,
+                "stress": calculator.results["stress"].copy(),
             }
         fp32 = results[system]["fp32"]
         fp64 = results[system]["fp64"]
@@ -516,11 +655,30 @@ def _single_point_comparison(
             "maximum_force_component_difference_ev_per_angstrom": float(
                 np.abs(force_delta).max()
             ),
-            "branch_weight_maximum_absolute_difference": float(
-                np.abs(fp32["weights"] - fp64["weights"]).max()
+            "evaluated_branch_ids": (
+                [int(single_head_map[system]["branch_id"])]
+                if head_mode == "single"
+                else list(range(NUM_BRANCHES))
+            ),
+            "selected_dataset": (
+                single_head_map[system]["dataset"] if head_mode == "single" else None
+            ),
+            "branch_weight_semantics": (
+                "single_head_selection_mask" if head_mode == "single" else "mlp_softmax"
+            ),
+            "branch_weight_maximum_absolute_difference": (
+                None
+                if head_mode == "single"
+                else float(np.abs(fp32["weights"] - fp64["weights"]).max())
             ),
             "fp32_graph_edges": fp32["edge_count"],
             "fp64_graph_edges": fp64["edge_count"],
+            "fp32_stress_ev_per_angstrom3_json": json.dumps(
+                fp32["stress"].tolist()
+            ),
+            "fp64_stress_ev_per_angstrom3_json": json.dumps(
+                fp64["stress"].tolist()
+            ),
             "fp32_branch_energies_ev_json": json.dumps(
                 fp32["branch_energies"].tolist()
             ),
@@ -560,103 +718,232 @@ def _aligned_rms_displacement(first: Atoms, second: Atoms) -> float:
     return float(np.sqrt(np.mean(np.sum((aligned - second_centered) ** 2, axis=1))))
 
 
-def _run_stage_a(output_dir: Path, initial_atoms: dict[str, Atoms]) -> None:
+def _resolve_single_head_map(overrides: list[str]) -> dict[str, dict[str, Any]]:
+    selection = {
+        system: dict(value)
+        for system, value in SINGLE_HEAD_CONFIG["selected_heads"].items()
+    }
+    for override in overrides:
+        try:
+            system, raw_branch_id = override.split("=", maxsplit=1)
+            branch_id = int(raw_branch_id)
+        except ValueError as error:
+            raise ValueError(
+                f"Invalid --head-override {override!r}; expected SYSTEM=BRANCH_ID"
+            ) from error
+        if system not in SYSTEM_CONFIG:
+            raise ValueError(f"Unknown system in --head-override: {system}")
+        if not 0 <= branch_id < len(BRANCH_DATASETS):
+            raise ValueError(
+                f"Branch ID for {system} must be in [0, {len(BRANCH_DATASETS) - 1}]"
+            )
+        selection[system] = {
+            "branch_id": branch_id,
+            "dataset": BRANCH_DATASETS[branch_id],
+        }
+    for system in SYSTEM_NAMES:
+        selected = selection.get(system)
+        if selected is None:
+            raise ValueError(f"No single head is configured for {system}")
+        branch_id = int(selected["branch_id"])
+        if not 0 <= branch_id < len(BRANCH_DATASETS):
+            raise ValueError(f"Configured branch ID for {system} is out of range")
+        if selected["dataset"] != BRANCH_DATASETS[branch_id]:
+            raise ValueError(
+                f"Configured dataset {selected['dataset']} for {system} does not "
+                f"match branch-{branch_id} dataset {BRANCH_DATASETS[branch_id]}"
+            )
+    return selection
+
+
+def _load_calculator(
+    precision: str,
+    *,
+    head_mode: str,
+    system: str,
+    single_head_map: dict[str, dict[str, Any]],
+) -> tuple[FusedHydraGNNCalculator, dict[str, Any]]:
+    common = {
+        "logdir": LOGDIR,
+        "backbone_checkpoint": BACKBONE_PATH,
+        "precision": precision,
+        "charge": float(INFERENCE_CONFIG["charge"]),
+        "spin": float(INFERENCE_CONFIG["spin"]),
+    }
+    if head_mode == "single":
+        return load_single_head_calculator(
+            **common, branch_id=int(single_head_map[system]["branch_id"])
+        )
+    if head_mode == "fused":
+        return load_fused_calculator(**common, mlp_checkpoint=MLP_PATH)
+    raise ValueError(f"Unsupported head mode: {head_mode}")
+
+
+def _run_stage_a(
+    output_dir: Path,
+    initial_atoms: dict[str, Atoms],
+    *,
+    head_mode: str,
+    single_head_map: dict[str, dict[str, Any]],
+    relax_cell: bool,
+    optimizer_name: str,
+    optimizer_maxstep: float,
+    hydrostatic_cell: bool,
+) -> None:
     stage_dir = output_dir / "stage_A"
     if stage_dir.exists() and any(stage_dir.iterdir()):
         raise FileExistsError(f"Stage A output already exists: {stage_dir}")
     stage_dir.mkdir(parents=True, exist_ok=True)
+    pilot_system = "Si" if relax_cell else "H2O"
     calculators: dict[str, FusedHydraGNNCalculator] = {}
     provenance: dict[str, Any] = {}
     for precision in PRECISIONS:
-        calculators[precision], provenance[precision] = load_fused_calculator(
-            logdir=LOGDIR,
-            backbone_checkpoint=BACKBONE_PATH,
-            mlp_checkpoint=MLP_PATH,
+        calculators[precision], provenance[precision] = _load_calculator(
             precision=precision,
-            charge=float(INFERENCE_CONFIG["charge"]),
-            spin=float(INFERENCE_CONFIG["spin"]),
+            head_mode=head_mode,
+            system=pilot_system,
+            single_head_map=single_head_map,
         )
 
-    water = initial_atoms["H2O"]
-    water_results: dict[str, Any] = {}
+    pilot_atoms = initial_atoms[pilot_system]
+    pilot_results: dict[str, Any] = {}
     for precision in PRECISIONS:
         calculator = calculators[precision]
-        single_point = calculator.evaluate_atoms(water)
-        if len(single_point["branch_energies"]) != 16:
-            raise RuntimeError(f"{precision} did not evaluate all 16 branches")
+        single_point = calculator.evaluate_atoms(pilot_atoms)
+        expected_evaluated_branches = 1 if head_mode == "single" else NUM_BRANCHES
+        if len(single_point["branch_energies"]) != expected_evaluated_branches:
+            raise RuntimeError(
+                f"{precision} evaluated {len(single_point['branch_energies'])} branches, "
+                f"expected {expected_evaluated_branches} in {head_mode} mode"
+            )
         if not np.isfinite(single_point["forces"]).all():
             raise FloatingPointError(f"Nonfinite {precision} pilot forces")
-        fd = _finite_difference_check(calculator, water)
+        fd = _finite_difference_check(calculator, pilot_atoms)
         if not fd["passed"]:
             raise RuntimeError(
                 f"{precision} finite-difference force check failed: "
                 f"best discrepancy {fd['best_absolute_error_ev_per_angstrom']:.6g} "
                 f"eV/A; topology stable={fd['neighbor_topology_stable']}"
             )
-        pilot_atoms = water.copy()
+        stress_fd = (
+            _finite_difference_stress_check(calculator, pilot_atoms)
+            if relax_cell
+            else None
+        )
+        if relax_cell and (
+            stress_fd is None
+            or not stress_fd["same_neighbor_topology"]
+            or stress_fd["absolute_error_ev_per_angstrom3"]
+            > STRESS_FD_TOLERANCES[precision]
+        ):
+            raise RuntimeError(
+                f"{precision} stress finite-difference check failed: {stress_fd}"
+            )
+        relaxed_pilot_atoms = pilot_atoms.copy()
         pilot = _run_relaxation(
-            pilot_atoms,
+            relaxed_pilot_atoms,
             calculator,
-            stage_dir / "H2O" / precision,
+            stage_dir / pilot_system / precision,
             max_steps=PILOT_MAX_STEPS,
             force_tolerance=FORCE_TOLERANCE,
+            relax_cell=relax_cell,
+            optimizer_name=optimizer_name,
+            optimizer_maxstep=optimizer_maxstep,
+            hydrostatic_cell=hydrostatic_cell,
         )
         if pilot["status"] == "failed":
             raise RuntimeError(
-                f"{precision} water pilot relaxation failed: {pilot['error']}"
+                f"{precision} {pilot_system} pilot relaxation failed: {pilot['error']}"
             )
         if calculator.graph_build_count <= 1 or calculator.last_graph_positions is None:
             raise RuntimeError(f"{precision} graph was not rebuilt during relaxation")
         if not np.allclose(
-            calculator.last_graph_positions, pilot_atoms.positions, rtol=0, atol=1e-12
+            calculator.last_graph_positions,
+            relaxed_pilot_atoms.positions,
+            rtol=0,
+            atol=1e-12,
         ):
             raise RuntimeError(f"{precision} calculator graph is stale for the current coordinates")
-        water_results[precision] = {
+        if calculator.last_graph_cell is None or not np.allclose(
+            np.asarray(calculator.last_graph_cell),
+            relaxed_pilot_atoms.cell.array,
+            rtol=0,
+            atol=1e-12,
+        ):
+            raise RuntimeError(f"{precision} calculator graph is stale for the current cell")
+        pilot_results[precision] = {
             "single_point_energy_ev": single_point["energy"],
             "force_maximum_ev_per_angstrom": float(
                 np.linalg.norm(single_point["forces"], axis=1).max()
             ),
             "branch_weights": single_point["branch_weights"].tolist(),
             "branch_energies_ev": single_point["branch_energies"].tolist(),
+            "evaluated_branch_ids": single_point["evaluated_branch_ids"],
             "graph_edges": single_point["edge_count"],
             "finite_difference_check": fd,
+            "finite_difference_stress_check": stress_fd,
             "pilot_relaxation": pilot,
             "graph_rebuild_count": calculator.graph_build_count,
             "graph_matches_latest_positions": True,
             "precision_provenance": provenance[precision],
         }
-    max_weight_difference = float(
-        np.max(
-            np.abs(
-                np.asarray(water_results["fp32"]["branch_weights"])
-                - np.asarray(water_results["fp64"]["branch_weights"])
+    max_weight_difference = (
+        float(
+            np.max(
+                np.abs(
+                    np.asarray(pilot_results["fp32"]["branch_weights"])
+                    - np.asarray(pilot_results["fp64"]["branch_weights"])
+                )
             )
         )
+        if head_mode == "fused"
+        else None
     )
     status = {
         "status": "passed",
+        "head_mode": head_mode,
+        "cell_relaxation": relax_cell,
+        "hydrostatic_cell": hydrostatic_cell,
+        "optimizer": optimizer_name,
+        "optimizer_maxstep_angstrom": optimizer_maxstep,
+        "pilot_system": pilot_system,
+        "single_head_selection": (
+            single_head_map if head_mode == "single" else None
+        ),
         "technical_validation_passed": True,
         "scientific_convergence_claim": False,
         "note": "The pilot is a software validation only; a 10-step limit is not a full-convergence result.",
-        "water_precision_results": water_results,
+        "pilot_precision_results": pilot_results,
         "fp32_fp64_branch_weight_maximum_absolute_difference": max_weight_difference,
         "checks": {
             "checkpoint_hashes_verified": True,
             "both_precisions_loaded_and_frozen": True,
-            "all_16_branches_evaluated": True,
-            "weights_sum_to_one": True,
+            "mlp_loaded": head_mode == "fused",
+            "all_16_branches_evaluated": head_mode == "fused",
+            "single_head_evaluated_only": head_mode == "single",
+            "branch_weights_or_selection_mask_sum_to_one": True,
             "single_point_energy_and_forces_finite": True,
             "finite_difference_force_check_passed": True,
+            "finite_difference_stress_check_passed": not relax_cell
+            or all(
+                value["finite_difference_stress_check"]["same_neighbor_topology"]
+                and value["finite_difference_stress_check"][
+                    "absolute_error_ev_per_angstrom3"
+                ]
+                <= STRESS_FD_TOLERANCES[precision]
+                for precision, value in pilot_results.items()
+            ),
             "neighbor_topology_unchanged_in_finite_difference": True,
             "graph_rebuilt_at_moving_geometry": True,
-            "ase_bfgs_executed_without_error": True,
+            "optimizer_executed_without_error": True,
             "periodic_and_molecular_construction_implemented": True,
-            "branch_skipping_disabled": True,
+            "branch_skipping_disabled": head_mode == "fused",
+            "only_selected_branch_evaluated": head_mode == "single",
         },
     }
     _json_dump(stage_dir / "stage_a_status.json", status)
     print(
-        "Stage A passed. The pilot used H2O only and is not a scientific convergence result."
+        f"Stage A passed. The pilot used {pilot_system} only and is not a scientific convergence result."
     )
 
 
@@ -672,31 +959,62 @@ def _capture_failure(path: Path, error: Exception) -> dict[str, Any]:
     return failure
 
 
-def _run_stage_b(output_dir: Path, initial_atoms: dict[str, Atoms]) -> None:
+def _run_stage_b(
+    output_dir: Path,
+    initial_atoms: dict[str, Atoms],
+    *,
+    head_mode: str,
+    single_head_map: dict[str, dict[str, Any]],
+    relax_cell: bool,
+    optimizer_name: str,
+    optimizer_maxstep: float,
+    hydrostatic_cell: bool,
+) -> None:
     stage_a_path = output_dir / "stage_A" / "stage_a_status.json"
     if not stage_a_path.is_file():
         raise RuntimeError("Stage B is blocked until Stage A has completed")
     stage_a = json.loads(stage_a_path.read_text(encoding="utf-8"))
     if stage_a.get("status") != "passed":
         raise RuntimeError("Stage B is blocked because Stage A did not pass")
+    if stage_a.get("head_mode") != head_mode:
+        raise RuntimeError("Stage B head mode must match the validated Stage A pilot")
+    if stage_a.get("cell_relaxation", False) != relax_cell:
+        raise RuntimeError("Stage B cell-relaxation setting must match Stage A")
+    if stage_a.get("hydrostatic_cell", False) != hydrostatic_cell:
+        raise RuntimeError("Stage B cell constraint must match Stage A")
+    if stage_a.get("optimizer") != optimizer_name or not np.isclose(
+        stage_a.get("optimizer_maxstep_angstrom", np.nan), optimizer_maxstep
+    ):
+        raise RuntimeError("Stage B optimizer settings must match Stage A")
+    if head_mode == "single" and stage_a.get("single_head_selection") != single_head_map:
+        raise RuntimeError("Stage B single-head selection must match the Stage A pilot")
     stage_dir = output_dir / "stage_B"
     if stage_dir.exists() and any(stage_dir.iterdir()):
         raise FileExistsError(f"Stage B output already exists: {stage_dir}")
     stage_dir.mkdir(parents=True, exist_ok=True)
 
-    calculators: dict[str, FusedHydraGNNCalculator] = {}
-    provenance: dict[str, Any] = {}
-    for precision in PRECISIONS:
-        calculators[precision], provenance[precision] = load_fused_calculator(
-            logdir=LOGDIR,
-            backbone_checkpoint=BACKBONE_PATH,
-            mlp_checkpoint=MLP_PATH,
-            precision=precision,
-            charge=float(INFERENCE_CONFIG["charge"]),
-            spin=float(INFERENCE_CONFIG["spin"]),
-        )
+    calculators: dict[str, dict[str, FusedHydraGNNCalculator]] = {}
+    provenance: dict[str, dict[str, Any]] = {}
+    for system in SYSTEM_NAMES:
+        calculators[system] = {}
+        provenance[system] = {}
+        for precision in PRECISIONS:
+            calculators[system][precision], provenance[system][precision] = (
+                _load_calculator(
+                    precision,
+                    head_mode=head_mode,
+                    system=system,
+                    single_head_map=single_head_map,
+                )
+            )
     _json_dump(stage_dir / "precision_provenance.json", provenance)
-    single_points = _single_point_comparison(stage_dir, initial_atoms, calculators)
+    single_points = _single_point_comparison(
+        stage_dir,
+        initial_atoms,
+        calculators,
+        head_mode=head_mode,
+        single_head_map=single_head_map,
+    )
     run_summaries: dict[str, dict[str, dict[str, Any]]] = {}
     finals: dict[str, dict[str, Atoms]] = {}
     for system in SYSTEM_NAMES:
@@ -704,15 +1022,20 @@ def _run_stage_b(output_dir: Path, initial_atoms: dict[str, Atoms]) -> None:
         finals[system] = {}
         for precision in PRECISIONS:
             run_dir = stage_dir / system / precision
+            relax_this_cell = relax_cell and bool(np.all(initial_atoms[system].pbc))
             start = _read_initial(output_dir, system)
             failure_path = run_dir / "failure.json"
             try:
                 summary = _run_relaxation(
                     start,
-                    calculators[precision],
+                    calculators[system][precision],
                     run_dir,
                     max_steps=FULL_MAX_STEPS,
                     force_tolerance=FORCE_TOLERANCE,
+                    relax_cell=relax_this_cell,
+                    optimizer_name=optimizer_name,
+                    optimizer_maxstep=optimizer_maxstep,
+                    hydrostatic_cell=hydrostatic_cell and relax_this_cell,
                 )
                 if summary["status"] == "failed":
                     run_summaries[system][precision] = summary
@@ -738,6 +1061,16 @@ def _run_stage_b(output_dir: Path, initial_atoms: dict[str, Atoms]) -> None:
         fp64_summary = run_summaries[system].get("fp64", {"status": "not_run"})
         row: dict[str, Any] = {
             "system": system,
+            "head_mode": head_mode,
+            "cell_relaxation": relax_cell and bool(np.all(initial_atoms[system].pbc)),
+            "selected_branch_id": (
+                int(single_head_map[system]["branch_id"])
+                if head_mode == "single"
+                else None
+            ),
+            "selected_dataset": (
+                single_head_map[system]["dataset"] if head_mode == "single" else None
+            ),
             "fp32_status": fp32_summary.get("status"),
             "fp64_status": fp64_summary.get("status"),
             "fp32_converged": bool(fp32_summary.get("converged", False)),
@@ -765,7 +1098,7 @@ def _run_stage_b(output_dir: Path, initial_atoms: dict[str, Atoms]) -> None:
                 ("fp64_geometry_as_fp32", fp64_final, "fp32"),
             ):
                 try:
-                    cross_results[label] = calculators[precision].evaluate_atoms(geometry)
+                    cross_results[label] = calculators[system][precision].evaluate_atoms(geometry)
                 except Exception as error:
                     row["cross_evaluation_error"] = (
                         f"{type(error).__name__}: {error}"
@@ -778,7 +1111,7 @@ def _run_stage_b(output_dir: Path, initial_atoms: dict[str, Atoms]) -> None:
                     np.linalg.norm(fp32_as_fp64["forces"], axis=1).max()
                 )
             if fp64_as_fp32 is not None:
-                row["fp64_relaxed_common_fp64_energy_ev"] = calculators[
+                row["fp64_relaxed_common_fp64_energy_ev"] = calculators[system][
                     "fp64"
                 ].evaluate_atoms(fp64_final)["energy"]
                 row["fp32_force_on_fp64_relaxed_max_ev_per_angstrom"] = float(
@@ -795,50 +1128,78 @@ def _run_stage_b(output_dir: Path, initial_atoms: dict[str, Atoms]) -> None:
             row["maximum_cross_precision_force_ev_per_angstrom"] = (
                 max(residuals) if residuals else None
             )
-            weights32 = single_points[system]["fp32"]["weights"]
-            weights64 = single_points[system]["fp64"]["weights"]
-            row["maximum_final_branch_weight_difference"] = float(
-                np.abs(weights32 - weights64).max()
-            )
-            weight_checks = []
-            for precision, weights in (("fp32", weights32), ("fp64", weights64)):
-                summary = run_summaries[system].get(precision, {})
-                initial_weights = summary.get("initial_branch_weights_json")
-                final_weights = summary.get("final_branch_weights_json")
-                if initial_weights is not None and final_weights is not None:
-                    weight_checks.append(
-                        np.allclose(
-                            json.loads(initial_weights), weights, rtol=0, atol=2e-6
+            if head_mode == "fused":
+                weights32 = single_points[system]["fp32"]["weights"]
+                weights64 = single_points[system]["fp64"]["weights"]
+                row["maximum_final_branch_weight_difference"] = float(
+                    np.abs(weights32 - weights64).max()
+                )
+                weight_checks = []
+                for precision, weights in (("fp32", weights32), ("fp64", weights64)):
+                    summary = run_summaries[system].get(precision, {})
+                    initial_weights = summary.get("initial_branch_weights_json")
+                    final_weights = summary.get("final_branch_weights_json")
+                    if initial_weights is not None and final_weights is not None:
+                        weight_checks.append(
+                            np.allclose(
+                                json.loads(initial_weights), weights, rtol=0, atol=2e-6
+                            )
+                            and np.allclose(
+                                json.loads(final_weights), weights, rtol=0, atol=2e-6
+                            )
                         )
-                        and np.allclose(
-                            json.loads(final_weights), weights, rtol=0, atol=2e-6
-                        )
-                    )
-            row["same_composition_weights_match_initial"] = (
-                bool(all(weight_checks)) if weight_checks else None
-            )
+                row["same_composition_weights_match_initial"] = (
+                    bool(all(weight_checks)) if weight_checks else None
+                )
         comparisons.append(row)
     _write_csv(stage_dir / "final_structure_comparison.csv", comparisons)
     _json_dump(
         stage_dir / "full_benchmark_summary.json",
         {
             "stage": "B",
+            "head_mode": head_mode,
+            "mlp_used_for_relaxation": head_mode == "fused",
+            "single_head_selection": (
+                single_head_map if head_mode == "single" else None
+            ),
             "force_tolerance_ev_per_angstrom": FORCE_TOLERANCE,
             "maximum_optimizer_steps": FULL_MAX_STEPS,
-            "branch_skipping": False,
+            "cell_relaxation": relax_cell,
+            "hydrostatic_cell": hydrostatic_cell,
+            "optimizer": optimizer_name,
+            "optimizer_maxstep_angstrom": optimizer_maxstep,
+            "branch_skipping": head_mode == "fused",
+            "evaluated_branch_count": (
+                NUM_BRANCHES if head_mode == "fused" else 1
+            ),
             "single_point_comparison_csv": "single_point_comparison.csv",
             "final_structure_comparison_csv": "final_structure_comparison.csv",
             "systems": run_summaries,
             "final_structure_comparisons": comparisons,
         },
     )
-    _make_figures(stage_dir, run_summaries)
-    _write_report(output_dir, stage_dir, run_summaries, comparisons, provenance)
+    _make_figures(stage_dir, run_summaries, optimizer_name=optimizer_name)
+    _write_report(
+        output_dir,
+        stage_dir,
+        run_summaries,
+        comparisons,
+        provenance,
+        head_mode=head_mode,
+        single_head_map=single_head_map,
+        relax_cell=relax_cell,
+        optimizer_name=optimizer_name,
+        optimizer_maxstep=optimizer_maxstep,
+        hydrostatic_cell=hydrostatic_cell,
+    )
     print(f"Stage B outputs written under {stage_dir}")
 
 
 def _make_figures(
-    stage_dir: Path, run_summaries: dict[str, dict[str, dict[str, Any]]]
+    stage_dir: Path,
+    run_summaries: dict[str, dict[str, dict[str, Any]]],
+    *,
+    optimizer_name: str,
 ) -> None:
     figure_dir = stage_dir / "figures"
     figure_dir.mkdir(parents=True, exist_ok=True)
@@ -875,7 +1236,7 @@ def _make_figures(
                         label=labels[precision],
                     )
             axis.set_title(system)
-            axis.set_xlabel("BFGS step")
+            axis.set_xlabel(f"{optimizer_name.upper()} step")
             axis.grid(alpha=0.25)
             if figure_type == "force":
                 axis.set_ylabel("Maximum atomic force (eV/Å)")
@@ -906,30 +1267,60 @@ def _write_report(
     runs: dict[str, dict[str, dict[str, Any]]],
     comparisons: list[dict[str, Any]],
     provenance: dict[str, Any],
+    *,
+    head_mode: str,
+    single_head_map: dict[str, dict[str, Any]],
+    relax_cell: bool,
+    optimizer_name: str,
+    optimizer_maxstep: float,
+    hydrostatic_cell: bool,
 ) -> None:
+    provenance_by_precision = provenance["H2O"]
     single_points = list(csv.DictReader((stage_dir / "single_point_comparison.csv").open()))
-    table_lines = [
-        "| System | FP32 converged? | FP64 converged? | FP32 steps | FP64 steps | RMS displacement (Å) | Max cross-precision force (eV/Å) |",
-        "|---|---:|---:|---:|---:|---:|---:|",
-    ]
+    single_mode = head_mode == "single"
+    table_header = (
+        "| System | Head | FP32 converged? | FP64 converged? | FP32 steps | "
+        "FP64 steps | RMS displacement (Å) | Max cross-precision force (eV/Å) |"
+        if single_mode
+        else "| System | FP32 converged? | FP64 converged? | FP32 steps | FP64 steps | RMS displacement (Å) | Max cross-precision force (eV/Å) |"
+    )
+    table_separator = (
+        "|---|---|---:|---:|---:|---:|---:|---:|"
+        if single_mode
+        else "|---|---:|---:|---:|---:|---:|---:|"
+    )
+    table_lines = [table_header, table_separator]
     for row in comparisons:
-        table_lines.append(
-            "| {system} | {fp32_converged} | {fp64_converged} | {fp32_steps} | "
-            "{fp64_steps} | {rms_displacement_angstrom} | "
-            "{maximum_cross_precision_force_ev_per_angstrom} |".format(**row)
+        head_cell = (
+            f"branch-{row['selected_branch_id']} ({row['selected_dataset']}) | "
+            if single_mode
+            else ""
         )
+        table_lines.append(
+            f"| {row['system']} | {head_cell}{row['fp32_converged']} | "
+            f"{row['fp64_converged']} | {row['fp32_steps']} | {row['fp64_steps']} | "
+            f"{row['rms_displacement_angstrom']} | "
+            f"{row['maximum_cross_precision_force_ev_per_angstrom']} |"
+        )
+    weight_header = "MLP max Δweight" if not single_mode else "MLP weight difference"
     sp_lines = [
-        "| System | ΔE (eV) | ΔE/N (eV/atom) | Force MAE (eV/Å) | Force RMSE (eV/Å) | Max component ΔF (eV/Å) | Max Δweight |",
+        f"| System | ΔE (eV) | ΔE/N (eV/atom) | Force MAE (eV/Å) | "
+        f"Force RMSE (eV/Å) | Max component ΔF (eV/Å) | {weight_header} |",
         "|---|---:|---:|---:|---:|---:|---:|",
     ]
     for row in single_points:
+        branch_weight_difference = (
+            "n/a"
+            if row["branch_weight_maximum_absolute_difference"] in (None, "")
+            else f"{float(row['branch_weight_maximum_absolute_difference']):.6g}"
+        )
         sp_lines.append(
             f"| {row['system']} | {float(row['absolute_energy_difference_ev']):.6g} "
             f"| {float(row['absolute_energy_difference_ev_per_atom']):.6g} "
             f"| {float(row['force_mae_ev_per_angstrom']):.6g} "
             f"| {float(row['force_rmse_ev_per_angstrom']):.6g} "
             f"| {float(row['maximum_force_component_difference_ev_per_angstrom']):.6g} "
-            f"| {float(row['branch_weight_maximum_absolute_difference']):.6g} |"
+            f"| {branch_weight_difference} |"
         )
     convergence_notes = []
     for system in SYSTEM_NAMES:
@@ -961,9 +1352,13 @@ def _write_report(
     max_force_rmse = max(
         float(row["force_rmse_ev_per_angstrom"]) for row in single_points
     )
-    max_branch_weight_difference = max(
-        float(row["branch_weight_maximum_absolute_difference"])
-        for row in single_points
+    max_branch_weight_difference = (
+        max(
+            float(row["branch_weight_maximum_absolute_difference"])
+            for row in single_points
+        )
+        if not single_mode
+        else None
     )
     max_final_displacement = max(
         float(row["rms_displacement_angstrom"])
@@ -981,31 +1376,127 @@ def _write_report(
         for precision in PRECISIONS
         if not runs.get(system, {}).get(precision, {}).get("converged", False)
     ]
+    branch_policy_text = (
+        "For each system, the selected branch is fixed by the configured "
+        "single-head selection rule; only that decoder head is evaluated during "
+        "each relaxation force call. The BranchWeightMLP is not loaded or invoked."
+        if single_mode
+        else "All 16 source-specific prediction heads were included at every "
+        "force step; the BranchWeightMLP softmax weights were fixed during a "
+        "relaxation because composition does not change."
+    )
+    branch_selection_rows = "\n".join(
+        f"| {system} | branch-{single_head_map[system]['branch_id']} | "
+        f"{single_head_map[system]['dataset']} |"
+        for system in SYSTEM_NAMES
+    )
+    branch_selection_section = (
+        "## Single-head selection\n\n"
+        "The selected heads below were fixed before relaxation using the "
+        "highest-weight head in the already-validated FP64 fused single-point "
+        "results. This uses the MLP only as an offline selection diagnostic; "
+        "the single-head relaxation run does not load or call it. Branch/dataset "
+        "IDs follow the training launch's `--multi_model_list` order.\n\n"
+        "| System | Branch | Dataset |\n|---|---|---|\n"
+        + branch_selection_rows
+        if single_mode
+        else ""
+    )
+    mlp_provenance_line = (
+        "- BranchWeightMLP: not loaded or used in single-head mode.\n"
+        if single_mode
+        else f"- BranchWeightMLP checkpoint SHA-256: `{provenance_by_precision['fp64']['checkpoint_sha256']['branch_weight_mlp']}`\n"
+    )
+    weight_interpretation = (
+        "Branch-weight differences are not applicable in single-head mode; "
+        "the one-hot branch selection mask is not an MLP output."
+        if single_mode
+        else f"The maximum FP32–FP64 MLP branch-weight difference at the starting geometries was {max_branch_weight_difference:.3g}."
+    )
+    manuscript_branch_text = (
+        "Each structure was evaluated using its fixed, selected source-specific "
+        "head; the MLP was not loaded or invoked in the relaxation."
+        if single_mode
+        else "All 16 prediction branches were combined using the frozen BranchWeightMLP."
+    )
+    reviewer_branch_text = (
+        "we selected one source-specific head per composition using the "
+        "highest-weight FP64 fused single-point route, then ran the relaxation "
+        "with that head alone and without loading or invoking the MLP."
+        if single_mode
+        else "all 16 source-specific heads and the frozen BranchWeightMLP were used."
+    )
+    branch_weight_claim = (
+        ""
+        if single_mode
+        else f"; the maximum branch-weight difference was {max_branch_weight_difference:.3g}"
+    )
+    si_converged = bool(
+        runs.get("Si", {}).get("fp32", {}).get("converged", False)
+        and runs.get("Si", {}).get("fp64", {}).get("converged", False)
+    )
+    si_interpretation = (
+        "Both Si runs met the force criterion."
+        if si_converged
+        else "At least one Si precision did not meet the force criterion."
+    )
+    si_manuscript_text = (
+        "Both Si runs converged."
+        if si_converged
+        else (
+            f"Si did not reach the 0.05 eV/Å force criterion within "
+            f"{FULL_MAX_STEPS} ASE {optimizer_name.upper()} steps in either "
+            "precision (final maximum forces "
+            f"{runs['Si']['fp32']['final_maximum_force_ev_per_angstrom']:.3f} "
+            "and "
+            f"{runs['Si']['fp64']['final_maximum_force_ev_per_angstrom']:.3f} "
+            "eV/Å, respectively)."
+        )
+    )
+    if relax_cell:
+        cell_protocol_text = (
+            "Cells were variable for fully periodic systems and fixed for molecules. "
+            f"ASE UnitCellFilter used {'hydrostatic' if hydrostatic_cell else 'full'} "
+            "cell strain and a cell factor equal to the atom count; the optimizer "
+            "criterion therefore includes atomic and generalized cell forces. "
+            "Per-step stress tensors are in eV/Å³."
+        )
+    else:
+        cell_protocol_text = "Cells and PBC were fixed."
+    convergence_force_description = (
+        "generalized optimization force"
+        if relax_cell
+        else "atomic force"
+    )
+    crystal_alignment_text = (
+        "minimum-image mapping using the FP32 final cell for crystals"
+        if relax_cell
+        else "minimum-image mapping in the fixed cell for crystals"
+    )
 
     report = f"""# FP32 vs FP64 HydraGNN structural-relaxation benchmark
 
 ## Scope and provenance
 
 This benchmark evaluates only numerical precision robustness of the frozen
-HydraGNN + BranchWeightMLP inference stack. It does not evaluate DFT accuracy,
-physical accuracy, or molecular-dynamics stability. All 16 source-specific
-prediction heads were included at every force step; branch skipping was
-disabled. The composition-dependent 16-way softmax weights are fixed during a
-relaxation because each system's element counts are unchanged.
+HydraGNN inference stack. It does not evaluate DFT accuracy, physical accuracy,
+or molecular-dynamics stability. {branch_policy_text}
 
-- HydraGNN checkpoint SHA-256: `{provenance['fp64']['checkpoint_sha256']['hydragNN']}`
-- BranchWeightMLP SHA-256: `{provenance['fp64']['checkpoint_sha256']['branch_weight_mlp']}`
-- HydraGNN parameter dtypes: FP32 `{provenance['fp32']['parameter_dtype']}`, FP64 `{provenance['fp64']['parameter_dtype']}`
-- Devices: FP32 `{provenance['fp32']['device']}`, FP64 `{provenance['fp64']['device']}`
-- Branch order: `{provenance['fp64']['branch_output_order']}`
-- Graph radius: {provenance['fp64']['radius_angstrom']} Å; maximum neighbors: {provenance['fp64']['max_neighbours']}
+- HydraGNN checkpoint SHA-256: `{provenance_by_precision['fp64']['checkpoint_sha256']['hydragNN']}`
+{mlp_provenance_line}- HydraGNN parameter dtypes: FP32 `{provenance_by_precision['fp32']['parameter_dtype']}`, FP64 `{provenance_by_precision['fp64']['parameter_dtype']}`
+- Devices: FP32 `{provenance_by_precision['fp32']['device']}`, FP64 `{provenance_by_precision['fp64']['device']}`
+- Branch order: `{provenance_by_precision['fp64']['branch_output_order']}`
+- Graph radius: {provenance_by_precision['fp64']['radius_angstrom']} Å; maximum neighbors: {provenance_by_precision['fp64']['max_neighbours']}
 - Energy and force units follow the existing inference output convention: eV and eV/Å.
 - Initial structures: standard ASE H₂O/CH₄ molecules, diamond Si conventional cell,
   rocksalt MgO conventional cell, and FCC Al conventional cell. Each was
   perturbed once using seed 42, then the saved identical coordinates were used
-  for both precisions. Cells and PBC were fixed.
-- Optimizer: ASE BFGS, maximum 200 steps, convergence if maximum atomic force is
+  for both precisions. {cell_protocol_text}
+- Optimizer: ASE {optimizer_name.upper()} (maximum step {optimizer_maxstep} Å),
+  maximum 200 steps, convergence at a maximum {convergence_force_description}
   below 0.05 eV/Å. Failed and capped runs are retained in their trajectory folders.
+
+{branch_selection_section}
 
 ## Initial single-point precision comparison
 
@@ -1023,8 +1514,8 @@ Unsuccessful runs:
 
 Energy and force differences at identical geometries are reported above and in
 `single_point_comparison.csv`. Final-geometry displacement is calculated after
-translation/rotation alignment for molecules and minimum-image mapping in the
-fixed cell for crystals. Both final geometries are also evaluated at a common
+translation/rotation alignment for molecules and {crystal_alignment_text}.
+{("Final lattice vectors and per-step stress are also preserved in the trajectory CSVs." if relax_cell else "")} Both final geometries are also evaluated at a common
 FP64 precision; cross-precision maximum residual forces are reported in the
 summary table. Every row reports each precision's independent convergence
 status and step count; the 0.05 eV/Å threshold is unchanged.
@@ -1037,8 +1528,8 @@ converged for {converged_systems}/5 systems. The nonconverged runs were
 must not be described as relaxed structures. The largest aligned final-geometry
 RMS difference was {max_final_displacement:.6g} Å, and the largest
 cross-precision maximum force was {max_cross_precision_force:.6g} eV/Å.
-The Si residual force is associated with its failure to meet the force
-criterion in either precision. Agreement therefore supports numerical
+{weight_interpretation}
+{si_interpretation} Agreement therefore supports numerical
 consistency of this frozen model on these probes, not structural validity or
 physical accuracy. No reference calculations were run, and the selected
 compositions are not validated against the training distribution.
@@ -1046,18 +1537,13 @@ compositions are not validated against the training distribution.
 ## Manuscript-ready wording
 
 We compared FP32 and FP64 structural relaxations using the same frozen
-HydraGNN and BranchWeightMLP checkpoints, identical perturbed starting
-geometries, all 16 prediction branches, and a common BFGS protocol. Across the
+HydraGNN checkpoint and identical perturbed starting geometries. {manuscript_branch_text}
+Across the
 five initial geometries, the largest absolute energy difference was
 {max_energy_difference:.3g} eV and the largest force-component difference was
 {max_force_component_difference:.3g} eV/Å (maximum force RMSE
-{max_force_rmse:.3g} eV/Å); the maximum branch-weight difference was
-{max_branch_weight_difference:.3g}. Both precisions converged for
-{converged_systems}/5 systems; Si did not reach the 0.05 eV/Å force
-criterion within 200 BFGS steps in either precision (final maximum forces
-{runs["Si"]["fp32"]["final_maximum_force_ev_per_angstrom"]:.3f} and
-{runs["Si"]["fp64"]["final_maximum_force_ev_per_angstrom"]:.3f} eV/Å,
-respectively). The maximum aligned FP32–FP64 final-geometry RMS difference was
+{max_force_rmse:.3g} eV/Å){branch_weight_claim}. Both precisions converged for
+{converged_systems}/5 systems; {si_manuscript_text} The maximum aligned FP32–FP64 final-geometry RMS difference was
 {max_final_displacement:.3g} Å. These results characterize numerical precision
 sensitivity of the pretrained potential on the tested structures; they do not
 establish DFT-level accuracy or structural validity.
@@ -1066,20 +1552,17 @@ establish DFT-level accuracy or structural validity.
 
 We thank the reviewer for requesting a direct FP32/FP64 relaxation comparison.
 We performed paired relaxations of H₂O, CH₄, Si, MgO, and Al using identical
-starting coordinates, the same frozen pretrained checkpoints, all 16
-source-specific heads, and ASE BFGS with a 0.05 eV/Å maximum-force criterion.
+starting coordinates and the same frozen HydraGNN checkpoint; {reviewer_branch_text}
+ASE {optimizer_name.upper()} used a 0.05 eV/Å criterion on the maximum
+{convergence_force_description}.
 We additionally compared initial energy and force predictions, checked the
 energy-gradient force implementation by finite differences, and cross-evaluated
 the final structures at the opposite precision. Both precisions converged for
-{converged_systems}/5 systems; Si did not meet the force criterion within 200 steps
-in either precision, with final maximum forces of
-{runs["Si"]["fp32"]["final_maximum_force_ev_per_angstrom"]:.3f} and
-{runs["Si"]["fp64"]["final_maximum_force_ev_per_angstrom"]:.3f} eV/Å.
+{converged_systems}/5 systems. {si_manuscript_text}
 The largest initial FP32–FP64 energy difference was {max_energy_difference:.3g}
 eV, the largest force-component difference was
 {max_force_component_difference:.3g} eV/Å (maximum force RMSE
-{max_force_rmse:.3g} eV/Å); the maximum branch-weight difference was
-{max_branch_weight_difference:.3g}. The largest aligned final geometry RMS
+{max_force_rmse:.3g} eV/Å){branch_weight_claim}. The largest aligned final geometry RMS
 difference was {max_final_displacement:.3g} Å. We interpret these data as a
 test of numerical consistency only, not as evidence of DFT accuracy or
 structural validity.
@@ -1089,7 +1572,7 @@ structural validity.
 - Single-point results: `stage_B/single_point_comparison.csv`
 - Final geometry table: `stage_B/final_structure_comparison.csv`
 - Per-run complete ASE trajectories (`.traj`), coordinate/force logs (`.csv`),
-  BFGS logs, final `.extxyz`, and `run_summary.json`: `stage_B/<system>/<precision>/`
+  optimizer logs, final `.extxyz`, and `run_summary.json`: `stage_B/<system>/<precision>/`
 - Figures: `stage_B/figures/`
 - Input references and saved perturbed structures: `inputs/`
 - Runtime and checkpoint provenance: `provenance.json`, `stage_B/precision_provenance.json`
@@ -1101,6 +1584,41 @@ def _parser() -> argparse.ArgumentParser:
     parser = argparse.ArgumentParser(description=__doc__)
     parser.add_argument("--stage", choices=("pilot", "full"), required=True)
     parser.add_argument(
+        "--head-mode",
+        choices=("fused", "single"),
+        default="fused",
+        help="Use the BranchWeightMLP-weighted 16-head ensemble (fused) or one fixed head without loading the MLP (single).",
+    )
+    parser.add_argument(
+        "--head-override",
+        action="append",
+        default=[],
+        metavar="SYSTEM=BRANCH_ID",
+        help="Override the configured single-head selection; repeat per system. Example: --head-override H2O=8",
+    )
+    parser.add_argument(
+        "--relax-cell",
+        action="store_true",
+        help="Relax the lattice vectors for fully periodic systems; molecular cells remain fixed.",
+    )
+    parser.add_argument(
+        "--hydrostatic-cell",
+        action="store_true",
+        help="Constrain --relax-cell to hydrostatic (volume-only) strain.",
+    )
+    parser.add_argument(
+        "--optimizer",
+        choices=("bfgs", "fire"),
+        default="bfgs",
+        help="ASE optimizer to use (default: bfgs).",
+    )
+    parser.add_argument(
+        "--optimizer-maxstep",
+        type=float,
+        default=0.2,
+        help="Maximum optimizer step in angstroms (default: 0.2).",
+    )
+    parser.add_argument(
         "--output-dir",
         type=Path,
         default=None,
@@ -1111,6 +1629,16 @@ def _parser() -> argparse.ArgumentParser:
 
 def main() -> None:
     args = _parser().parse_args()
+    if args.hydrostatic_cell and not args.relax_cell:
+        raise ValueError("--hydrostatic-cell requires --relax-cell")
+    if not np.isfinite(args.optimizer_maxstep) or args.optimizer_maxstep <= 0:
+        raise ValueError("--optimizer-maxstep must be a positive finite number")
+    if args.head_mode == "single":
+        single_head_map = _resolve_single_head_map(args.head_override)
+    else:
+        if args.head_override:
+            raise ValueError("--head-override can only be used with --head-mode single")
+        single_head_map = _resolve_single_head_map([])
     if args.output_dir is None:
         stamp = datetime.now(timezone.utc).strftime("%Y%m%dT%H%M%SZ")
         output_dir = HERE / "results" / f"run_{stamp}"
@@ -1124,10 +1652,21 @@ def main() -> None:
         provenance = _runtime_provenance()
         _json_dump(output_dir / "provenance.json", provenance)
         _json_dump(output_dir / "input_manifest.json", inputs)
-        _json_dump(output_dir / "benchmark_config.json", BENCHMARK_CONFIG)
+        run_config = json.loads(json.dumps(BENCHMARK_CONFIG))
+        run_config["relaxation"]["cell_relaxation"] = args.relax_cell
+        run_config["relaxation"]["hydrostatic_cell"] = args.hydrostatic_cell
+        run_config["relaxation"]["optimizer"] = args.optimizer
+        run_config["relaxation"]["optimizer_maxstep_angstrom"] = args.optimizer_maxstep
+        _json_dump(output_dir / "benchmark_config.json", run_config)
         _run_stage_a(
             output_dir,
             {name: _read_initial(output_dir, name) for name in SYSTEM_NAMES},
+            head_mode=args.head_mode,
+            single_head_map=single_head_map,
+            relax_cell=args.relax_cell,
+            optimizer_name=args.optimizer,
+            optimizer_maxstep=args.optimizer_maxstep,
+            hydrostatic_cell=args.hydrostatic_cell,
         )
         return
 
@@ -1137,7 +1676,16 @@ def main() -> None:
             "Stage B requires a passing Stage A pilot in the same --output-dir"
         )
     initial_atoms = {name: _read_initial(output_dir, name) for name in SYSTEM_NAMES}
-    _run_stage_b(output_dir, initial_atoms)
+    _run_stage_b(
+        output_dir,
+        initial_atoms,
+        head_mode=args.head_mode,
+        single_head_map=single_head_map,
+        relax_cell=args.relax_cell,
+        optimizer_name=args.optimizer,
+        optimizer_maxstep=args.optimizer_maxstep,
+        hydrostatic_cell=args.hydrostatic_cell,
+    )
 
 
 if __name__ == "__main__":

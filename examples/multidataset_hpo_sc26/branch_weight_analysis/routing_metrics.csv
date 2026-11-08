@@ -1,0 +1,196 @@
+sample_id,chemical_family,domain_classification,dominant_branch,maximum_branch_weight,top3_cumulative_weight,weight_entropy,effective_number_of_branches,support_90_size,support_95_size
+SYN-001,synthetic C-H motifs,unknown; training coverage unavailable,branch-8:OMol25,1.0,1.0,-0.0,1.0,1,1
+SYN-002,synthetic C-H motifs,unknown; training coverage unavailable,branch-8:OMol25,1.0,1.0,7.88910784707791e-175,1.0,1,1
+SYN-003,synthetic C-H motifs,unknown; training coverage unavailable,branch-15:transition1x,1.0,1.0,-0.0,1.0,1,1
+SYN-004,synthetic C-H motifs,unknown; training coverage unavailable,branch-8:OMol25,1.0,1.0,5.871379366743967e-36,1.0,1,1
+SYN-005,synthetic C-H motifs,unknown; training coverage unavailable,branch-8:OMol25,1.0,1.0,6.317089492241167e-191,1.0,1,1
+SYN-006,synthetic C-H motifs,unknown; training coverage unavailable,branch-8:OMol25,1.0,1.0,3.862668675543534e-112,1.0,1,1
+SYN-007,synthetic C-H motifs,unknown; training coverage unavailable,branch-8:OMol25,1.0,1.0,2.8327032845541225e-195,1.0,1,1
+SYN-008,synthetic C-H motifs,unknown; training coverage unavailable,branch-8:OMol25,1.0,1.0,-0.0,1.0,1,1
+SYN-009,synthetic C-H motifs,unknown; training coverage unavailable,branch-8:OMol25,1.0,1.0,-0.0,1.0,1,1
+SYN-010,synthetic C-H motifs,unknown; training coverage unavailable,branch-8:OMol25,1.0,1.0,-0.0,1.0,1,1
+SYN-011,synthetic C-H motifs,unknown; training coverage unavailable,branch-8:OMol25,1.0,1.0,-0.0,1.0,1,1
+SYN-012,synthetic C-H motifs,unknown; training coverage unavailable,branch-8:OMol25,1.0,1.0,-0.0,1.0,1,1
+SYN-013,synthetic C-H motifs,unknown; training coverage unavailable,branch-8:OMol25,1.0,1.0,1.6498857913e-313,1.0,1,1
+SYN-014,synthetic C-H motifs,unknown; training coverage unavailable,branch-8:OMol25,1.0,1.0,-0.0,1.0,1,1
+SYN-015,synthetic C-H motifs,unknown; training coverage unavailable,branch-8:OMol25,1.0,1.0,3.4311621061888205e-193,1.0,1,1
+SYN-016,synthetic C-H-N-O motifs,unknown; training coverage unavailable,branch-8:OMol25,1.0,1.0,1.1368856111606917e-148,1.0,1,1
+SYN-017,synthetic C-H-N-O motifs,unknown; training coverage unavailable,branch-8:OMol25,1.0,1.0,-0.0,1.0,1,1
+SYN-018,synthetic C-H-N-O motifs,unknown; training coverage unavailable,branch-8:OMol25,1.0,1.0,3.093384050264552e-122,1.0,1,1
+SYN-019,synthetic C-H-N-O motifs,unknown; training coverage unavailable,branch-8:OMol25,1.0,1.0,7.429672361307666e-180,1.0,1,1
+SYN-020,synthetic C-H-N-O motifs,unknown; training coverage unavailable,branch-8:OMol25,1.0,1.0,5.6823928994788844e-263,1.0,1,1
+SYN-021,synthetic C-H-N-O motifs,unknown; training coverage unavailable,branch-8:OMol25,1.0,1.0,3.550800548261561e-235,1.0,1,1
+SYN-022,synthetic C-H-N-O motifs,unknown; training coverage unavailable,branch-8:OMol25,1.0,1.0,3.032796517738306e-268,1.0,1,1
+SYN-023,synthetic C-H-N-O motifs,unknown; training coverage unavailable,branch-8:OMol25,1.0,1.0,4.902836925376483e-274,1.0,1,1
+SYN-024,synthetic C-H-N-O motifs,unknown; training coverage unavailable,branch-8:OMol25,1.0,1.0,-0.0,1.0,1,1
+SYN-025,synthetic C-H-N-O motifs,unknown; training coverage unavailable,branch-8:OMol25,1.0,1.0,9.547933546613824e-256,1.0,1,1
+SYN-026,synthetic C-H-N-O motifs,unknown; training coverage unavailable,branch-15:transition1x,0.9999989340308787,1.0,1.572477744983057e-05,1.0000157249010848,1,1
+SYN-027,synthetic C-H-N-O motifs,unknown; training coverage unavailable,branch-15:transition1x,1.0,1.0,3.3168254780620943e-32,1.0,1,1
+SYN-028,synthetic C-H-N-O motifs,unknown; training coverage unavailable,branch-8:OMol25,1.0,1.0,7.865531729594633e-250,1.0,1,1
+SYN-029,synthetic C-H-N-O motifs,unknown; training coverage unavailable,branch-8:OMol25,1.0,1.0,9.89025576505252e-131,1.0,1,1
+SYN-030,synthetic C-H-N-O motifs,unknown; training coverage unavailable,branch-15:transition1x,1.0,1.0,1.8541028649268344e-115,1.0,1,1
+SYN-031,synthetic C-H-N-O-S-P motifs,unknown; training coverage unavailable,branch-8:OMol25,1.0,1.0,2.8732763323924826e-249,1.0,1,1
+SYN-032,synthetic C-H-N-O-S-P motifs,unknown; training coverage unavailable,branch-8:OMol25,1.0,1.0,7.418226985919222e-246,1.0,1,1
+SYN-033,synthetic C-H-N-O-S-P motifs,unknown; training coverage unavailable,branch-8:OMol25,1.0,1.0,-0.0,1.0,1,1
+SYN-034,synthetic C-H-N-O-S-P motifs,unknown; training coverage unavailable,branch-8:OMol25,1.0,1.0,-0.0,1.0,1,1
+SYN-035,synthetic C-H-N-O-S-P motifs,unknown; training coverage unavailable,branch-8:OMol25,1.0,1.0,-0.0,1.0,1,1
+SYN-036,synthetic C-H-N-O-S-P motifs,unknown; training coverage unavailable,branch-8:OMol25,0.9999999999682863,0.9999999999999999,7.983682400962218e-10,1.0000000007983683,1,1
+SYN-037,synthetic C-H-N-O-S-P motifs,unknown; training coverage unavailable,branch-8:OMol25,0.9999999973510125,1.0,5.4964074645700705e-08,1.0000000549640762,1,1
+SYN-038,synthetic C-H-N-O-S-P motifs,unknown; training coverage unavailable,branch-8:OMol25,1.0,1.0,-0.0,1.0,1,1
+SYN-039,synthetic C-H-N-O-S-P motifs,unknown; training coverage unavailable,branch-8:OMol25,1.0,1.0,-0.0,1.0,1,1
+SYN-040,synthetic C-H-N-O-S-P motifs,unknown; training coverage unavailable,branch-8:OMol25,1.0,1.0,-0.0,1.0,1,1
+SYN-041,synthetic C-H-N-O-S-P motifs,unknown; training coverage unavailable,branch-8:OMol25,1.0,1.0,1.0771132289461445e-173,1.0,1,1
+SYN-042,synthetic C-H-N-O-S-P motifs,unknown; training coverage unavailable,branch-2:MPTrj,1.0,1.0,-0.0,1.0,1,1
+SYN-043,synthetic C-H-N-O-S-P motifs,unknown; training coverage unavailable,branch-15:transition1x,1.0,1.0,1.7105308790074578e-50,1.0,1,1
+SYN-044,synthetic C-H-N-O-S-P motifs,unknown; training coverage unavailable,branch-8:OMol25,1.0,1.0,-0.0,1.0,1,1
+SYN-045,synthetic C-H-N-O-S-P motifs,unknown; training coverage unavailable,branch-8:OMol25,1.0,1.0,5.695443007878047e-171,1.0,1,1
+SYN-046,synthetic transition-metal oxides,unknown; training coverage unavailable,branch-4:OC2022,1.0,1.0,-0.0,1.0,1,1
+SYN-047,synthetic transition-metal oxides,unknown; training coverage unavailable,branch-4:OC2022,1.0,1.0,-0.0,1.0,1,1
+SYN-048,synthetic transition-metal oxides,unknown; training coverage unavailable,branch-4:OC2022,1.0,1.0,-0.0,1.0,1,1
+SYN-049,synthetic transition-metal oxides,unknown; training coverage unavailable,branch-4:OC2022,1.0,1.0,-0.0,1.0,1,1
+SYN-050,synthetic transition-metal oxides,unknown; training coverage unavailable,branch-4:OC2022,1.0,1.0,-0.0,1.0,1,1
+SYN-051,synthetic transition-metal oxides,unknown; training coverage unavailable,branch-4:OC2022,1.0,1.0,-0.0,1.0,1,1
+SYN-052,synthetic transition-metal oxides,unknown; training coverage unavailable,branch-4:OC2022,1.0,1.0,-0.0,1.0,1,1
+SYN-053,synthetic transition-metal oxides,unknown; training coverage unavailable,branch-4:OC2022,1.0,1.0,-0.0,1.0,1,1
+SYN-054,synthetic transition-metal oxides,unknown; training coverage unavailable,branch-4:OC2022,1.0,1.0,-0.0,1.0,1,1
+SYN-055,synthetic transition-metal oxides,unknown; training coverage unavailable,branch-4:OC2022,1.0,1.0,-0.0,1.0,1,1
+SYN-056,synthetic transition-metal oxides,unknown; training coverage unavailable,branch-4:OC2022,1.0,1.0,-0.0,1.0,1,1
+SYN-057,synthetic transition-metal oxides,unknown; training coverage unavailable,branch-4:OC2022,1.0,1.0,-0.0,1.0,1,1
+SYN-058,synthetic transition-metal oxides,unknown; training coverage unavailable,branch-4:OC2022,1.0,1.0,-0.0,1.0,1,1
+SYN-059,synthetic transition-metal oxides,unknown; training coverage unavailable,branch-4:OC2022,1.0,1.0,-0.0,1.0,1,1
+SYN-060,synthetic transition-metal oxides,unknown; training coverage unavailable,branch-4:OC2022,1.0,1.0,-0.0,1.0,1,1
+SYN-061,synthetic mixed-metal oxides,unknown; training coverage unavailable,branch-4:OC2022,1.0,1.0,-0.0,1.0,1,1
+SYN-062,synthetic mixed-metal oxides,unknown; training coverage unavailable,branch-2:MPTrj,1.0,1.0,5.787989720205917e-57,1.0,1,1
+SYN-063,synthetic mixed-metal oxides,unknown; training coverage unavailable,branch-4:OC2022,1.0,1.0,-0.0,1.0,1,1
+SYN-064,synthetic mixed-metal oxides,unknown; training coverage unavailable,branch-4:OC2022,1.0,1.0,-0.0,1.0,1,1
+SYN-065,synthetic mixed-metal oxides,unknown; training coverage unavailable,branch-4:OC2022,1.0,1.0,-0.0,1.0,1,1
+SYN-066,synthetic mixed-metal oxides,unknown; training coverage unavailable,branch-4:OC2022,1.0,1.0,-0.0,1.0,1,1
+SYN-067,synthetic mixed-metal oxides,unknown; training coverage unavailable,branch-4:OC2022,1.0,1.0,-0.0,1.0,1,1
+SYN-068,synthetic mixed-metal oxides,unknown; training coverage unavailable,branch-4:OC2022,1.0,1.0,-0.0,1.0,1,1
+SYN-069,synthetic mixed-metal oxides,unknown; training coverage unavailable,branch-4:OC2022,1.0,1.0,-0.0,1.0,1,1
+SYN-070,synthetic mixed-metal oxides,unknown; training coverage unavailable,branch-4:OC2022,1.0,1.0,-0.0,1.0,1,1
+SYN-071,synthetic mixed-metal oxides,unknown; training coverage unavailable,branch-4:OC2022,1.0,1.0,4.1136989953480315e-109,1.0,1,1
+SYN-072,synthetic mixed-metal oxides,unknown; training coverage unavailable,branch-4:OC2022,1.0,1.0,-0.0,1.0,1,1
+SYN-073,synthetic mixed-metal oxides,unknown; training coverage unavailable,branch-4:OC2022,1.0,1.0,-0.0,1.0,1,1
+SYN-074,synthetic mixed-metal oxides,unknown; training coverage unavailable,branch-4:OC2022,1.0,1.0,5.251828137493822e-271,1.0,1,1
+SYN-075,synthetic mixed-metal oxides,unknown; training coverage unavailable,branch-4:OC2022,1.0,1.0,-0.0,1.0,1,1
+SYN-076,synthetic silicate/oxide motifs,unknown; training coverage unavailable,branch-4:OC2022,1.0,1.0,-0.0,1.0,1,1
+SYN-077,synthetic silicate/oxide motifs,unknown; training coverage unavailable,branch-4:OC2022,1.0,1.0,-0.0,1.0,1,1
+SYN-078,synthetic silicate/oxide motifs,unknown; training coverage unavailable,branch-4:OC2022,1.0,1.0,-0.0,1.0,1,1
+SYN-079,synthetic silicate/oxide motifs,unknown; training coverage unavailable,branch-4:OC2022,1.0,1.0,-0.0,1.0,1,1
+SYN-080,synthetic silicate/oxide motifs,unknown; training coverage unavailable,branch-2:MPTrj,1.0,1.0,3.9016201273892624e-52,1.0,1,1
+SYN-081,synthetic silicate/oxide motifs,unknown; training coverage unavailable,branch-4:OC2022,1.0,1.0,-0.0,1.0,1,1
+SYN-082,synthetic silicate/oxide motifs,unknown; training coverage unavailable,branch-4:OC2022,1.0,1.0,-0.0,1.0,1,1
+SYN-083,synthetic silicate/oxide motifs,unknown; training coverage unavailable,branch-4:OC2022,1.0,1.0,-0.0,1.0,1,1
+SYN-084,synthetic silicate/oxide motifs,unknown; training coverage unavailable,branch-4:OC2022,0.999999999952295,1.0,1.181462656782676e-09,1.0000000011814627,1,1
+SYN-085,synthetic silicate/oxide motifs,unknown; training coverage unavailable,branch-2:MPTrj,1.0,1.0,-0.0,1.0,1,1
+SYN-086,synthetic silicate/oxide motifs,unknown; training coverage unavailable,branch-2:MPTrj,1.0,1.0,6.36770897848323e-192,1.0,1,1
+SYN-087,synthetic silicate/oxide motifs,unknown; training coverage unavailable,branch-2:MPTrj,1.0,1.0,2.850725978978911e-188,1.0,1,1
+SYN-088,synthetic silicate/oxide motifs,unknown; training coverage unavailable,branch-4:OC2022,1.0,1.0,-0.0,1.0,1,1
+SYN-089,synthetic silicate/oxide motifs,unknown; training coverage unavailable,branch-2:MPTrj,1.0,1.0,2.5348391301526223e-32,1.0,1,1
+SYN-090,synthetic silicate/oxide motifs,unknown; training coverage unavailable,branch-4:OC2022,1.0,1.0,-0.0,1.0,1,1
+SYN-091,synthetic transition-metal chalcogenides,unknown; training coverage unavailable,branch-2:MPTrj,0.8720658826117432,1.0,0.3824405952402025,1.4658577928409824,2,2
+SYN-092,synthetic transition-metal chalcogenides,unknown; training coverage unavailable,branch-15:transition1x,0.5878979374926601,1.0,0.6776488350687802,1.969242271629507,2,2
+SYN-093,synthetic transition-metal chalcogenides,unknown; training coverage unavailable,branch-2:MPTrj,0.6184788530748657,1.0,0.6648038932400855,1.9441092309890364,2,2
+SYN-094,synthetic transition-metal chalcogenides,unknown; training coverage unavailable,branch-2:MPTrj,0.621775278839483,0.9999999999999999,0.6632179204537179,1.9410283703812794,2,2
+SYN-095,synthetic transition-metal chalcogenides,unknown; training coverage unavailable,branch-15:transition1x,0.6207233283624664,1.0,0.6640910513579975,1.9427238823317687,2,2
+SYN-096,synthetic transition-metal chalcogenides,unknown; training coverage unavailable,branch-7:OMat24,0.9999999999996876,1.0,9.425082325287491e-12,1.0000000000094251,1,1
+SYN-097,synthetic transition-metal chalcogenides,unknown; training coverage unavailable,branch-2:MPTrj,0.521902098541072,1.0,0.6921874710206057,1.998081501669147,2,2
+SYN-098,synthetic transition-metal chalcogenides,unknown; training coverage unavailable,branch-2:MPTrj,0.619860015456772,0.9999999999999999,0.664133642698242,1.9428066273077396,2,2
+SYN-099,synthetic transition-metal chalcogenides,unknown; training coverage unavailable,branch-2:MPTrj,0.850922993928195,1.0,0.4229166374390245,1.5264070454621657,2,2
+SYN-100,synthetic transition-metal chalcogenides,unknown; training coverage unavailable,branch-2:MPTrj,0.7480835459128843,1.0,0.564430807116351,1.75844660252409,2,2
+SYN-101,synthetic transition-metal chalcogenides,unknown; training coverage unavailable,branch-7:OMat24,0.7713618910576071,1.0,0.6960882894903735,2.0058908764691528,3,3
+SYN-102,synthetic transition-metal chalcogenides,unknown; training coverage unavailable,branch-2:MPTrj,0.6392876881524779,1.0,0.6538269327052133,1.922885519715314,2,2
+SYN-103,synthetic transition-metal chalcogenides,unknown; training coverage unavailable,branch-2:MPTrj,0.8629843673702212,1.0,0.39950878352492186,1.4910920687262885,2,2
+SYN-104,synthetic transition-metal chalcogenides,unknown; training coverage unavailable,branch-2:MPTrj,0.8212786095605464,1.0,0.46944912205570555,1.599113034433071,2,2
+SYN-105,synthetic transition-metal chalcogenides,unknown; training coverage unavailable,branch-15:transition1x,0.6382100964268134,0.9999999999999999,0.8390459627932111,2.3141581303290537,2,3
+SYN-106,synthetic binary refractory alloys,unknown; training coverage unavailable,branch-15:transition1x,0.6812069992626777,0.9999999999999999,0.6259568287374725,1.8700344043352097,2,2
+SYN-107,synthetic binary refractory alloys,unknown; training coverage unavailable,branch-2:MPTrj,0.5240978291535562,1.0,0.6919853202186714,1.9976776287142508,2,2
+SYN-108,synthetic binary refractory alloys,unknown; training coverage unavailable,branch-2:MPTrj,0.6836886510255898,1.0000000000000002,0.6240577281975284,1.8664863910715253,2,2
+SYN-109,synthetic binary refractory alloys,unknown; training coverage unavailable,branch-2:MPTrj,0.7039566715291661,0.9999999999999999,0.6074744564758274,1.8357891737189684,2,2
+SYN-110,synthetic binary refractory alloys,unknown; training coverage unavailable,branch-2:MPTrj,0.78494817599797,1.0,0.520573490982787,1.682992554044312,2,2
+SYN-111,synthetic binary refractory alloys,unknown; training coverage unavailable,branch-7:OMat24,0.9999868275582616,0.9999999999999999,0.00017016437617728165,1.000170178854956,1,1
+SYN-112,synthetic binary refractory alloys,unknown; training coverage unavailable,branch-2:MPTrj,0.6407607925944665,1.0,0.6702438492537408,1.9547139180548099,2,2
+SYN-113,synthetic binary refractory alloys,unknown; training coverage unavailable,branch-7:OMat24,0.9999999999734204,1.0000000000000002,6.85076417137811e-10,1.0000000006850764,1,1
+SYN-114,synthetic binary refractory alloys,unknown; training coverage unavailable,branch-2:MPTrj,0.5307497755017065,1.0,0.9199686616657565,2.509211754187507,2,3
+SYN-115,synthetic binary refractory alloys,unknown; training coverage unavailable,branch-2:MPTrj,0.5761204271182084,1.0,0.6882070201794268,1.990144044284625,2,2
+SYN-116,synthetic binary refractory alloys,unknown; training coverage unavailable,branch-15:transition1x,0.5004988080056719,1.0,0.6931670945339587,2.0000398283445957,2,2
+SYN-117,synthetic binary refractory alloys,unknown; training coverage unavailable,branch-2:MPTrj,0.8179359781082063,0.9999999999999969,0.47452430982618726,1.6072494628354872,2,2
+SYN-118,synthetic binary refractory alloys,unknown; training coverage unavailable,branch-2:MPTrj,0.7037537966501621,1.0,0.607650101598135,1.8361116494527332,2,2
+SYN-119,synthetic binary refractory alloys,unknown; training coverage unavailable,branch-2:MPTrj,0.4777169765543563,1.0,0.9600902028345459,2.6119320664734147,3,3
+SYN-120,synthetic binary refractory alloys,unknown; training coverage unavailable,branch-2:MPTrj,0.7404512882513679,0.9999999999999999,0.5725843543996743,1.7728427902865882,2,2
+SYN-121,synthetic ternary refractory alloys,unknown; training coverage unavailable,branch-2:MPTrj,0.7397659761665487,1.0,0.5869444353200015,1.7984846249885975,2,2
+SYN-122,synthetic ternary refractory alloys,unknown; training coverage unavailable,branch-7:OMat24,0.9573761184006868,0.9999999999999998,0.20026588875487578,1.2217275585972172,1,1
+SYN-123,synthetic ternary refractory alloys,unknown; training coverage unavailable,branch-7:OMat24,0.9999999884300074,0.9999999999999998,2.291364307092544e-07,1.000000229136457,1,1
+SYN-124,synthetic ternary refractory alloys,unknown; training coverage unavailable,branch-7:OMat24,0.9999999997175777,1.0,6.6188007396299375e-09,1.0000000066188008,1,1
+SYN-125,synthetic ternary refractory alloys,unknown; training coverage unavailable,branch-2:MPTrj,0.5701964981884364,1.0,0.6832608628212262,1.9803247825016477,2,2
+SYN-126,synthetic ternary refractory alloys,unknown; training coverage unavailable,branch-2:MPTrj,0.5217010264705252,1.0000000000000002,0.6922406086948855,1.998187677894121,2,2
+SYN-127,synthetic ternary refractory alloys,unknown; training coverage unavailable,branch-7:OMat24,0.9999999974686995,1.0,5.383992130063339e-08,1.0000000538399227,1,1
+SYN-128,synthetic ternary refractory alloys,unknown; training coverage unavailable,branch-7:OMat24,0.9999999842471947,1.0,3.0589540489164655e-07,1.0000003058954516,1,1
+SYN-129,synthetic ternary refractory alloys,unknown; training coverage unavailable,branch-2:MPTrj,0.7027240065349433,1.0,0.6085385592358228,1.8377436817597663,2,2
+SYN-130,synthetic ternary refractory alloys,unknown; training coverage unavailable,branch-2:MPTrj,0.5302817605541192,1.0000000000000002,0.6913120877328609,1.9963331798525281,2,2
+SYN-131,synthetic ternary refractory alloys,unknown; training coverage unavailable,branch-15:transition1x,0.7129762084097664,1.0000000000000002,0.6377256308593566,1.892172483016212,2,2
+SYN-132,synthetic ternary refractory alloys,unknown; training coverage unavailable,branch-7:OMat24,0.9998139059315153,1.0,0.001882281736139433,1.0018840543404122,1,1
+SYN-133,synthetic ternary refractory alloys,unknown; training coverage unavailable,branch-2:MPTrj,0.7007094938289972,1.0000000000000002,0.6112387494902516,1.8427126448932358,2,2
+SYN-134,synthetic ternary refractory alloys,unknown; training coverage unavailable,branch-2:MPTrj,0.6750715132329851,1.0,0.630528748601745,1.878603625745584,2,2
+SYN-135,synthetic ternary refractory alloys,unknown; training coverage unavailable,branch-15:transition1x,0.6984919350587911,1.0,0.6259632974626053,1.8700465011128855,2,2
+SYN-136,synthetic multicomponent alloys,unknown; training coverage unavailable,branch-2:MPTrj,0.8739758839919948,1.0,0.3787582155902557,1.4604698742041913,2,2
+SYN-137,synthetic multicomponent alloys,unknown; training coverage unavailable,branch-2:MPTrj,1.0,1.0,1.3080150772380378e-75,1.0,1,1
+SYN-138,synthetic multicomponent alloys,unknown; training coverage unavailable,branch-2:MPTrj,0.6851218766697067,0.9999999999999999,0.623341270277112,1.8651496110437942,2,2
+SYN-139,synthetic multicomponent alloys,unknown; training coverage unavailable,branch-2:MPTrj,0.7825962500048516,1.0,0.5239985901325082,1.6887668535392972,2,2
+SYN-140,synthetic multicomponent alloys,unknown; training coverage unavailable,branch-2:MPTrj,0.8364792563526706,1.0,0.44546290462178917,1.5612127211738323,2,2
+SYN-141,synthetic multicomponent alloys,unknown; training coverage unavailable,branch-2:MPTrj,0.6505172737405676,0.9999999999999999,0.6544572494548115,1.9240979287266635,2,2
+SYN-142,synthetic multicomponent alloys,unknown; training coverage unavailable,branch-2:MPTrj,0.7573477012067225,1.0,0.5544050838185219,1.7409049840923938,2,2
+SYN-143,synthetic multicomponent alloys,unknown; training coverage unavailable,branch-2:MPTrj,0.8755484509807745,0.9999999999999999,0.37570156765947005,1.456012547694592,2,2
+SYN-144,synthetic multicomponent alloys,unknown; training coverage unavailable,branch-2:MPTrj,0.9512145839766897,1.0,0.1949233257774351,1.2152178070369437,1,1
+SYN-145,synthetic multicomponent alloys,unknown; training coverage unavailable,branch-7:OMat24,0.682184192150333,1.0,0.8401565085773006,2.316729536452243,3,3
+SYN-146,synthetic multicomponent alloys,unknown; training coverage unavailable,branch-2:MPTrj,0.8021070135896304,0.9999999999999952,0.4974675723554264,1.644551285697235,2,2
+SYN-147,synthetic multicomponent alloys,unknown; training coverage unavailable,branch-2:MPTrj,0.8305344199137557,1.0,0.45503789147275236,1.5762331076963079,2,2
+SYN-148,synthetic multicomponent alloys,unknown; training coverage unavailable,branch-2:MPTrj,0.6376215895039619,0.9999999999999999,0.6822291116438767,1.9782826337516133,2,2
+SYN-149,synthetic multicomponent alloys,unknown; training coverage unavailable,branch-2:MPTrj,0.7547908993366715,1.0,0.5572442785541968,1.745854775744707,2,2
+SYN-150,synthetic multicomponent alloys,unknown; training coverage unavailable,branch-2:MPTrj,0.7971051198347296,1.0,0.5056107379525475,1.6579978134964404,2,2
+SYN-151,synthetic semiconductor motifs,unknown; training coverage unavailable,branch-2:MPTrj,0.6818385379297203,1.0,0.7121571315666582,2.0383835811025923,2,2
+SYN-152,synthetic semiconductor motifs,unknown; training coverage unavailable,branch-7:OMat24,0.9898084652041143,0.9999999999999999,0.063765890403048,1.0658428455122626,1,1
+SYN-153,synthetic semiconductor motifs,unknown; training coverage unavailable,branch-7:OMat24,0.9835248384157534,1.0000000000000002,0.09540361157590549,1.100102779750111,1,1
+SYN-154,synthetic semiconductor motifs,unknown; training coverage unavailable,branch-7:OMat24,0.9381240125017336,1.0,0.2749875455447261,1.3165142782973203,1,2
+SYN-155,synthetic semiconductor motifs,unknown; training coverage unavailable,branch-2:MPTrj,0.5567979184047812,1.0,0.7613343826397322,2.1411314036941915,2,2
+SYN-156,synthetic semiconductor motifs,unknown; training coverage unavailable,branch-7:OMat24,0.9362961963745491,0.9999999999999999,0.27958271235198917,1.322577801791635,1,2
+SYN-157,synthetic semiconductor motifs,unknown; training coverage unavailable,branch-15:transition1x,0.5123658986596794,1.0,0.756419326364849,2.1306334425220244,2,2
+SYN-158,synthetic semiconductor motifs,unknown; training coverage unavailable,branch-2:MPTrj,0.6603008042961092,1.0,0.6408357544906642,1.8980665342331062,2,2
+SYN-159,synthetic semiconductor motifs,unknown; training coverage unavailable,branch-15:transition1x,0.48915799164064155,1.0,0.7957844181796829,2.2161787260439025,2,2
+SYN-160,synthetic semiconductor motifs,unknown; training coverage unavailable,branch-2:MPTrj,0.5424330108135743,1.0,0.6895547789349764,1.9928280866596335,2,2
+SYN-161,synthetic semiconductor motifs,unknown; training coverage unavailable,branch-2:MPTrj,0.638312854187057,0.9999999999999999,0.6543827449911389,1.9239545801825495,2,2
+SYN-162,synthetic semiconductor motifs,unknown; training coverage unavailable,branch-15:transition1x,0.5314040765715583,1.0,0.7713302902882687,2.162641281744154,2,2
+SYN-163,synthetic semiconductor motifs,unknown; training coverage unavailable,branch-15:transition1x,0.5830600834277395,1.0,0.6792850534103795,1.9724670194297047,2,2
+SYN-164,synthetic semiconductor motifs,unknown; training coverage unavailable,branch-15:transition1x,0.5952785109590158,1.0,0.6748796835267492,1.9637966846639836,2,2
+SYN-165,synthetic semiconductor motifs,unknown; training coverage unavailable,branch-2:MPTrj,0.6994590011870565,1.0,0.6178085030182907,1.8548586672930978,2,2
+SYN-166,synthetic ionic/halide motifs,unknown; training coverage unavailable,branch-2:MPTrj,1.0,1.0,-0.0,1.0,1,1
+SYN-167,synthetic ionic/halide motifs,unknown; training coverage unavailable,branch-7:OMat24,1.0,1.0,-0.0,1.0,1,1
+SYN-168,synthetic ionic/halide motifs,unknown; training coverage unavailable,branch-7:OMat24,1.0,1.0,-0.0,1.0,1,1
+SYN-169,synthetic ionic/halide motifs,unknown; training coverage unavailable,branch-2:MPTrj,1.0,1.0,5.488686112062517e-75,1.0,1,1
+SYN-170,synthetic ionic/halide motifs,unknown; training coverage unavailable,branch-2:MPTrj,1.0,1.0,-0.0,1.0,1,1
+SYN-171,synthetic ionic/halide motifs,unknown; training coverage unavailable,branch-4:OC2022,1.0,1.0,-0.0,1.0,1,1
+SYN-172,synthetic ionic/halide motifs,unknown; training coverage unavailable,branch-2:MPTrj,1.0,1.0,-0.0,1.0,1,1
+SYN-173,synthetic ionic/halide motifs,unknown; training coverage unavailable,branch-2:MPTrj,1.0,1.0,-0.0,1.0,1,1
+SYN-174,synthetic ionic/halide motifs,unknown; training coverage unavailable,branch-4:OC2022,1.0,1.0,-0.0,1.0,1,1
+SYN-175,synthetic ionic/halide motifs,unknown; training coverage unavailable,branch-7:OMat24,1.0,1.0,-0.0,1.0,1,1
+SYN-176,synthetic ionic/halide motifs,unknown; training coverage unavailable,branch-2:MPTrj,1.0,1.0,-0.0,1.0,1,1
+SYN-177,synthetic ionic/halide motifs,unknown; training coverage unavailable,branch-2:MPTrj,1.0,1.0,9.771296831784645e-120,1.0,1,1
+SYN-178,synthetic ionic/halide motifs,unknown; training coverage unavailable,branch-2:MPTrj,1.0,1.0,-0.0,1.0,1,1
+SYN-179,synthetic ionic/halide motifs,unknown; training coverage unavailable,branch-7:OMat24,1.0,1.0,3.3659187892220686e-266,1.0,1,1
+SYN-180,synthetic ionic/halide motifs,unknown; training coverage unavailable,branch-2:MPTrj,1.0,1.0,2.2063177743490598e-117,1.0,1,1
+SYN-181,synthetic rare-earth oxides,unknown; training coverage unavailable,branch-4:OC2022,1.0,1.0,-0.0,1.0,1,1
+SYN-182,synthetic rare-earth oxides,unknown; training coverage unavailable,branch-2:MPTrj,1.0,1.0,-0.0,1.0,1,1
+SYN-183,synthetic rare-earth oxides,unknown; training coverage unavailable,branch-4:OC2022,1.0,1.0,-0.0,1.0,1,1
+SYN-184,synthetic rare-earth oxides,unknown; training coverage unavailable,branch-2:MPTrj,1.0,1.0,-0.0,1.0,1,1
+SYN-185,synthetic rare-earth oxides,unknown; training coverage unavailable,branch-4:OC2022,1.0,1.0,-0.0,1.0,1,1
+SYN-186,synthetic rare-earth oxides,unknown; training coverage unavailable,branch-4:OC2022,1.0,1.0,1.4086871060353487e-83,1.0,1,1
+SYN-187,synthetic rare-earth oxides,unknown; training coverage unavailable,branch-4:OC2022,1.0,1.0,-0.0,1.0,1,1
+SYN-188,synthetic rare-earth oxides,unknown; training coverage unavailable,branch-4:OC2022,1.0,1.0,-0.0,1.0,1,1
+SYN-189,synthetic rare-earth oxides,unknown; training coverage unavailable,branch-4:OC2022,1.0,1.0,-0.0,1.0,1,1
+SYN-190,synthetic rare-earth oxides,unknown; training coverage unavailable,branch-4:OC2022,1.0,1.0,-0.0,1.0,1,1
+SYN-191,synthetic rare-earth oxides,unknown; training coverage unavailable,branch-4:OC2022,1.0,1.0,-0.0,1.0,1,1
+SYN-192,synthetic rare-earth oxides,unknown; training coverage unavailable,branch-4:OC2022,1.0,1.0,-0.0,1.0,1,1
+SYN-193,synthetic rare-earth oxides,unknown; training coverage unavailable,branch-2:MPTrj,0.959479532543274,0.9999999999999999,0.1695947087281624,1.1848245549461973,1,1
+SYN-194,synthetic rare-earth oxides,unknown; training coverage unavailable,branch-4:OC2022,1.0,1.0,-0.0,1.0,1,1
+SYN-195,synthetic rare-earth oxides,unknown; training coverage unavailable,branch-2:MPTrj,0.9999999814732227,0.9999999999999999,3.483784217813507e-07,1.0000003483784825,1,1

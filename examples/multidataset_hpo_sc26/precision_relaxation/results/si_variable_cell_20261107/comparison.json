@@ -1,0 +1,227 @@
+{
+  "fused": {
+    "precision": "fp64",
+    "head_mode": "fused",
+    "selected_branch_id": null,
+    "status": "max_steps_without_convergence",
+    "converged": false,
+    "force_tolerance_ev_per_angstrom": 0.05,
+    "cell_relaxation": true,
+    "cell_factor": 8.0,
+    "maximum_steps": 200,
+    "steps_taken": 200,
+    "total_calculation_time_seconds": 16.991489499807358,
+    "initial_energy_ev": 1.450907972418795,
+    "final_energy_ev": 1.365186660709176,
+    "final_maximum_force_ev_per_angstrom": 0.47590629665736883,
+    "final_rms_force_ev_per_angstrom": 0.18707640716067128,
+    "final_maximum_optimization_force": 0.48235019788797034,
+    "final_maximum_absolute_stress_ev_per_angstrom3": 0.006279630024784993,
+    "initial_branch_weights_json": "[8.483632264696845e-228, 0.0, 0.0003073657110139529, 0.0, 7.373603510971982e-21, 0.0, 0.0, 0.9996926342790214, 7.973904427521348e-41, 0.0, 2.0837557903574047e-290, 0.0, 0.0, 0.0, 0.0, 9.964414787356667e-12]",
+    "final_branch_weights_json": "[8.483632264696845e-228, 0.0, 0.0003073657110139529, 0.0, 7.373603510971982e-21, 0.0, 0.0, 0.9996926342790214, 7.973904427521348e-41, 0.0, 2.0837557903574047e-290, 0.0, 0.0, 0.0, 0.0, 9.964414787356667e-12]",
+    "graph_edges_final": 160,
+    "trajectory_csv": "trajectory.csv",
+    "trajectory_file": "trajectory.traj",
+    "error": null,
+    "initial_lattice_angstrom": [
+      [
+        5.43,
+        0.0,
+        0.0
+      ],
+      [
+        0.0,
+        5.43,
+        0.0
+      ],
+      [
+        0.0,
+        0.0,
+        5.43
+      ]
+    ],
+    "final_lattice_angstrom": [
+      [
+        5.51465676609485,
+        -0.02270387916010389,
+        -0.008653967919689212
+      ],
+      [
+        -0.022706296097075425,
+        5.492450968120258,
+        0.01972747690607388
+      ],
+      [
+        -0.008533569493644625,
+        0.0197733079852322,
+        5.512805055102371
+      ]
+    ],
+    "initial_volume_angstrom3": 160.10300699999996,
+    "final_volume_angstrom3": 166.97186148203366,
+    "final_lattice_lengths_angstrom": [
+      5.514710292039409,
+      5.4925333304799056,
+      5.512847121141601
+    ],
+    "final_stress_ev_per_angstrom3": [
+      0.0033762136149870976,
+      0.002114074210468659,
+      0.0030312713774456857,
+      0.006279630024784993,
+      -0.0021390469808230984,
+      -0.0030290647125328658
+    ],
+    "provenance": {
+      "head_mode": "fused",
+      "mlp_loaded": true,
+      "precision": "fp64",
+      "device": "cpu",
+      "mlp_device": "cpu",
+      "parameter_dtype": "torch.float64",
+      "mlp_parameter_dtype": "torch.float64",
+      "number_of_branches": 16,
+      "branch_output_order": [
+        "branch-0",
+        "branch-1",
+        "branch-2",
+        "branch-3",
+        "branch-4",
+        "branch-5",
+        "branch-6",
+        "branch-7",
+        "branch-8",
+        "branch-9",
+        "branch-10",
+        "branch-11",
+        "branch-12",
+        "branch-13",
+        "branch-14",
+        "branch-15"
+      ],
+      "checkpoint_sha256": {
+        "hydragNN": "8532b03296a8ab4cfc3b37beb6d57b2091a50807b155fac93cb1882253d32867",
+        "branch_weight_mlp": "c984b338ee947534bbdedf1fc4dd2aea92bb846e3302638d6719b1e3f5ca7ca8"
+      },
+      "state_dict_prefix_normalization": "Repeated leading 'module.' prefixes removed; strict key match then enforced",
+      "radius_angstrom": 5.0,
+      "max_neighbours": 20,
+      "model_eval_mode": true,
+      "mlp_eval_mode": true,
+      "all_parameters_frozen": true
+    }
+  },
+  "single": {
+    "precision": "fp64",
+    "head_mode": "single",
+    "selected_branch_id": 7,
+    "status": "max_steps_without_convergence",
+    "converged": false,
+    "force_tolerance_ev_per_angstrom": 0.05,
+    "cell_relaxation": true,
+    "cell_factor": 8.0,
+    "maximum_steps": 200,
+    "steps_taken": 200,
+    "total_calculation_time_seconds": 1.5999362079892308,
+    "initial_energy_ev": 1.4484604101493535,
+    "final_energy_ev": 1.3627230473726568,
+    "final_maximum_force_ev_per_angstrom": 0.47604195509760966,
+    "final_rms_force_ev_per_angstrom": 0.18713108943371265,
+    "final_maximum_optimization_force": 0.48248782562063985,
+    "final_maximum_absolute_stress_ev_per_angstrom3": 0.006280360643331769,
+    "initial_branch_weights_json": "[0.0, 0.0, 0.0, 0.0, 0.0, 0.0, 0.0, 1.0, 0.0, 0.0, 0.0, 0.0, 0.0, 0.0, 0.0, 0.0]",
+    "final_branch_weights_json": "[0.0, 0.0, 0.0, 0.0, 0.0, 0.0, 0.0, 1.0, 0.0, 0.0, 0.0, 0.0, 0.0, 0.0, 0.0, 0.0]",
+    "graph_edges_final": 160,
+    "trajectory_csv": "trajectory.csv",
+    "trajectory_file": "trajectory.traj",
+    "error": null,
+    "initial_lattice_angstrom": [
+      [
+        5.43,
+        0.0,
+        0.0
+      ],
+      [
+        0.0,
+        5.43,
+        0.0
+      ],
+      [
+        0.0,
+        0.0,
+        5.43
+      ]
+    ],
+    "final_lattice_angstrom": [
+      [
+        5.51465995332387,
+        -0.022698679005550077,
+        -0.008657443945845679
+      ],
+      [
+        -0.022701055573759815,
+        5.492455624231949,
+        0.019723105458431343
+      ],
+      [
+        -0.0085370569489578,
+        0.019768941145004694,
+        5.51280652037792
+      ]
+    ],
+    "initial_volume_angstrom3": 160.10300699999996,
+    "final_volume_angstrom3": 166.97214584778763,
+    "final_lattice_lengths_angstrom": [
+      5.514713463286945,
+      5.492537949160685,
+      5.5128485761443375
+    ],
+    "final_stress_ev_per_angstrom3": [
+      0.0033773112090072165,
+      0.0021149409074573008,
+      0.0030322039466760017,
+      0.006280360643331769,
+      -0.0021397027662058287,
+      -0.003029050045038184
+    ],
+    "provenance": {
+      "head_mode": "single",
+      "mlp_loaded": false,
+      "selected_branch_id": 7,
+      "selected_branch_name": "branch-7",
+      "evaluated_branch_ids": [
+        7
+      ],
+      "precision": "fp64",
+      "device": "cpu",
+      "parameter_dtype": "torch.float64",
+      "number_of_branches": 16,
+      "branch_output_order": [
+        "branch-0",
+        "branch-1",
+        "branch-2",
+        "branch-3",
+        "branch-4",
+        "branch-5",
+        "branch-6",
+        "branch-7",
+        "branch-8",
+        "branch-9",
+        "branch-10",
+        "branch-11",
+        "branch-12",
+        "branch-13",
+        "branch-14",
+        "branch-15"
+      ],
+      "checkpoint_sha256": {
+        "hydragNN": "8532b03296a8ab4cfc3b37beb6d57b2091a50807b155fac93cb1882253d32867"
+      },
+      "state_dict_prefix_normalization": "Repeated leading 'module.' prefixes removed; strict key match then enforced",
+      "radius_angstrom": 5.0,
+      "max_neighbours": 20,
+      "model_eval_mode": true,
+      "all_model_parameters_frozen": true
+    }
+  }
+}

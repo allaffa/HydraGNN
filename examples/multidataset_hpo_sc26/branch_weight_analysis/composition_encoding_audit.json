@@ -1,0 +1,18 @@
+{
+  "status": "archive comparison not performed; synthetic-only scope",
+  "feature_definition": "118-bin atomic-number count histogram; vector index Z-1 stores count of element Z",
+  "source_code_evidence": [
+    "examples/ani1_x/train.py: bins=range(1, 118 + 2), histogram cast to float32",
+    "examples/transition1x/train.py: same 118-bin histogram construction",
+    "examples/multidataset_hpo_sc26/inference_fused.py: reshape to [graphs, features], then direct MLP input"
+  ],
+  "raw_counts": true,
+  "normalized": false,
+  "absent_elements_are_zero": true,
+  "depends_on_unit_cell_or_structure_atom_count": true,
+  "pre_mlp_transform": "layout reshape and dtype/device conversion only; no count normalization",
+  "generated_structure_vectors": "computed from ASE atomic numbers using the same histogram bins",
+  "archived_structure_checks_required": 3,
+  "archived_structure_checks_completed": 0,
+  "limitation": "No archived structures with stored chemical_composition are available locally; generated records cannot establish an independent stored-field match."
+}

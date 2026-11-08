@@ -1,0 +1,150 @@
+{
+  "status": "verified",
+  "dataset_branch_order": [
+    {
+      "branch_id_zero_based": 0,
+      "branch_name": "Alexandria"
+    },
+    {
+      "branch_id_zero_based": 1,
+      "branch_name": "ANI1x"
+    },
+    {
+      "branch_id_zero_based": 2,
+      "branch_name": "MPTrj"
+    },
+    {
+      "branch_id_zero_based": 3,
+      "branch_name": "OC2020"
+    },
+    {
+      "branch_id_zero_based": 4,
+      "branch_name": "OC2022"
+    },
+    {
+      "branch_id_zero_based": 5,
+      "branch_name": "OC25"
+    },
+    {
+      "branch_id_zero_based": 6,
+      "branch_name": "ODAC23"
+    },
+    {
+      "branch_id_zero_based": 7,
+      "branch_name": "OMat24"
+    },
+    {
+      "branch_id_zero_based": 8,
+      "branch_name": "OMol25"
+    },
+    {
+      "branch_id_zero_based": 9,
+      "branch_name": "OMol25-neutral"
+    },
+    {
+      "branch_id_zero_based": 10,
+      "branch_name": "OMol25-non-neutral"
+    },
+    {
+      "branch_id_zero_based": 11,
+      "branch_name": "OPoly2026"
+    },
+    {
+      "branch_id_zero_based": 12,
+      "branch_name": "Nabla2DFT"
+    },
+    {
+      "branch_id_zero_based": 13,
+      "branch_name": "QCML"
+    },
+    {
+      "branch_id_zero_based": 14,
+      "branch_name": "QM7X"
+    },
+    {
+      "branch_id_zero_based": 15,
+      "branch_name": "transition1x"
+    }
+  ],
+  "evidence": {
+    "training_config": "multidataset_hpo-BEST6-fp64/config.json",
+    "training_config_graph_head_order": [
+      "branch-0",
+      "branch-1",
+      "branch-2",
+      "branch-3",
+      "branch-4",
+      "branch-5",
+      "branch-6",
+      "branch-7",
+      "branch-8",
+      "branch-9",
+      "branch-10",
+      "branch-11",
+      "branch-12",
+      "branch-13",
+      "branch-14",
+      "branch-15"
+    ],
+    "launch_script": "SC26-job-best-continue-aurora.sh",
+    "launch_alias_order": [
+      "Alexandria",
+      "ANI1x",
+      "MPTrj",
+      "OC2020",
+      "OC2022",
+      "OC25",
+      "ODAC23",
+      "OMat24",
+      "OMol25",
+      "OMol25-neutral",
+      "OMol25-non-neutral",
+      "OPoly2026",
+      "Nabla2DFT",
+      "QCML",
+      "QM7X",
+      "transition1x"
+    ],
+    "run_log": "multidataset_hpo-BEST6-fp64/run-4284444.log",
+    "run_log_multi_model_list_order": [
+      "Alexandria",
+      "ANI1x",
+      "MPTrj",
+      "OC2020",
+      "OC2022",
+      "OC25",
+      "ODAC23",
+      "OMat24",
+      "OMol25",
+      "OMol25-neutral",
+      "OMol25-non-neutral",
+      "OPoly2026",
+      "Nabla2DFT",
+      "QCML",
+      "QM7X",
+      "transition1x"
+    ],
+    "training_code_enumerates_model_order_zero_based": true,
+    "dataset_ids_validated_in_zero_based_range": true,
+    "hydragNN_checkpoint_branch_ids": [
+      "branch-0",
+      "branch-1",
+      "branch-2",
+      "branch-3",
+      "branch-4",
+      "branch-5",
+      "branch-6",
+      "branch-7",
+      "branch-8",
+      "branch-9",
+      "branch-10",
+      "branch-11",
+      "branch-12",
+      "branch-13",
+      "branch-14",
+      "branch-15"
+    ]
+  },
+  "interpretation": "branch-k is zero-based and associated with the kth name in multi_model_list",
+  "mlp_checkpoint_branch_order_metadata": "not stored inside the MLP checkpoint; pairing/mapping comes from matched run metadata"
+}

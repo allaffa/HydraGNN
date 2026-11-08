@@ -1,0 +1,148 @@
+{
+  "model": "Frozen HydraGNN/BranchWeightMLP fused 16-head checkpoint",
+  "precision_pair": [
+    "fp32",
+    "fp64"
+  ],
+  "optimizer": "ASE FIRE",
+  "optimizer_maxstep_angstrom": 0.03,
+  "force_tolerance_ev_per_angstrom": 0.05,
+  "maximum_steps": 500,
+  "seed": 20261109,
+  "atomic_displacement_range_angstrom": [
+    0.1,
+    0.15
+  ],
+  "cell_scales_from_prototype": {
+    "Si_diamond": 1.05,
+    "MgO_rocksalt": 0.95
+  },
+  "cell_relaxation": "hydrostatic volume-only strain, with positions relaxed",
+  "results": [
+    {
+      "structure": "Si_diamond",
+      "precision": "fp32",
+      "status": "converged",
+      "converged": true,
+      "steps": 181,
+      "cell_scale_from_prototype": 1.05,
+      "initial_energy_ev_per_atom": 0.7515881657600403,
+      "final_energy_ev_per_atom": 0.724682629108429,
+      "initial_maximum_force_ev_per_angstrom": 0.3827357862323805,
+      "final_maximum_force_ev_per_angstrom": 0.036214845126689106,
+      "final_maximum_generalized_force": 0.04987122355236562,
+      "initial_maximum_absolute_stress_ev_per_angstrom3": 0.006657344289124012,
+      "final_maximum_absolute_stress_ev_per_angstrom3": 0.002360845683142543,
+      "initial_cell_lengths_angstrom": [
+        11.403,
+        11.403,
+        11.403
+      ],
+      "final_cell_lengths_angstrom": [
+        10.932654469152872,
+        10.932654469152872,
+        10.932654469152872
+      ],
+      "rms_atomic_displacement_angstrom": 0.11650961536994302,
+      "maximum_atomic_displacement_angstrom": 0.14886065187169972,
+      "cell_linear_change_percent": -4.12475252869533,
+      "cell_volume_change_percent": -11.870867765521186,
+      "final_structure": "Si_diamond/fp32/final.extxyz",
+      "error": null
+    },
+    {
+      "structure": "Si_diamond",
+      "precision": "fp64",
+      "status": "converged",
+      "converged": true,
+      "steps": 181,
+      "cell_scale_from_prototype": 1.05,
+      "initial_energy_ev_per_atom": 0.7515908158277353,
+      "final_energy_ev_per_atom": 0.7246682171376643,
+      "initial_maximum_force_ev_per_angstrom": 0.3827377948491777,
+      "final_maximum_force_ev_per_angstrom": 0.03290071481285012,
+      "final_maximum_generalized_force": 0.04992463802936405,
+      "initial_maximum_absolute_stress_ev_per_angstrom3": 0.006657357393288287,
+      "final_maximum_absolute_stress_ev_per_angstrom3": 0.0024043502747383614,
+      "initial_cell_lengths_angstrom": [
+        11.403,
+        11.403,
+        11.403
+      ],
+      "final_cell_lengths_angstrom": [
+        10.932636531737128,
+        10.932636531737128,
+        10.932636531737128
+      ],
+      "rms_atomic_displacement_angstrom": 0.1165295161112723,
+      "maximum_atomic_displacement_angstrom": 0.14945208687903777,
+      "cell_linear_change_percent": -4.124909833051604,
+      "cell_volume_change_percent": -11.871301550279068,
+      "final_structure": "Si_diamond/fp64/final.extxyz",
+      "error": null
+    },
+    {
+      "structure": "MgO_rocksalt",
+      "precision": "fp32",
+      "status": "converged",
+      "converged": true,
+      "steps": 84,
+      "cell_scale_from_prototype": 0.95,
+      "initial_energy_ev_per_atom": -0.5099915266036987,
+      "final_energy_ev_per_atom": -0.5329748392105103,
+      "initial_maximum_force_ev_per_angstrom": 0.8326582886533574,
+      "final_maximum_force_ev_per_angstrom": 0.02710391467727685,
+      "final_maximum_generalized_force": 0.0479771762581396,
+      "initial_maximum_absolute_stress_ev_per_angstrom3": 0.038260914385318756,
+      "final_maximum_absolute_stress_ev_per_angstrom3": 0.005819546524435282,
+      "initial_cell_lengths_angstrom": [
+        8.002799999999999,
+        8.002799999999999,
+        8.002799999999999
+      ],
+      "final_cell_lengths_angstrom": [
+        8.123006022438542,
+        8.123006022438542,
+        8.123006022438542
+      ],
+      "rms_atomic_displacement_angstrom": 0.12714736633094864,
+      "maximum_atomic_displacement_angstrom": 0.16209964700888757,
+      "cell_linear_change_percent": 1.5020495631346886,
+      "cell_volume_change_percent": 4.574172161453771,
+      "final_structure": "MgO_rocksalt/fp32/final.extxyz",
+      "error": null
+    },
+    {
+      "structure": "MgO_rocksalt",
+      "precision": "fp64",
+      "status": "converged",
+      "converged": true,
+      "steps": 84,
+      "cell_scale_from_prototype": 0.95,
+      "initial_energy_ev_per_atom": -0.5099917012426717,
+      "final_energy_ev_per_atom": -0.5329748607424672,
+      "initial_maximum_force_ev_per_angstrom": 0.8326582116944453,
+      "final_maximum_force_ev_per_angstrom": 0.02711023928002187,
+      "final_maximum_generalized_force": 0.04797654627044137,
+      "initial_maximum_absolute_stress_ev_per_angstrom3": 0.03826095413943684,
+      "final_maximum_absolute_stress_ev_per_angstrom3": 0.005819457138099309,
+      "initial_cell_lengths_angstrom": [
+        8.002799999999999,
+        8.002799999999999,
+        8.002799999999999
+      ],
+      "final_cell_lengths_angstrom": [
+        8.123006008860054,
+        8.123006008860054,
+        8.123006008860054
+      ],
+      "rms_atomic_displacement_angstrom": 0.1271469803700523,
+      "maximum_atomic_displacement_angstrom": 0.1620995049857968,
+      "cell_linear_change_percent": 1.5020493934629897,
+      "cell_volume_change_percent": 4.574171637032487,
+      "final_structure": "MgO_rocksalt/fp64/final.extxyz",
+      "error": null
+    }
+  ],
+  "scientific_limit": "Predictions from the frozen learned potential only; no independent DFT or experimental reference validation was performed."
+}

@@ -1,0 +1,4659 @@
+{
+  "model": "Frozen HydraGNN/BranchWeightMLP fused 16-head checkpoint",
+  "precision_pair": [
+    "fp32",
+    "fp64"
+  ],
+  "optimizer": "ASE FIRE",
+  "optimizer_maxstep_angstrom": 0.03,
+  "force_tolerance_ev_per_angstrom": 0.05,
+  "maximum_steps": 500,
+  "seed": 20261109,
+  "atomic_displacement_range_angstrom": [
+    0.1,
+    0.15
+  ],
+  "broad": true,
+  "cell_mode": "full",
+  "expected_runs": 52,
+  "study_status": "complete",
+  "cell_relaxation": "full cell lengths and shape, with positions relaxed",
+  "results": [
+    {
+      "structure": "C_diamond_compressed",
+      "precision": "fp32",
+      "status": "max_steps_without_convergence",
+      "converged": false,
+      "steps": 500,
+      "prototype": "C_diamond",
+      "cell_scale_from_prototype": 0.95,
+      "initial_energy_ev_per_atom": -0.2364189475774765,
+      "final_energy_ev_per_atom": -0.40823817253112793,
+      "initial_maximum_force_ev_per_angstrom": 5.3155677837118676,
+      "final_maximum_force_ev_per_angstrom": 2.3559703641490786,
+      "final_maximum_generalized_force": 2.333056316561198,
+      "initial_maximum_absolute_stress_ev_per_angstrom3": 0.03292577341198921,
+      "final_maximum_absolute_stress_ev_per_angstrom3": 0.03811638802289963,
+      "initial_cell_lengths_angstrom": [
+        6.7773,
+        6.7773,
+        6.7773
+      ],
+      "final_cell_lengths_angstrom": [
+        6.710720653920501,
+        6.705715239724913,
+        6.696973419754834
+      ],
+      "initial_cell_vectors_angstrom": [
+        [
+          6.7773,
+          0.0,
+          0.0
+        ],
+        [
+          0.0,
+          6.7773,
+          0.0
+        ],
+        [
+          0.0,
+          0.0,
+          6.7773
+        ]
+      ],
+      "final_cell_vectors_angstrom": [
+        [
+          6.7106924904709375,
+          -0.008992334793510704,
+          0.017237494223955145
+        ],
+        [
+          -0.008966961178626862,
+          6.705680053684027,
+          0.01978604332236941
+        ],
+        [
+          0.017206919609526954,
+          0.019778401301213836,
+          6.69692210807788
+        ]
+      ],
+      "initial_cell_angles_degrees": [
+        90.0,
+        90.0,
+        90.0
+      ],
+      "final_cell_angles_degrees": [
+        89.6619251924721,
+        89.70584103375532,
+        90.15295787584621
+      ],
+      "final_minimum_interatomic_distance_angstrom": 1.2506372214994494,
+      "initial_rms_internal_offset_from_prototype_angstrom": 0.12305488299647305,
+      "final_rms_internal_offset_from_prototype_angstrom": 0.5517325641169839,
+      "rms_atomic_displacement_angstrom": 0.5472804020205742,
+      "maximum_atomic_displacement_angstrom": 0.9276335024608364,
+      "cell_linear_change_percent": -1.0746201122362131,
+      "cell_volume_change_percent": -3.192758466040091,
+      "final_structure": "C_diamond_compressed/fp32/final.extxyz",
+      "error": null
+    },
+    {
+      "structure": "C_diamond_compressed",
+      "precision": "fp64",
+      "status": "max_steps_without_convergence",
+      "converged": false,
+      "steps": 500,
+      "prototype": "C_diamond",
+      "cell_scale_from_prototype": 0.95,
+      "initial_energy_ev_per_atom": -0.23641966802367922,
+      "final_energy_ev_per_atom": -0.43307871755617117,
+      "initial_maximum_force_ev_per_angstrom": 5.315562356373413,
+      "final_maximum_force_ev_per_angstrom": 1.9418896339249379,
+      "final_maximum_generalized_force": 1.9260653454653507,
+      "initial_maximum_absolute_stress_ev_per_angstrom3": 0.032926717270528566,
+      "final_maximum_absolute_stress_ev_per_angstrom3": 0.028719703254697828,
+      "initial_cell_lengths_angstrom": [
+        6.7773,
+        6.7773,
+        6.7773
+      ],
+      "final_cell_lengths_angstrom": [
+        6.699850801127295,
+        6.701052004191841,
+        6.720267584355288
+      ],
+      "initial_cell_vectors_angstrom": [
+        [
+          6.7773,
+          0.0,
+          0.0
+        ],
+        [
+          0.0,
+          6.7773,
+          0.0
+        ],
+        [
+          0.0,
+          0.0,
+          6.7773
+        ]
+      ],
+      "final_cell_vectors_angstrom": [
+        [
+          6.699846059475685,
+          0.007946386382286414,
+          0.0006258096027692858
+        ],
+        [
+          0.007956731742637944,
+          6.701042715386529,
+          0.0078217561077776
+        ],
+        [
+          0.0006315318142036211,
+          0.007816207467180857,
+          6.720263009243378
+        ]
+      ],
+      "initial_cell_angles_degrees": [
+        90.0,
+        90.0,
+        90.0
+      ],
+      "final_cell_angles_degrees": [
+        89.86647596198247,
+        89.98918484569941,
+        89.86400569042208
+      ],
+      "final_minimum_interatomic_distance_angstrom": 1.2851059907550666,
+      "initial_rms_internal_offset_from_prototype_angstrom": 0.12305488299647305,
+      "final_rms_internal_offset_from_prototype_angstrom": 0.5873270672343437,
+      "rms_atomic_displacement_angstrom": 0.5754651033170256,
+      "maximum_atomic_displacement_angstrom": 1.1580028557690523,
+      "cell_linear_change_percent": -1.0364481938509251,
+      "cell_volume_change_percent": -3.0780496205881303,
+      "final_structure": "C_diamond_compressed/fp64/final.extxyz",
+      "error": null
+    },
+    {
+      "structure": "C_diamond_expanded",
+      "precision": "fp32",
+      "status": "max_steps_without_convergence",
+      "converged": false,
+      "steps": 500,
+      "prototype": "C_diamond",
+      "cell_scale_from_prototype": 1.05,
+      "initial_energy_ev_per_atom": -0.32887399196624756,
+      "final_energy_ev_per_atom": -0.42681849002838135,
+      "initial_maximum_force_ev_per_angstrom": 1.843354264685973,
+      "final_maximum_force_ev_per_angstrom": 0.12628392464152075,
+      "final_maximum_generalized_force": 0.12417104228552976,
+      "initial_maximum_absolute_stress_ev_per_angstrom3": 0.03626358509063721,
+      "final_maximum_absolute_stress_ev_per_angstrom3": 0.003925337456166744,
+      "initial_cell_lengths_angstrom": [
+        7.4907,
+        7.4907,
+        7.4907
+      ],
+      "final_cell_lengths_angstrom": [
+        7.366145871291365,
+        7.365484082956702,
+        7.360359726398049
+      ],
+      "initial_cell_vectors_angstrom": [
+        [
+          7.4907,
+          0.0,
+          0.0
+        ],
+        [
+          0.0,
+          7.4907,
+          0.0
+        ],
+        [
+          0.0,
+          0.0,
+          7.4907
+        ]
+      ],
+      "final_cell_vectors_angstrom": [
+        [
+          7.366145862902517,
+          7.563502674928333e-06,
+          -0.0003514679835572555
+        ],
+        [
+          7.844530589159014e-06,
+          7.365484076431522,
+          -0.00030993658878286987
+        ],
+        [
+          -0.00035184878487820375,
+          -0.00031017112962910377,
+          7.360359711452876
+        ]
+      ],
+      "initial_cell_angles_degrees": [
+        90.0,
+        90.0,
+        90.0
+      ],
+      "final_cell_angles_degrees": [
+        90.00482547363879,
+        90.00547273285852,
+        89.99988003182962
+      ],
+      "final_minimum_interatomic_distance_angstrom": 1.5865095154143096,
+      "initial_rms_internal_offset_from_prototype_angstrom": 0.12305488299647296,
+      "final_rms_internal_offset_from_prototype_angstrom": 0.019257872895004215,
+      "rms_atomic_displacement_angstrom": 0.12156870008565658,
+      "maximum_atomic_displacement_angstrom": 0.16392469245469635,
+      "cell_linear_change_percent": -1.6914766281472815,
+      "cell_volume_change_percent": -4.989099381535045,
+      "final_structure": "C_diamond_expanded/fp32/final.extxyz",
+      "error": null
+    },
+    {
+      "structure": "C_diamond_expanded",
+      "precision": "fp64",
+      "status": "max_steps_without_convergence",
+      "converged": false,
+      "steps": 500,
+      "prototype": "C_diamond",
+      "cell_scale_from_prototype": 1.05,
+      "initial_energy_ev_per_atom": -0.3288738990440004,
+      "final_energy_ev_per_atom": -0.42615977910825764,
+      "initial_maximum_force_ev_per_angstrom": 1.8433554633922409,
+      "final_maximum_force_ev_per_angstrom": 0.12526396731649503,
+      "final_maximum_generalized_force": 0.1231590756265063,
+      "initial_maximum_absolute_stress_ev_per_angstrom3": 0.036263617184200375,
+      "final_maximum_absolute_stress_ev_per_angstrom3": 0.0023711148151223395,
+      "initial_cell_lengths_angstrom": [
+        7.4907,
+        7.4907,
+        7.4907
+      ],
+      "final_cell_lengths_angstrom": [
+        7.366258210352482,
+        7.3642291441837395,
+        7.360231013195571
+      ],
+      "initial_cell_vectors_angstrom": [
+        [
+          7.4907,
+          0.0,
+          0.0
+        ],
+        [
+          0.0,
+          7.4907,
+          0.0
+        ],
+        [
+          0.0,
+          0.0,
+          7.4907
+        ]
+      ],
+      "final_cell_vectors_angstrom": [
+        [
+          7.366258190778568,
+          8.850203401678384e-06,
+          -0.000536930804000127
+        ],
+        [
+          9.002444919038665e-06,
+          7.364229144161871,
+          1.5525533840024637e-05
+        ],
+        [
+          -0.0005372665369793118,
+          1.5259181725605905e-05,
+          7.360230993570631
+        ]
+      ],
+      "initial_cell_angles_degrees": [
+        90.0,
+        90.0,
+        90.0
+      ],
+      "final_cell_angles_degrees": [
+        89.99976042685446,
+        90.0083586780602,
+        89.99986112913331
+      ],
+      "final_minimum_interatomic_distance_angstrom": 1.588942571576232,
+      "initial_rms_internal_offset_from_prototype_angstrom": 0.12305488299647296,
+      "final_rms_internal_offset_from_prototype_angstrom": 0.01941917315181943,
+      "rms_atomic_displacement_angstrom": 0.12233013336655602,
+      "maximum_atomic_displacement_angstrom": 0.16759013103140968,
+      "cell_linear_change_percent": -1.6971339228118776,
+      "cell_volume_change_percent": -5.005500171426036,
+      "final_structure": "C_diamond_expanded/fp64/final.extxyz",
+      "error": null
+    },
+    {
+      "structure": "Si_diamond_compressed",
+      "precision": "fp32",
+      "status": "converged",
+      "converged": true,
+      "steps": 142,
+      "prototype": "Si_diamond",
+      "cell_scale_from_prototype": 0.95,
+      "initial_energy_ev_per_atom": 0.7580212950706482,
+      "final_energy_ev_per_atom": 0.724663496017456,
+      "initial_maximum_force_ev_per_angstrom": 1.0004771504822207,
+      "final_maximum_force_ev_per_angstrom": 0.02708763708710455,
+      "final_maximum_generalized_force": 0.049994921175914864,
+      "initial_maximum_absolute_stress_ev_per_angstrom3": 0.015241228975355625,
+      "final_maximum_absolute_stress_ev_per_angstrom3": 0.0027466570027172565,
+      "initial_cell_lengths_angstrom": [
+        10.316999999999998,
+        10.316999999999998,
+        10.316999999999998
+      ],
+      "final_cell_lengths_angstrom": [
+        10.627773368559973,
+        10.626921184027237,
+        10.623315461769952
+      ],
+      "initial_cell_vectors_angstrom": [
+        [
+          10.316999999999998,
+          0.0,
+          0.0
+        ],
+        [
+          0.0,
+          10.316999999999998,
+          0.0
+        ],
+        [
+          0.0,
+          0.0,
+          10.316999999999998
+        ]
+      ],
+      "final_cell_vectors_angstrom": [
+        [
+          10.627773049033536,
+          0.001800317492955517,
+          -0.0018842945441039647
+        ],
+        [
+          0.0018003674083637599,
+          10.626920895550546,
+          0.0016999750725732973
+        ],
+        [
+          -0.0018847287107017561,
+          0.0016991249666548427,
+          10.623315158699405
+        ]
+      ],
+      "initial_cell_angles_degrees": [
+        90.0,
+        90.0,
+        90.0
+      ],
+      "final_cell_angles_degrees": [
+        89.9816721303316,
+        90.02032203105236,
+        89.98058906221294
+      ],
+      "final_minimum_interatomic_distance_angstrom": 2.2843332377044914,
+      "initial_rms_internal_offset_from_prototype_angstrom": 0.12527014202503603,
+      "final_rms_internal_offset_from_prototype_angstrom": 0.13342649000482132,
+      "rms_atomic_displacement_angstrom": 0.14770251357968672,
+      "maximum_atomic_displacement_angstrom": 0.29318428020834547,
+      "cell_linear_change_percent": 2.9950890580503486,
+      "cell_volume_change_percent": 9.257046534655844,
+      "final_structure": "Si_diamond_compressed/fp32/final.extxyz",
+      "error": null
+    },
+    {
+      "structure": "Si_diamond_compressed",
+      "precision": "fp64",
+      "status": "converged",
+      "converged": true,
+      "steps": 142,
+      "prototype": "Si_diamond",
+      "cell_scale_from_prototype": 0.95,
+      "initial_energy_ev_per_atom": 0.7580245227506939,
+      "final_energy_ev_per_atom": 0.7246662432641136,
+      "initial_maximum_force_ev_per_angstrom": 1.000479938380177,
+      "final_maximum_force_ev_per_angstrom": 0.027007843240421724,
+      "final_maximum_generalized_force": 0.04994925885171189,
+      "initial_maximum_absolute_stress_ev_per_angstrom3": 0.015241400187547825,
+      "final_maximum_absolute_stress_ev_per_angstrom3": 0.0027441342604868314,
+      "initial_cell_lengths_angstrom": [
+        10.316999999999998,
+        10.316999999999998,
+        10.316999999999998
+      ],
+      "final_cell_lengths_angstrom": [
+        10.627764738604418,
+        10.626921755039684,
+        10.623314930215937
+      ],
+      "initial_cell_vectors_angstrom": [
+        [
+          10.316999999999998,
+          0.0,
+          0.0
+        ],
+        [
+          0.0,
+          10.316999999999998,
+          0.0
+        ],
+        [
+          0.0,
+          0.0,
+          10.316999999999998
+        ]
+      ],
+      "final_cell_vectors_angstrom": [
+        [
+          10.627764418368686,
+          0.0017995774068282674,
+          -0.001888994732756433
+        ],
+        [
+          0.0017996296725035776,
+          10.626921465938576,
+          0.0017046532395668139
+        ],
+        [
+          -0.001889428978756063,
+          0.0017038023591568667,
+          10.623314625561294
+        ]
+      ],
+      "initial_cell_angles_degrees": [
+        90.0,
+        90.0,
+        90.0
+      ],
+      "final_cell_angles_degrees": [
+        89.98162168424898,
+        90.02037272597742,
+        89.98059703085492
+      ],
+      "final_minimum_interatomic_distance_angstrom": 2.2843778077463766,
+      "initial_rms_internal_offset_from_prototype_angstrom": 0.12527014202503603,
+      "final_rms_internal_offset_from_prototype_angstrom": 0.13343628238050845,
+      "rms_atomic_displacement_angstrom": 0.14770900489461203,
+      "maximum_atomic_displacement_angstrom": 0.2930604443792447,
+      "cell_linear_change_percent": 2.995061302898261,
+      "cell_volume_change_percent": 9.25695815964691,
+      "final_structure": "Si_diamond_compressed/fp64/final.extxyz",
+      "error": null
+    },
+    {
+      "structure": "Si_diamond_expanded",
+      "precision": "fp32",
+      "status": "converged",
+      "converged": true,
+      "steps": 183,
+      "prototype": "Si_diamond",
+      "cell_scale_from_prototype": 1.05,
+      "initial_energy_ev_per_atom": 0.7519012689590454,
+      "final_energy_ev_per_atom": 0.7245907783508301,
+      "initial_maximum_force_ev_per_angstrom": 0.38385556172291463,
+      "final_maximum_force_ev_per_angstrom": 0.03170868944055368,
+      "final_maximum_generalized_force": 0.04990793472950447,
+      "initial_maximum_absolute_stress_ev_per_angstrom3": 0.006629203911870718,
+      "final_maximum_absolute_stress_ev_per_angstrom3": 0.002304785419255495,
+      "initial_cell_lengths_angstrom": [
+        11.403,
+        11.403,
+        11.403
+      ],
+      "final_cell_lengths_angstrom": [
+        10.92857682738752,
+        10.929066699847489,
+        10.927581129930338
+      ],
+      "initial_cell_vectors_angstrom": [
+        [
+          11.403,
+          0.0,
+          0.0
+        ],
+        [
+          0.0,
+          11.403,
+          0.0
+        ],
+        [
+          0.0,
+          0.0,
+          11.403
+        ]
+      ],
+      "final_cell_vectors_angstrom": [
+        [
+          10.928576436049795,
+          -0.002903585066685968,
+          -0.0003503175952209616
+        ],
+        [
+          -0.002902803290369964,
+          10.929066313979083,
+          8.997765341797009e-05
+        ],
+        [
+          -0.0003509815895479576,
+          9.107650095237433e-05,
+          10.92758112391423
+        ]
+      ],
+      "initial_cell_angles_degrees": [
+        90.0,
+        90.0,
+        90.0
+      ],
+      "final_cell_angles_degrees": [
+        89.99905026747689,
+        90.0036770297098,
+        90.03044076703905
+      ],
+      "final_minimum_interatomic_distance_angstrom": 2.3572966411882317,
+      "initial_rms_internal_offset_from_prototype_angstrom": 0.12527014202503606,
+      "final_rms_internal_offset_from_prototype_angstrom": 0.012513921376791057,
+      "rms_atomic_displacement_angstrom": 0.11900893959850821,
+      "maximum_atomic_displacement_angstrom": 0.14939475746752753,
+      "cell_linear_change_percent": -4.161990537094495,
+      "cell_volume_change_percent": -11.973529162478568,
+      "final_structure": "Si_diamond_expanded/fp32/final.extxyz",
+      "error": null
+    },
+    {
+      "structure": "Si_diamond_expanded",
+      "precision": "fp64",
+      "status": "converged",
+      "converged": true,
+      "steps": 183,
+      "prototype": "Si_diamond",
+      "cell_scale_from_prototype": 1.05,
+      "initial_energy_ev_per_atom": 0.7519041116401673,
+      "final_energy_ev_per_atom": 0.7246053062733875,
+      "initial_maximum_force_ev_per_angstrom": 0.3838583525793727,
+      "final_maximum_force_ev_per_angstrom": 0.03163140791420457,
+      "final_maximum_generalized_force": 0.04942855250249607,
+      "initial_maximum_absolute_stress_ev_per_angstrom3": 0.006629214956902854,
+      "final_maximum_absolute_stress_ev_per_angstrom3": 0.0022993076534039,
+      "initial_cell_lengths_angstrom": [
+        11.403,
+        11.403,
+        11.403
+      ],
+      "final_cell_lengths_angstrom": [
+        10.928479100527683,
+        10.929182807093273,
+        10.927464505730635
+      ],
+      "initial_cell_vectors_angstrom": [
+        [
+          11.403,
+          0.0,
+          0.0
+        ],
+        [
+          0.0,
+          11.403,
+          0.0
+        ],
+        [
+          0.0,
+          0.0,
+          11.403
+        ]
+      ],
+      "final_cell_vectors_angstrom": [
+        [
+          10.928478560376565,
+          -0.0034296073351767005,
+          -0.00020941267287191972
+        ],
+        [
+          -0.0034287828090837657,
+          10.929182267493532,
+          0.00019549058185102313
+        ],
+        [
+          -0.00021023597263399434,
+          0.00019683058758106328,
+          10.927464501935544
+        ]
+      ],
+      "initial_cell_angles_degrees": [
+        90.0,
+        90.0,
+        90.0
+      ],
+      "final_cell_angles_degrees": [
+        89.99794276479275,
+        90.00220055813365,
+        90.03595599878099
+      ],
+      "final_minimum_interatomic_distance_angstrom": 2.3577269936697216,
+      "initial_rms_internal_offset_from_prototype_angstrom": 0.12527014202503606,
+      "final_rms_internal_offset_from_prototype_angstrom": 0.012412529925058037,
+      "rms_atomic_displacement_angstrom": 0.11931495928368917,
+      "maximum_atomic_displacement_angstrom": 0.14854471530817534,
+      "cell_linear_change_percent": -4.162277724132268,
+      "cell_volume_change_percent": -11.974325462806767,
+      "final_structure": "Si_diamond_expanded/fp64/final.extxyz",
+      "error": null
+    },
+    {
+      "structure": "Ge_diamond_compressed",
+      "precision": "fp32",
+      "status": "converged",
+      "converged": true,
+      "steps": 339,
+      "prototype": "Ge_diamond",
+      "cell_scale_from_prototype": 0.95,
+      "initial_energy_ev_per_atom": 0.011387154459953308,
+      "final_energy_ev_per_atom": -0.10299360752105713,
+      "initial_maximum_force_ev_per_angstrom": 1.4157772601427403,
+      "final_maximum_force_ev_per_angstrom": 0.02296723004550654,
+      "final_maximum_generalized_force": 0.04886319271000493,
+      "initial_maximum_absolute_stress_ev_per_angstrom3": 0.04119236022233963,
+      "final_maximum_absolute_stress_ev_per_angstrom3": 0.0021322432439774275,
+      "initial_cell_lengths_angstrom": [
+        10.7502,
+        10.7502,
+        10.7502
+      ],
+      "final_cell_lengths_angstrom": [
+        11.677621700646814,
+        11.677931532599432,
+        11.676119073973226
+      ],
+      "initial_cell_vectors_angstrom": [
+        [
+          10.7502,
+          0.0,
+          0.0
+        ],
+        [
+          0.0,
+          10.7502,
+          0.0
+        ],
+        [
+          0.0,
+          0.0,
+          10.7502
+        ]
+      ],
+      "final_cell_vectors_angstrom": [
+        [
+          11.677621687773456,
+          -0.0002211848112041076,
+          -0.000501734655491987
+        ],
+        [
+          -0.00022112571638250786,
+          11.677931488041583,
+          -0.0009958867540842853
+        ],
+        [
+          -0.0005016580552254587,
+          -0.0009958231491755446,
+          11.676119020731024
+        ]
+      ],
+      "initial_cell_angles_degrees": [
+        90.0,
+        90.0,
+        90.0
+      ],
+      "final_cell_angles_degrees": [
+        90.00977269678606,
+        90.00492333002799,
+        90.00216994002432
+      ],
+      "final_minimum_interatomic_distance_angstrom": 2.521668219115922,
+      "initial_rms_internal_offset_from_prototype_angstrom": 0.12891850102052316,
+      "final_rms_internal_offset_from_prototype_angstrom": 0.007566665517585557,
+      "rms_atomic_displacement_angstrom": 0.14032204793130154,
+      "maximum_atomic_displacement_angstrom": 0.1645617092771902,
+      "cell_linear_change_percent": 8.623319588533152,
+      "cell_volume_change_percent": 28.164929093834566,
+      "final_structure": "Ge_diamond_compressed/fp32/final.extxyz",
+      "error": null
+    },
+    {
+      "structure": "Ge_diamond_compressed",
+      "precision": "fp64",
+      "status": "converged",
+      "converged": true,
+      "steps": 339,
+      "prototype": "Ge_diamond",
+      "cell_scale_from_prototype": 0.95,
+      "initial_energy_ev_per_atom": 0.011390797129136168,
+      "final_energy_ev_per_atom": -0.10299301966352883,
+      "initial_maximum_force_ev_per_angstrom": 1.4158087827579826,
+      "final_maximum_force_ev_per_angstrom": 0.021968763687108022,
+      "final_maximum_generalized_force": 0.048964225276041745,
+      "initial_maximum_absolute_stress_ev_per_angstrom3": 0.04119330650187771,
+      "final_maximum_absolute_stress_ev_per_angstrom3": 0.002136469837493544,
+      "initial_cell_lengths_angstrom": [
+        10.7502,
+        10.7502,
+        10.7502
+      ],
+      "final_cell_lengths_angstrom": [
+        11.677622526709635,
+        11.67791866976608,
+        11.676131029369538
+      ],
+      "initial_cell_vectors_angstrom": [
+        [
+          10.7502,
+          0.0,
+          0.0
+        ],
+        [
+          0.0,
+          10.7502,
+          0.0
+        ],
+        [
+          0.0,
+          0.0,
+          10.7502
+        ]
+      ],
+      "final_cell_vectors_angstrom": [
+        [
+          11.677622513444378,
+          -0.00020860550838155492,
+          -0.0005160397816717387
+        ],
+        [
+          -0.0002085436999537207,
+          11.677918627379505,
+          -0.0009728738265864765
+        ],
+        [
+          -0.0005159638136727497,
+          -0.000972807292742349,
+          11.67613097744426
+        ]
+      ],
+      "initial_cell_angles_degrees": [
+        90.0,
+        90.0,
+        90.0
+      ],
+      "final_cell_angles_degrees": [
+        90.00954684864614,
+        90.00506372172188,
+        90.00204648872361
+      ],
+      "final_minimum_interatomic_distance_angstrom": 2.521503221316931,
+      "initial_rms_internal_offset_from_prototype_angstrom": 0.12891850102052316,
+      "final_rms_internal_offset_from_prototype_angstrom": 0.007568061838899161,
+      "rms_atomic_displacement_angstrom": 0.14034229960406602,
+      "maximum_atomic_displacement_angstrom": 0.1644912512447169,
+      "cell_linear_change_percent": 8.623319336214696,
+      "cell_volume_change_percent": 28.164928289186754,
+      "final_structure": "Ge_diamond_compressed/fp64/final.extxyz",
+      "error": null
+    },
+    {
+      "structure": "Ge_diamond_expanded",
+      "precision": "fp32",
+      "status": "converged",
+      "converged": true,
+      "steps": 28,
+      "prototype": "Ge_diamond",
+      "cell_scale_from_prototype": 1.05,
+      "initial_energy_ev_per_atom": -0.09349312633275986,
+      "final_energy_ev_per_atom": -0.1030099093914032,
+      "initial_maximum_force_ev_per_angstrom": 0.36892291554430007,
+      "final_maximum_force_ev_per_angstrom": 0.04718659444740925,
+      "final_maximum_generalized_force": 0.04718948312595888,
+      "initial_maximum_absolute_stress_ev_per_angstrom3": 0.0007649665349163115,
+      "final_maximum_absolute_stress_ev_per_angstrom3": 0.0006761340191587806,
+      "initial_cell_lengths_angstrom": [
+        11.881800000000002,
+        11.881800000000002,
+        11.881800000000002
+      ],
+      "final_cell_lengths_angstrom": [
+        11.880716896362896,
+        11.880566053545992,
+        11.880576585138991
+      ],
+      "initial_cell_vectors_angstrom": [
+        [
+          11.881800000000002,
+          0.0,
+          0.0
+        ],
+        [
+          0.0,
+          11.881800000000002,
+          0.0
+        ],
+        [
+          0.0,
+          0.0,
+          11.881800000000002
+        ]
+      ],
+      "final_cell_vectors_angstrom": [
+        [
+          11.880716627610148,
+          -0.001935139560058687,
+          -0.0016251724337050506
+        ],
+        [
+          -0.0019351398218785698,
+          11.880565793304958,
+          -0.0015616835162658956
+        ],
+        [
+          -0.0016251929504895188,
+          -0.0015617089963781167,
+          11.880576371336776
+        ]
+      ],
+      "initial_cell_angles_degrees": [
+        90.0,
+        90.0,
+        90.0
+      ],
+      "final_cell_angles_degrees": [
+        90.01506173695829,
+        90.01567403243814,
+        90.01866384351025
+      ],
+      "final_minimum_interatomic_distance_angstrom": 2.5366923542601336,
+      "initial_rms_internal_offset_from_prototype_angstrom": 0.1289185010205229,
+      "final_rms_internal_offset_from_prototype_angstrom": 0.05492988937540599,
+      "rms_atomic_displacement_angstrom": 0.10022355230024887,
+      "maximum_atomic_displacement_angstrom": 0.14877443666400708,
+      "cell_linear_change_percent": -0.009932459594041987,
+      "cell_volume_change_percent": -0.02980692547676078,
+      "final_structure": "Ge_diamond_expanded/fp32/final.extxyz",
+      "error": null
+    },
+    {
+      "structure": "Ge_diamond_expanded",
+      "precision": "fp64",
+      "status": "converged",
+      "converged": true,
+      "steps": 28,
+      "prototype": "Ge_diamond",
+      "cell_scale_from_prototype": 1.05,
+      "initial_energy_ev_per_atom": -0.09349209971788704,
+      "final_energy_ev_per_atom": -0.10300890336023985,
+      "initial_maximum_force_ev_per_angstrom": 0.3689302114462702,
+      "final_maximum_force_ev_per_angstrom": 0.04718750828602974,
+      "final_maximum_generalized_force": 0.04719039755889537,
+      "initial_maximum_absolute_stress_ev_per_angstrom3": 0.0007649789261035629,
+      "final_maximum_absolute_stress_ev_per_angstrom3": 0.000676142754075519,
+      "initial_cell_lengths_angstrom": [
+        11.881800000000002,
+        11.881800000000002,
+        11.881800000000002
+      ],
+      "final_cell_lengths_angstrom": [
+        11.880717045639775,
+        11.880566331716828,
+        11.880576815473429
+      ],
+      "initial_cell_vectors_angstrom": [
+        [
+          11.881800000000002,
+          0.0,
+          0.0
+        ],
+        [
+          0.0,
+          11.881800000000002,
+          0.0
+        ],
+        [
+          0.0,
+          0.0,
+          11.881800000000002
+        ]
+      ],
+      "final_cell_vectors_angstrom": [
+        [
+          11.880716776922114,
+          -0.0019350416349339637,
+          -0.0016250325505406632
+        ],
+        [
+          -0.0019350418780147943,
+          11.88056607149661,
+          -0.0015616465721742271
+        ],
+        [
+          -0.0016250530595861277,
+          -0.0015616720629638649,
+          11.880576601695209
+        ]
+      ],
+      "initial_cell_angles_degrees": [
+        90.0,
+        90.0,
+        90.0
+      ],
+      "final_cell_angles_degrees": [
+        90.01506138052552,
+        90.01567268303639,
+        90.01866289868656
+      ],
+      "final_minimum_interatomic_distance_angstrom": 2.5366931768804135,
+      "initial_rms_internal_offset_from_prototype_angstrom": 0.1289185010205229,
+      "final_rms_internal_offset_from_prototype_angstrom": 0.05492966107787131,
+      "rms_atomic_displacement_angstrom": 0.10022344310132385,
+      "maximum_atomic_displacement_angstrom": 0.14877467052874543,
+      "cell_linear_change_percent": -0.009930614244690883,
+      "cell_volume_change_percent": -0.02980138917666464,
+      "final_structure": "Ge_diamond_expanded/fp64/final.extxyz",
+      "error": null
+    },
+    {
+      "structure": "Al_fcc_compressed",
+      "precision": "fp32",
+      "status": "converged",
+      "converged": true,
+      "steps": 50,
+      "prototype": "Al_fcc",
+      "cell_scale_from_prototype": 0.95,
+      "initial_energy_ev_per_atom": 1.2201933860778809,
+      "final_energy_ev_per_atom": 1.203665852546692,
+      "initial_maximum_force_ev_per_angstrom": 0.3455347160717537,
+      "final_maximum_force_ev_per_angstrom": 0.022525141897101645,
+      "final_maximum_generalized_force": 0.039186561557282944,
+      "initial_maximum_absolute_stress_ev_per_angstrom3": 0.008349688723683357,
+      "final_maximum_absolute_stress_ev_per_angstrom3": 0.002847891766577959,
+      "initial_cell_lengths_angstrom": [
+        7.694999999999999,
+        7.694999999999999,
+        7.694999999999999
+      ],
+      "final_cell_lengths_angstrom": [
+        7.564364463690374,
+        7.561165633322592,
+        7.562016209228037
+      ],
+      "initial_cell_vectors_angstrom": [
+        [
+          7.694999999999999,
+          0.0,
+          0.0
+        ],
+        [
+          0.0,
+          7.694999999999999,
+          0.0
+        ],
+        [
+          0.0,
+          0.0,
+          7.694999999999999
+        ]
+      ],
+      "final_cell_vectors_angstrom": [
+        [
+          7.564364461350185,
+          8.594310786140613e-05,
+          -0.0001673853746007487
+        ],
+        [
+          8.59159430150309e-05,
+          7.561165630738197,
+          -0.00017804642251990552
+        ],
+        [
+          -0.0001673244898674999,
+          -0.00017809319353013345,
+          7.562016205279707
+        ]
+      ],
+      "initial_cell_angles_degrees": [
+        90.0,
+        90.0,
+        90.0
+      ],
+      "final_cell_angles_degrees": [
+        90.00269855986272,
+        90.00253564667986,
+        89.9986979597917
+      ],
+      "final_minimum_interatomic_distance_angstrom": 2.662109368095225,
+      "initial_rms_internal_offset_from_prototype_angstrom": 0.12663966074628977,
+      "final_rms_internal_offset_from_prototype_angstrom": 0.030366182175631574,
+      "rms_atomic_displacement_angstrom": 0.11860213416422252,
+      "maximum_atomic_displacement_angstrom": 0.16427990284323882,
+      "cell_linear_change_percent": -1.721696745761292,
+      "cell_volume_change_percent": -5.076678177477579,
+      "final_structure": "Al_fcc_compressed/fp32/final.extxyz",
+      "error": null
+    },
+    {
+      "structure": "Al_fcc_compressed",
+      "precision": "fp64",
+      "status": "converged",
+      "converged": true,
+      "steps": 50,
+      "prototype": "Al_fcc",
+      "cell_scale_from_prototype": 0.95,
+      "initial_energy_ev_per_atom": 1.2201931901436718,
+      "final_energy_ev_per_atom": 1.2036655358616566,
+      "initial_maximum_force_ev_per_angstrom": 0.345534933245993,
+      "final_maximum_force_ev_per_angstrom": 0.022525192548046555,
+      "final_maximum_generalized_force": 0.03918401503121284,
+      "initial_maximum_absolute_stress_ev_per_angstrom3": 0.008349681094848365,
+      "final_maximum_absolute_stress_ev_per_angstrom3": 0.0028477065519410196,
+      "initial_cell_lengths_angstrom": [
+        7.694999999999999,
+        7.694999999999999,
+        7.694999999999999
+      ],
+      "final_cell_lengths_angstrom": [
+        7.564364454711301,
+        7.5611656127066516,
+        7.562016182866532
+      ],
+      "initial_cell_vectors_angstrom": [
+        [
+          7.694999999999999,
+          0.0,
+          0.0
+        ],
+        [
+          0.0,
+          7.694999999999999,
+          0.0
+        ],
+        [
+          0.0,
+          0.0,
+          7.694999999999999
+        ]
+      ],
+      "final_cell_vectors_angstrom": [
+        [
+          7.564364452371046,
+          8.594683859418416e-05,
+          -0.00016738645822877963
+        ],
+        [
+          8.591967380942392e-05,
+          7.561165610122268,
+          -0.0001780441244908867
+        ],
+        [
+          -0.00016732557394927433,
+          -0.0001780908952950606,
+          7.562016178918232
+        ]
+      ],
+      "initial_cell_angles_degrees": [
+        90.0,
+        90.0,
+        90.0
+      ],
+      "final_cell_angles_degrees": [
+        90.00269852504495,
+        90.00253566310796,
+        89.99869790326055
+      ],
+      "final_minimum_interatomic_distance_angstrom": 2.6621093630484247,
+      "initial_rms_internal_offset_from_prototype_angstrom": 0.12663966074628977,
+      "final_rms_internal_offset_from_prototype_angstrom": 0.03036619125406219,
+      "rms_atomic_displacement_angstrom": 0.1186020875141212,
+      "maximum_atomic_displacement_angstrom": 0.16427975600288286,
+      "cell_linear_change_percent": -1.7216969881547084,
+      "cell_volume_change_percent": -5.076678879874819,
+      "final_structure": "Al_fcc_compressed/fp64/final.extxyz",
+      "error": null
+    },
+    {
+      "structure": "Al_fcc_expanded",
+      "precision": "fp32",
+      "status": "converged",
+      "converged": true,
+      "steps": 132,
+      "prototype": "Al_fcc",
+      "cell_scale_from_prototype": 1.05,
+      "initial_energy_ev_per_atom": 1.2512167692184448,
+      "final_energy_ev_per_atom": 1.2120734453201294,
+      "initial_maximum_force_ev_per_angstrom": 0.11401226887029577,
+      "final_maximum_force_ev_per_angstrom": 0.018017875506347366,
+      "final_maximum_generalized_force": 0.04695591924796892,
+      "initial_maximum_absolute_stress_ev_per_angstrom3": 0.00981403049081564,
+      "final_maximum_absolute_stress_ev_per_angstrom3": 0.002795302774757147,
+      "initial_cell_lengths_angstrom": [
+        8.505,
+        8.505,
+        8.505
+      ],
+      "final_cell_lengths_angstrom": [
+        7.937955786858693,
+        7.93778939523346,
+        7.937881057284894
+      ],
+      "initial_cell_vectors_angstrom": [
+        [
+          8.505,
+          0.0,
+          0.0
+        ],
+        [
+          0.0,
+          8.505,
+          0.0
+        ],
+        [
+          0.0,
+          0.0,
+          8.505
+        ]
+      ],
+      "final_cell_vectors_angstrom": [
+        [
+          7.937955770914073,
+          -0.00032110080248353063,
+          0.00038733662989138895
+        ],
+        [
+          -0.00032079577575871906,
+          7.937789371336241,
+          -0.0005258062870404874
+        ],
+        [
+          0.0003875849007529429,
+          -0.0005258447360662892,
+          7.937881030405255
+        ]
+      ],
+      "initial_cell_angles_degrees": [
+        90.0,
+        90.0,
+        90.0
+      ],
+      "final_cell_angles_degrees": [
+        90.00759099437842,
+        89.99440647414494,
+        90.00463341206557
+      ],
+      "final_minimum_interatomic_distance_angstrom": 2.8036104016558054,
+      "initial_rms_internal_offset_from_prototype_angstrom": 0.1266396607462897,
+      "final_rms_internal_offset_from_prototype_angstrom": 0.028335408578742005,
+      "rms_atomic_displacement_angstrom": 0.11521819649539264,
+      "maximum_atomic_displacement_angstrom": 0.16367046800347376,
+      "cell_linear_change_percent": -6.668131532913801,
+      "cell_volume_change_percent": -18.700125795673017,
+      "final_structure": "Al_fcc_expanded/fp32/final.extxyz",
+      "error": null
+    },
+    {
+      "structure": "Al_fcc_expanded",
+      "precision": "fp64",
+      "status": "converged",
+      "converged": true,
+      "steps": 132,
+      "prototype": "Al_fcc",
+      "cell_scale_from_prototype": 1.05,
+      "initial_energy_ev_per_atom": 1.2512165853279407,
+      "final_energy_ev_per_atom": 1.212074711802839,
+      "initial_maximum_force_ev_per_angstrom": 0.1140122751032755,
+      "final_maximum_force_ev_per_angstrom": 0.01834764014431601,
+      "final_maximum_generalized_force": 0.04652477680021002,
+      "initial_maximum_absolute_stress_ev_per_angstrom3": 0.009814032121539234,
+      "final_maximum_absolute_stress_ev_per_angstrom3": 0.002769202234320482,
+      "initial_cell_lengths_angstrom": [
+        8.505,
+        8.505,
+        8.505
+      ],
+      "final_cell_lengths_angstrom": [
+        7.937960602265886,
+        7.937796276006093,
+        7.937870418334734
+      ],
+      "initial_cell_vectors_angstrom": [
+        [
+          8.505,
+          0.0,
+          0.0
+        ],
+        [
+          0.0,
+          8.505,
+          0.0
+        ],
+        [
+          0.0,
+          0.0,
+          8.505
+        ]
+      ],
+      "final_cell_vectors_angstrom": [
+        [
+          7.937960585976006,
+          -0.0003157788447738008,
+          0.0003986233499502937
+        ],
+        [
+          -0.00031547156249007,
+          7.937796251684861,
+          -0.0005353425640343525
+        ],
+        [
+          0.0003988738172768233,
+          -0.0005353773076285541,
+          7.937870390258615
+        ]
+      ],
+      "initial_cell_angles_degrees": [
+        90.0,
+        90.0,
+        90.0
+      ],
+      "final_cell_angles_degrees": [
+        90.00772863768393,
+        89.99424352122321,
+        90.00455657321069
+      ],
+      "final_minimum_interatomic_distance_angstrom": 2.803629838578306,
+      "initial_rms_internal_offset_from_prototype_angstrom": 0.1266396607462897,
+      "final_rms_internal_offset_from_prototype_angstrom": 0.0283352991472944,
+      "rms_atomic_displacement_angstrom": 0.1152177582157408,
+      "maximum_atomic_displacement_angstrom": 0.1635702337015054,
+      "cell_linear_change_percent": -6.668127389352508,
+      "cell_volume_change_percent": -18.700115007548245,
+      "final_structure": "Al_fcc_expanded/fp64/final.extxyz",
+      "error": null
+    },
+    {
+      "structure": "Cu_fcc_compressed",
+      "precision": "fp32",
+      "status": "converged",
+      "converged": true,
+      "steps": 70,
+      "prototype": "Cu_fcc",
+      "cell_scale_from_prototype": 0.95,
+      "initial_energy_ev_per_atom": -0.3034064769744873,
+      "final_energy_ev_per_atom": -0.33053022623062134,
+      "initial_maximum_force_ev_per_angstrom": 0.45171967230026266,
+      "final_maximum_force_ev_per_angstrom": 0.01481896851830212,
+      "final_maximum_generalized_force": 0.04887630167989185,
+      "initial_maximum_absolute_stress_ev_per_angstrom3": 0.030590036883950233,
+      "final_maximum_absolute_stress_ev_per_angstrom3": 0.004543321672827005,
+      "initial_cell_lengths_angstrom": [
+        6.8685,
+        6.8685,
+        6.8685
+      ],
+      "final_cell_lengths_angstrom": [
+        7.078823747483254,
+        7.081029942116917,
+        7.0795769544723255
+      ],
+      "initial_cell_vectors_angstrom": [
+        [
+          6.8685,
+          0.0,
+          0.0
+        ],
+        [
+          0.0,
+          6.8685,
+          0.0
+        ],
+        [
+          0.0,
+          0.0,
+          6.8685
+        ]
+      ],
+      "final_cell_vectors_angstrom": [
+        [
+          7.078823673338092,
+          0.0009438031857083276,
+          0.0003986936204693291
+        ],
+        [
+          0.0009437916251027235,
+          7.081029870465544,
+          0.0003521198519196012
+        ],
+        [
+          0.00039870156571920337,
+          0.0003520383433281844,
+          7.079576934492747
+        ]
+      ],
+      "initial_cell_angles_degrees": [
+        90.0,
+        90.0,
+        90.0
+      ],
+      "final_cell_angles_degrees": [
+        89.9943013265186,
+        89.99354587163477,
+        89.98472408578844
+      ],
+      "final_minimum_interatomic_distance_angstrom": 2.4653446834365225,
+      "initial_rms_internal_offset_from_prototype_angstrom": 0.12193119870638419,
+      "final_rms_internal_offset_from_prototype_angstrom": 0.031051816612469075,
+      "rms_atomic_displacement_angstrom": 0.11504991924044343,
+      "maximum_atomic_displacement_angstrom": 0.13828788122997465,
+      "cell_linear_change_percent": 3.0765118248647028,
+      "cell_volume_change_percent": 9.516387243879464,
+      "final_structure": "Cu_fcc_compressed/fp32/final.extxyz",
+      "error": null
+    },
+    {
+      "structure": "Cu_fcc_compressed",
+      "precision": "fp64",
+      "status": "converged",
+      "converged": true,
+      "steps": 70,
+      "prototype": "Cu_fcc",
+      "cell_scale_from_prototype": 0.95,
+      "initial_energy_ev_per_atom": -0.3034061170454566,
+      "final_energy_ev_per_atom": -0.3305301099560009,
+      "initial_maximum_force_ev_per_angstrom": 0.4517197858885295,
+      "final_maximum_force_ev_per_angstrom": 0.014818941497141904,
+      "final_maximum_generalized_force": 0.048876569546235905,
+      "initial_maximum_absolute_stress_ev_per_angstrom3": 0.030590044000951933,
+      "final_maximum_absolute_stress_ev_per_angstrom3": 0.0045433466084760015,
+      "initial_cell_lengths_angstrom": [
+        6.8685,
+        6.8685,
+        6.8685
+      ],
+      "final_cell_lengths_angstrom": [
+        7.078823767837742,
+        7.081029947631471,
+        7.079576967961394
+      ],
+      "initial_cell_vectors_angstrom": [
+        [
+          6.8685,
+          0.0,
+          0.0
+        ],
+        [
+          0.0,
+          6.8685,
+          0.0
+        ],
+        [
+          0.0,
+          0.0,
+          6.8685
+        ]
+      ],
+      "final_cell_vectors_angstrom": [
+        [
+          7.0788236936923985,
+          0.0009438041944936131,
+          0.00039869446108818776
+        ],
+        [
+          0.0009437926331263848,
+          7.081029875979625,
+          0.0003521266761302999
+        ],
+        [
+          0.0003987024056252369,
+          0.00035204516784663985,
+          7.079576947981429
+        ]
+      ],
+      "initial_cell_angles_degrees": [
+        90.0,
+        90.0,
+        90.0
+      ],
+      "final_cell_angles_degrees": [
+        89.99430121607557,
+        89.99354585804102,
+        89.98472406949146
+      ],
+      "final_minimum_interatomic_distance_angstrom": 2.4653447998901314,
+      "initial_rms_internal_offset_from_prototype_angstrom": 0.12193119870638419,
+      "final_rms_internal_offset_from_prototype_angstrom": 0.03105181874446194,
+      "rms_atomic_displacement_angstrom": 0.11504991306068622,
+      "maximum_atomic_displacement_angstrom": 0.13828792138836246,
+      "cell_linear_change_percent": 3.07651201587249,
+      "cell_volume_change_percent": 9.516387852707275,
+      "final_structure": "Cu_fcc_compressed/fp64/final.extxyz",
+      "error": null
+    },
+    {
+      "structure": "Cu_fcc_expanded",
+      "precision": "fp32",
+      "status": "converged",
+      "converged": true,
+      "steps": 86,
+      "prototype": "Cu_fcc",
+      "cell_scale_from_prototype": 1.05,
+      "initial_energy_ev_per_atom": -0.3129812479019165,
+      "final_energy_ev_per_atom": -0.3303752839565277,
+      "initial_maximum_force_ev_per_angstrom": 0.1381519358798179,
+      "final_maximum_force_ev_per_angstrom": 0.004684173350599833,
+      "final_maximum_generalized_force": 0.04987658656772965,
+      "initial_maximum_absolute_stress_ev_per_angstrom3": 0.010039067827165127,
+      "final_maximum_absolute_stress_ev_per_angstrom3": 0.0039504524320364,
+      "initial_cell_lengths_angstrom": [
+        7.591500000000001,
+        7.591500000000001,
+        7.591500000000001
+      ],
+      "final_cell_lengths_angstrom": [
+        7.29134644859305,
+        7.291885787782887,
+        7.2923257984615
+      ],
+      "initial_cell_vectors_angstrom": [
+        [
+          7.591500000000001,
+          0.0,
+          0.0
+        ],
+        [
+          0.0,
+          7.591500000000001,
+          0.0
+        ],
+        [
+          0.0,
+          0.0,
+          7.591500000000001
+        ]
+      ],
+      "final_cell_vectors_angstrom": [
+        [
+          7.291346094352011,
+          -0.002272268493100704,
+          -5.083342968138056e-05
+        ],
+        [
+          -0.002272018399406804,
+          7.291885392738761,
+          0.0007740578360683298
+        ],
+        [
+          -5.07748608194188e-05,
+          0.0007742548179958102,
+          7.2923257571818985
+        ]
+      ],
+      "initial_cell_angles_degrees": [
+        90.0,
+        90.0,
+        90.0
+      ],
+      "final_cell_angles_degrees": [
+        89.9878344216149,
+        90.0008002854238,
+        90.03570796503374
+      ],
+      "final_minimum_interatomic_distance_angstrom": 2.5475402334198725,
+      "initial_rms_internal_offset_from_prototype_angstrom": 0.12193119870638428,
+      "final_rms_internal_offset_from_prototype_angstrom": 0.021872737737802475,
+      "rms_atomic_displacement_angstrom": 0.11547721481555658,
+      "maximum_atomic_displacement_angstrom": 0.13831786126022408,
+      "cell_linear_change_percent": -3.9471424846322267,
+      "cell_volume_change_percent": -11.38019867928377,
+      "final_structure": "Cu_fcc_expanded/fp32/final.extxyz",
+      "error": null
+    },
+    {
+      "structure": "Cu_fcc_expanded",
+      "precision": "fp64",
+      "status": "converged",
+      "converged": true,
+      "steps": 86,
+      "prototype": "Cu_fcc",
+      "cell_scale_from_prototype": 1.05,
+      "initial_energy_ev_per_atom": -0.31298080273051554,
+      "final_energy_ev_per_atom": -0.3303746927654735,
+      "initial_maximum_force_ev_per_angstrom": 0.13815201328294474,
+      "final_maximum_force_ev_per_angstrom": 0.004678534873775739,
+      "final_maximum_generalized_force": 0.04987657852844332,
+      "initial_maximum_absolute_stress_ev_per_angstrom3": 0.010039048891549702,
+      "final_maximum_absolute_stress_ev_per_angstrom3": 0.003950449874130615,
+      "initial_cell_lengths_angstrom": [
+        7.591500000000001,
+        7.591500000000001,
+        7.591500000000001
+      ],
+      "final_cell_lengths_angstrom": [
+        7.291349592705087,
+        7.291883159997337,
+        7.292325506244583
+      ],
+      "initial_cell_vectors_angstrom": [
+        [
+          7.591500000000001,
+          0.0,
+          0.0
+        ],
+        [
+          0.0,
+          7.591500000000001,
+          0.0
+        ],
+        [
+          0.0,
+          0.0,
+          7.591500000000001
+        ]
+      ],
+      "final_cell_vectors_angstrom": [
+        [
+          7.29134923863261,
+          -0.0022717493091480054,
+          -4.987360260623503e-05
+        ],
+        [
+          -0.0022714982507825903,
+          7.291882765199969,
+          0.0007732581031980343
+        ],
+        [
+          -4.981505318427308e-05,
+          0.0007734549541859762,
+          7.29232546505648
+        ]
+      ],
+      "initial_cell_angles_degrees": [
+        90.0,
+        90.0,
+        90.0
+      ],
+      "final_cell_angles_degrees": [
+        89.98784698996396,
+        90.00078519930247,
+        90.03569979609706
+      ],
+      "final_minimum_interatomic_distance_angstrom": 2.547535973158384,
+      "initial_rms_internal_offset_from_prototype_angstrom": 0.12193119870638428,
+      "final_rms_internal_offset_from_prototype_angstrom": 0.02187235023967463,
+      "rms_atomic_displacement_angstrom": 0.11547614380552443,
+      "maximum_atomic_displacement_angstrom": 0.1383235241582625,
+      "cell_linear_change_percent": -3.9471415005949417,
+      "cell_volume_change_percent": -11.38019594028835,
+      "final_structure": "Cu_fcc_expanded/fp64/final.extxyz",
+      "error": null
+    },
+    {
+      "structure": "Ni_fcc_compressed",
+      "precision": "fp32",
+      "status": "converged",
+      "converged": true,
+      "steps": 107,
+      "prototype": "Ni_fcc",
+      "cell_scale_from_prototype": 0.95,
+      "initial_energy_ev_per_atom": -0.5693035125732422,
+      "final_energy_ev_per_atom": -0.7898935675621033,
+      "initial_maximum_force_ev_per_angstrom": 3.0388305594876317,
+      "final_maximum_force_ev_per_angstrom": 0.04225682771001792,
+      "final_maximum_generalized_force": 0.04444979260861587,
+      "initial_maximum_absolute_stress_ev_per_angstrom3": 0.247775599360466,
+      "final_maximum_absolute_stress_ev_per_angstrom3": 0.0020782160572707653,
+      "initial_cell_lengths_angstrom": [
+        6.6956,
+        6.6956,
+        6.6956
+      ],
+      "final_cell_lengths_angstrom": [
+        7.0375047281789875,
+        7.028162862457592,
+        7.030022549307301
+      ],
+      "initial_cell_vectors_angstrom": [
+        [
+          6.6956,
+          0.0,
+          0.0
+        ],
+        [
+          0.0,
+          6.6956,
+          0.0
+        ],
+        [
+          0.0,
+          0.0,
+          6.6956
+        ]
+      ],
+      "final_cell_vectors_angstrom": [
+        [
+          7.037496143886832,
+          -0.0038600908061601773,
+          0.010291920060708077
+        ],
+        [
+          -0.0038641892943053614,
+          7.028153456900639,
+          0.010829382474665947
+        ],
+        [
+          0.010297016192282292,
+          0.01083023375241062,
+          7.030006665805057
+        ]
+      ],
+      "initial_cell_angles_degrees": [
+        90.0,
+        90.0,
+        90.0
+      ],
+      "final_cell_angles_degrees": [
+        89.82349357757283,
+        89.83233460899162,
+        90.06279979335918
+      ],
+      "final_minimum_interatomic_distance_angstrom": 2.4427802537900796,
+      "initial_rms_internal_offset_from_prototype_angstrom": 0.12538409004860313,
+      "final_rms_internal_offset_from_prototype_angstrom": 0.026098863839512876,
+      "rms_atomic_displacement_angstrom": 0.12131135068862718,
+      "maximum_atomic_displacement_angstrom": 0.1609118944321871,
+      "cell_linear_change_percent": 5.022652388353954,
+      "cell_volume_change_percent": 15.836265306634179,
+      "final_structure": "Ni_fcc_compressed/fp32/final.extxyz",
+      "error": null
+    },
+    {
+      "structure": "Ni_fcc_compressed",
+      "precision": "fp64",
+      "status": "converged",
+      "converged": true,
+      "steps": 107,
+      "prototype": "Ni_fcc",
+      "cell_scale_from_prototype": 0.95,
+      "initial_energy_ev_per_atom": -0.5693036278239451,
+      "final_energy_ev_per_atom": -0.789894388966769,
+      "initial_maximum_force_ev_per_angstrom": 3.0388452693247405,
+      "final_maximum_force_ev_per_angstrom": 0.04225581546864657,
+      "final_maximum_generalized_force": 0.04444872690768319,
+      "initial_maximum_absolute_stress_ev_per_angstrom3": 0.24777690221819956,
+      "final_maximum_absolute_stress_ev_per_angstrom3": 0.00207822308421493,
+      "initial_cell_lengths_angstrom": [
+        6.6956,
+        6.6956,
+        6.6956
+      ],
+      "final_cell_lengths_angstrom": [
+        7.037504829242415,
+        7.028162964109776,
+        7.030022684201004
+      ],
+      "initial_cell_vectors_angstrom": [
+        [
+          6.6956,
+          0.0,
+          0.0
+        ],
+        [
+          0.0,
+          6.6956,
+          0.0
+        ],
+        [
+          0.0,
+          0.0,
+          6.6956
+        ]
+      ],
+      "final_cell_vectors_angstrom": [
+        [
+          7.037496244943107,
+          -0.0038600934951914093,
+          0.010291924027956785
+        ],
+        [
+          -0.0038641919882162717,
+          7.028153558553443,
+          0.010829381199582508
+        ],
+        [
+          0.010297020169529112,
+          0.01083023248851804,
+          7.030006800695186
+        ]
+      ],
+      "initial_cell_angles_degrees": [
+        90.0,
+        90.0,
+        90.0
+      ],
+      "final_cell_angles_degrees": [
+        89.8234936012878,
+        89.83233454711717,
+        90.06279983627564
+      ],
+      "final_minimum_interatomic_distance_angstrom": 2.442780048299975,
+      "initial_rms_internal_offset_from_prototype_angstrom": 0.12538409004860313,
+      "final_rms_internal_offset_from_prototype_angstrom": 0.02609888303783414,
+      "rms_atomic_displacement_angstrom": 0.12131138001336621,
+      "maximum_atomic_displacement_angstrom": 0.16091188794682484,
+      "cell_linear_change_percent": 5.022654069106047,
+      "cell_volume_change_percent": 15.836270867905288,
+      "final_structure": "Ni_fcc_compressed/fp64/final.extxyz",
+      "error": null
+    },
+    {
+      "structure": "Ni_fcc_expanded",
+      "precision": "fp32",
+      "status": "converged",
+      "converged": true,
+      "steps": 100,
+      "prototype": "Ni_fcc",
+      "cell_scale_from_prototype": 1.05,
+      "initial_energy_ev_per_atom": -0.6548440456390381,
+      "final_energy_ev_per_atom": -0.7911849021911621,
+      "initial_maximum_force_ev_per_angstrom": 0.8335308849086923,
+      "final_maximum_force_ev_per_angstrom": 0.04507185410005072,
+      "final_maximum_generalized_force": 0.042857467895521556,
+      "initial_maximum_absolute_stress_ev_per_angstrom3": 0.08564134687185287,
+      "final_maximum_absolute_stress_ev_per_angstrom3": 0.003388318931683898,
+      "initial_cell_lengths_angstrom": [
+        7.4004,
+        7.4004,
+        7.4004
+      ],
+      "final_cell_lengths_angstrom": [
+        7.036822258865438,
+        7.036656675611791,
+        7.034936347678393
+      ],
+      "initial_cell_vectors_angstrom": [
+        [
+          7.4004,
+          0.0,
+          0.0
+        ],
+        [
+          0.0,
+          7.4004,
+          0.0
+        ],
+        [
+          0.0,
+          0.0,
+          7.4004
+        ]
+      ],
+      "final_cell_vectors_angstrom": [
+        [
+          7.036822221458988,
+          -0.00010139628145066386,
+          0.0007184454607377888
+        ],
+        [
+          -0.00010145681958546449,
+          7.036656407858443,
+          0.0019385260428263235
+        ],
+        [
+          0.0007183511542310276,
+          0.0019383075945634183,
+          7.034936043975232
+        ]
+      ],
+      "initial_cell_angles_degrees": [
+        90.0,
+        90.0,
+        90.0
+      ],
+      "final_cell_angles_degrees": [
+        89.96842921545141,
+        89.98829985885719,
+        90.00165009466443
+      ],
+      "final_minimum_interatomic_distance_angstrom": 2.416976628700087,
+      "initial_rms_internal_offset_from_prototype_angstrom": 0.12538409004860313,
+      "final_rms_internal_offset_from_prototype_angstrom": 0.023843899295273127,
+      "rms_atomic_displacement_angstrom": 0.12435685273577998,
+      "maximum_atomic_displacement_angstrom": 0.14727047849973762,
+      "cell_linear_change_percent": -4.922187619788021,
+      "cell_volume_change_percent": -14.051667141709068,
+      "final_structure": "Ni_fcc_expanded/fp32/final.extxyz",
+      "error": null
+    },
+    {
+      "structure": "Ni_fcc_expanded",
+      "precision": "fp64",
+      "status": "converged",
+      "converged": true,
+      "steps": 100,
+      "prototype": "Ni_fcc",
+      "cell_scale_from_prototype": 1.05,
+      "initial_energy_ev_per_atom": -0.6548458648609766,
+      "final_energy_ev_per_atom": -0.7911860625829095,
+      "initial_maximum_force_ev_per_angstrom": 0.8335358546598103,
+      "final_maximum_force_ev_per_angstrom": 0.045069683994492404,
+      "final_maximum_generalized_force": 0.0428554052994282,
+      "initial_maximum_absolute_stress_ev_per_angstrom3": 0.08564167849304911,
+      "final_maximum_absolute_stress_ev_per_angstrom3": 0.003388232250014192,
+      "initial_cell_lengths_angstrom": [
+        7.4004,
+        7.4004,
+        7.4004
+      ],
+      "final_cell_lengths_angstrom": [
+        7.036822246870182,
+        7.036656661111544,
+        7.03493632267694
+      ],
+      "initial_cell_vectors_angstrom": [
+        [
+          7.4004,
+          0.0,
+          0.0
+        ],
+        [
+          0.0,
+          7.4004,
+          0.0
+        ],
+        [
+          0.0,
+          0.0,
+          7.4004
+        ]
+      ],
+      "final_cell_vectors_angstrom": [
+        [
+          7.036822209463791,
+          -0.00010139444481592327,
+          0.0007184451351363266
+        ],
+        [
+          -0.00010145498148199642,
+          7.036656393360306,
+          0.0019385184758178588
+        ],
+        [
+          0.0007183508250649603,
+          0.0019383000269851708,
+          7.034936018975897
+        ]
+      ],
+      "initial_cell_angles_degrees": [
+        90.0,
+        90.0,
+        90.0
+      ],
+      "final_cell_angles_degrees": [
+        89.96842933860923,
+        89.98829986415345,
+        90.00165006475345
+      ],
+      "final_minimum_interatomic_distance_angstrom": 2.416976779449057,
+      "initial_rms_internal_offset_from_prototype_angstrom": 0.12538409004860313,
+      "final_rms_internal_offset_from_prototype_angstrom": 0.02384384107805514,
+      "rms_atomic_displacement_angstrom": 0.12435682231208742,
+      "maximum_atomic_displacement_angstrom": 0.1472703307273717,
+      "cell_linear_change_percent": -4.922187851743742,
+      "cell_volume_change_percent": -14.051667770678467,
+      "final_structure": "Ni_fcc_expanded/fp64/final.extxyz",
+      "error": null
+    },
+    {
+      "structure": "Fe_bcc_compressed",
+      "precision": "fp32",
+      "status": "converged",
+      "converged": true,
+      "steps": 52,
+      "prototype": "Fe_bcc",
+      "cell_scale_from_prototype": 0.95,
+      "initial_energy_ev_per_atom": -0.24725544452667236,
+      "final_energy_ev_per_atom": -0.3009277284145355,
+      "initial_maximum_force_ev_per_angstrom": 0.34183099157826036,
+      "final_maximum_force_ev_per_angstrom": 0.05198223760887465,
+      "final_maximum_generalized_force": 0.04956412502557432,
+      "initial_maximum_absolute_stress_ev_per_angstrom3": 0.01985793560743332,
+      "final_maximum_absolute_stress_ev_per_angstrom3": 0.001219536759890616,
+      "initial_cell_lengths_angstrom": [
+        5.4454,
+        5.4454,
+        5.4454
+      ],
+      "final_cell_lengths_angstrom": [
+        5.192350827511201,
+        5.187943079473602,
+        5.18967792767104
+      ],
+      "initial_cell_vectors_angstrom": [
+        [
+          5.4454,
+          0.0,
+          0.0
+        ],
+        [
+          0.0,
+          5.4454,
+          0.0
+        ],
+        [
+          0.0,
+          0.0,
+          5.4454
+        ]
+      ],
+      "final_cell_vectors_angstrom": [
+        [
+          5.192350822016327,
+          -0.00021932619488702134,
+          -9.465013505847268e-05
+        ],
+        [
+          -0.0002191632804143519,
+          5.187943068738613,
+          -0.00025169918936796275
+        ],
+        [
+          -9.479099557651884e-05,
+          -0.00025159402118119976,
+          5.189677920706746
+        ]
+      ],
+      "initial_cell_angles_degrees": [
+        90.0,
+        90.0,
+        90.0
+      ],
+      "final_cell_angles_degrees": [
+        90.00555741035704,
+        90.00209083816517,
+        90.0048405823734
+      ],
+      "final_minimum_interatomic_distance_angstrom": 2.199284290731458,
+      "initial_rms_internal_offset_from_prototype_angstrom": 0.1262641800270626,
+      "final_rms_internal_offset_from_prototype_angstrom": 0.06878794860566909,
+      "rms_atomic_displacement_angstrom": 0.09896844649320342,
+      "maximum_atomic_displacement_angstrom": 0.16625368340297397,
+      "cell_linear_change_percent": -4.690369641312897,
+      "cell_volume_change_percent": -13.421457133465243,
+      "final_structure": "Fe_bcc_compressed/fp32/final.extxyz",
+      "error": null
+    },
+    {
+      "structure": "Fe_bcc_compressed",
+      "precision": "fp64",
+      "status": "converged",
+      "converged": true,
+      "steps": 52,
+      "prototype": "Fe_bcc",
+      "cell_scale_from_prototype": 0.95,
+      "initial_energy_ev_per_atom": -0.24725524984482408,
+      "final_energy_ev_per_atom": -0.30092730782453164,
+      "initial_maximum_force_ev_per_angstrom": 0.3418317754198931,
+      "final_maximum_force_ev_per_angstrom": 0.05198273089135416,
+      "final_maximum_generalized_force": 0.04956459578409445,
+      "initial_maximum_absolute_stress_ev_per_angstrom3": 0.0198578886104449,
+      "final_maximum_absolute_stress_ev_per_angstrom3": 0.001219770052366376,
+      "initial_cell_lengths_angstrom": [
+        5.4454,
+        5.4454,
+        5.4454
+      ],
+      "final_cell_lengths_angstrom": [
+        5.1923508690511335,
+        5.187943135102593,
+        5.189677987516391
+      ],
+      "initial_cell_vectors_angstrom": [
+        [
+          5.4454,
+          0.0,
+          0.0
+        ],
+        [
+          0.0,
+          5.4454,
+          0.0
+        ],
+        [
+          0.0,
+          0.0,
+          5.4454
+        ]
+      ],
+      "final_cell_vectors_angstrom": [
+        [
+          5.192350863556279,
+          -0.0002193280669322121,
+          -9.46447205923253e-05
+        ],
+        [
+          -0.00021916514618509038,
+          5.1879431243675445,
+          -0.00025169878759281796
+        ],
+        [
+          -9.47855796363165e-05,
+          -0.0002515936172929666,
+          5.189677980552216
+        ]
+      ],
+      "initial_cell_angles_degrees": [
+        90.0,
+        90.0,
+        90.0
+      ],
+      "final_cell_angles_degrees": [
+        90.00555740140108,
+        90.0020907186034,
+        90.00484062359406
+      ],
+      "final_minimum_interatomic_distance_angstrom": 2.199284506581148,
+      "initial_rms_internal_offset_from_prototype_angstrom": 0.1262641800270626,
+      "final_rms_internal_offset_from_prototype_angstrom": 0.06878791751657441,
+      "rms_atomic_displacement_angstrom": 0.0989684360173331,
+      "maximum_atomic_displacement_angstrom": 0.16625364219031025,
+      "cell_linear_change_percent": -4.69036868016971,
+      "cell_volume_change_percent": -13.421454514065667,
+      "final_structure": "Fe_bcc_compressed/fp64/final.extxyz",
+      "error": null
+    },
+    {
+      "structure": "Fe_bcc_expanded",
+      "precision": "fp32",
+      "status": "converged",
+      "converged": true,
+      "steps": 61,
+      "prototype": "Fe_bcc",
+      "cell_scale_from_prototype": 1.05,
+      "initial_energy_ev_per_atom": -0.22130323946475983,
+      "final_energy_ev_per_atom": -0.24176020920276642,
+      "initial_maximum_force_ev_per_angstrom": 0.11244832456264581,
+      "final_maximum_force_ev_per_angstrom": 0.04141540425066305,
+      "final_maximum_generalized_force": 0.03912494562546603,
+      "initial_maximum_absolute_stress_ev_per_angstrom3": 0.009568762965500355,
+      "final_maximum_absolute_stress_ev_per_angstrom3": 0.00230285432189703,
+      "initial_cell_lengths_angstrom": [
+        6.0186,
+        6.0186,
+        6.0186
+      ],
+      "final_cell_lengths_angstrom": [
+        5.688426529419295,
+        5.687723182287288,
+        5.678446822008078
+      ],
+      "initial_cell_vectors_angstrom": [
+        [
+          6.0186,
+          0.0,
+          0.0
+        ],
+        [
+          0.0,
+          6.0186,
+          0.0
+        ],
+        [
+          0.0,
+          0.0,
+          6.0186
+        ]
+      ],
+      "final_cell_vectors_angstrom": [
+        [
+          5.688426388227171,
+          -0.00020661842392563255,
+          -0.001250452258979686
+        ],
+        [
+          -0.00020585713432968758,
+          5.687723148784876,
+          -0.0005820031981684864
+        ],
+        [
+          -0.0012486628327332589,
+          -0.0005811387583835585,
+          5.678446654983431
+        ]
+      ],
+      "initial_cell_angles_degrees": [
+        90.0,
+        90.0,
+        90.0
+      ],
+      "final_cell_angles_degrees": [
+        90.01172612002532,
+        90.0251938335981,
+        90.00415356258787
+      ],
+      "final_minimum_interatomic_distance_angstrom": 2.3965781954719767,
+      "initial_rms_internal_offset_from_prototype_angstrom": 0.12626418002706247,
+      "final_rms_internal_offset_from_prototype_angstrom": 0.1259276915876146,
+      "rms_atomic_displacement_angstrom": 0.11586276702859578,
+      "maximum_atomic_displacement_angstrom": 0.23984639545608277,
+      "cell_linear_change_percent": -5.545051818724966,
+      "cell_volume_change_percent": -15.729868228090925,
+      "final_structure": "Fe_bcc_expanded/fp32/final.extxyz",
+      "error": null
+    },
+    {
+      "structure": "Fe_bcc_expanded",
+      "precision": "fp64",
+      "status": "converged",
+      "converged": true,
+      "steps": 61,
+      "prototype": "Fe_bcc",
+      "cell_scale_from_prototype": 1.05,
+      "initial_energy_ev_per_atom": -0.22130284407864598,
+      "final_energy_ev_per_atom": -0.24175977184922093,
+      "initial_maximum_force_ev_per_angstrom": 0.11244863679936559,
+      "final_maximum_force_ev_per_angstrom": 0.04141521299951739,
+      "final_maximum_generalized_force": 0.03912476575025422,
+      "initial_maximum_absolute_stress_ev_per_angstrom3": 0.009568750399339167,
+      "final_maximum_absolute_stress_ev_per_angstrom3": 0.002302739180560494,
+      "initial_cell_lengths_angstrom": [
+        6.0186,
+        6.0186,
+        6.0186
+      ],
+      "final_cell_lengths_angstrom": [
+        5.6884266536131,
+        5.6877232988894475,
+        5.678446882211996
+      ],
+      "initial_cell_vectors_angstrom": [
+        [
+          6.0186,
+          0.0,
+          0.0
+        ],
+        [
+          0.0,
+          6.0186,
+          0.0
+        ],
+        [
+          0.0,
+          0.0,
+          6.0186
+        ]
+      ],
+      "final_cell_vectors_angstrom": [
+        [
+          5.688426512423158,
+          -0.00020659198110016647,
+          -0.0012504467202190217
+        ],
+        [
+          -0.000205830678499793,
+          5.687723265388216,
+          -0.0005820010270068949
+        ],
+        [
+          -0.001248657305091638,
+          -0.0005811365789034599,
+          5.678446715188789
+        ]
+      ],
+      "initial_cell_angles_degrees": [
+        90.0,
+        90.0,
+        90.0
+      ],
+      "final_cell_angles_degrees": [
+        90.01172607604116,
+        90.02519372165516,
+        90.0041530296642
+      ],
+      "final_minimum_interatomic_distance_angstrom": 2.396578781997868,
+      "initial_rms_internal_offset_from_prototype_angstrom": 0.12626418002706247,
+      "final_rms_internal_offset_from_prototype_angstrom": 0.1259277569275666,
+      "rms_atomic_displacement_angstrom": 0.11586291893501345,
+      "maximum_atomic_displacement_angstrom": 0.23984658639751086,
+      "cell_linear_change_percent": -5.54505015167125,
+      "cell_volume_change_percent": -15.729863767060648,
+      "final_structure": "Fe_bcc_expanded/fp64/final.extxyz",
+      "error": null
+    },
+    {
+      "structure": "W_bcc_compressed",
+      "precision": "fp32",
+      "status": "converged",
+      "converged": true,
+      "steps": 30,
+      "prototype": "W_bcc",
+      "cell_scale_from_prototype": 0.95,
+      "initial_energy_ev_per_atom": 0.2713332772254944,
+      "final_energy_ev_per_atom": 0.260736882686615,
+      "initial_maximum_force_ev_per_angstrom": 0.2396416629087149,
+      "final_maximum_force_ev_per_angstrom": 0.04563570934796123,
+      "final_maximum_generalized_force": 0.04509076505693579,
+      "initial_maximum_absolute_stress_ev_per_angstrom3": 0.0034259832464158535,
+      "final_maximum_absolute_stress_ev_per_angstrom3": 0.0011114533990621567,
+      "initial_cell_lengths_angstrom": [
+        6.0135,
+        6.0135,
+        6.0135
+      ],
+      "final_cell_lengths_angstrom": [
+        5.950336156573851,
+        5.938372979104996,
+        5.948395689762886
+      ],
+      "initial_cell_vectors_angstrom": [
+        [
+          6.0135,
+          0.0,
+          0.0
+        ],
+        [
+          0.0,
+          6.0135,
+          0.0
+        ],
+        [
+          0.0,
+          0.0,
+          6.0135
+        ]
+      ],
+      "final_cell_vectors_angstrom": [
+        [
+          5.9503350076387225,
+          0.0001618889051356344,
+          -0.0036941698844082274
+        ],
+        [
+          0.00016228514957920668,
+          5.938372717373661,
+          -0.0017556138638082767
+        ],
+        [
+          -0.0036942327703495806,
+          -0.0017560979015936234,
+          5.948394283397333
+        ]
+      ],
+      "initial_cell_angles_degrees": [
+        90.0,
+        90.0,
+        90.0
+      ],
+      "final_cell_angles_degrees": [
+        90.03385480971227,
+        90.07115498736842,
+        89.99686486454888
+      ],
+      "final_minimum_interatomic_distance_angstrom": 2.5116197911586067,
+      "initial_rms_internal_offset_from_prototype_angstrom": 0.12584066698238733,
+      "final_rms_internal_offset_from_prototype_angstrom": 0.17546424990421736,
+      "rms_atomic_displacement_angstrom": 0.13735003913038946,
+      "maximum_atomic_displacement_angstrom": 0.18116805450599915,
+      "cell_linear_change_percent": -1.1274364599554554,
+      "cell_volume_change_percent": -3.344523601343552,
+      "final_structure": "W_bcc_compressed/fp32/final.extxyz",
+      "error": null
+    },
+    {
+      "structure": "W_bcc_compressed",
+      "precision": "fp64",
+      "status": "converged",
+      "converged": true,
+      "steps": 30,
+      "prototype": "W_bcc",
+      "cell_scale_from_prototype": 0.95,
+      "initial_energy_ev_per_atom": 0.2713334815891752,
+      "final_energy_ev_per_atom": 0.26073662043800566,
+      "initial_maximum_force_ev_per_angstrom": 0.2396420085955936,
+      "final_maximum_force_ev_per_angstrom": 0.04563632242219254,
+      "final_maximum_generalized_force": 0.04509137390956184,
+      "initial_maximum_absolute_stress_ev_per_angstrom3": 0.003425905252412999,
+      "final_maximum_absolute_stress_ev_per_angstrom3": 0.0011112336285312879,
+      "initial_cell_lengths_angstrom": [
+        6.0135,
+        6.0135,
+        6.0135
+      ],
+      "final_cell_lengths_angstrom": [
+        5.950336576633306,
+        5.938373402898567,
+        5.9483961109194095
+      ],
+      "initial_cell_vectors_angstrom": [
+        [
+          6.0135,
+          0.0,
+          0.0
+        ],
+        [
+          0.0,
+          6.0135,
+          0.0
+        ],
+        [
+          0.0,
+          0.0,
+          6.0135
+        ]
+      ],
+      "final_cell_vectors_angstrom": [
+        [
+          5.95033542769392,
+          0.00016190256675933674,
+          -0.0036941762729025803
+        ],
+        [
+          0.0001622987877131313,
+          5.938373141165247,
+          -0.0017556193803641084
+        ],
+        [
+          -0.003694239160144513,
+          -0.0017561034377679109,
+          5.948394704548354
+        ]
+      ],
+      "initial_cell_angles_degrees": [
+        90.0,
+        90.0,
+        90.0
+      ],
+      "final_cell_angles_degrees": [
+        90.03385491394017,
+        90.07115510544035,
+        89.9968646015871
+      ],
+      "final_minimum_interatomic_distance_angstrom": 2.511620047723549,
+      "initial_rms_internal_offset_from_prototype_angstrom": 0.12584066698238733,
+      "final_rms_internal_offset_from_prototype_angstrom": 0.17546438991507468,
+      "rms_atomic_displacement_angstrom": 0.13735010715578258,
+      "maximum_atomic_displacement_angstrom": 0.18116802968701756,
+      "cell_linear_change_percent": -1.127429447901751,
+      "cell_volume_change_percent": -3.3445030371816564,
+      "final_structure": "W_bcc_compressed/fp64/final.extxyz",
+      "error": null
+    },
+    {
+      "structure": "W_bcc_expanded",
+      "precision": "fp32",
+      "status": "converged",
+      "converged": true,
+      "steps": 29,
+      "prototype": "W_bcc",
+      "cell_scale_from_prototype": 1.05,
+      "initial_energy_ev_per_atom": 0.2844078242778778,
+      "final_energy_ev_per_atom": 0.2776290774345398,
+      "initial_maximum_force_ev_per_angstrom": 0.07016219570442246,
+      "final_maximum_force_ev_per_angstrom": 0.04853428132000309,
+      "final_maximum_generalized_force": 0.04848127295638859,
+      "initial_maximum_absolute_stress_ev_per_angstrom3": 0.0003232579038012773,
+      "final_maximum_absolute_stress_ev_per_angstrom3": 0.0016937927575781941,
+      "initial_cell_lengths_angstrom": [
+        6.6465000000000005,
+        6.6465000000000005,
+        6.6465000000000005
+      ],
+      "final_cell_lengths_angstrom": [
+        6.632799395584951,
+        6.627829893294037,
+        6.626924982873125
+      ],
+      "initial_cell_vectors_angstrom": [
+        [
+          6.6465000000000005,
+          0.0,
+          0.0
+        ],
+        [
+          0.0,
+          6.6465000000000005,
+          0.0
+        ],
+        [
+          0.0,
+          0.0,
+          6.6465000000000005
+        ]
+      ],
+      "final_cell_vectors_angstrom": [
+        [
+          6.632795941772664,
+          -0.0060990884995115804,
+          0.002935642287321
+        ],
+        [
+          -0.006099270694268221,
+          6.627823631129017,
+          -0.006768159780447684
+        ],
+        [
+          0.00293532748307864,
+          -0.006769280593536637,
+          6.626920875438365
+        ]
+      ],
+      "initial_cell_angles_degrees": [
+        90.0,
+        90.0,
+        90.0
+      ],
+      "final_cell_angles_degrees": [
+        90.11705881054385,
+        89.94920882352112,
+        90.10543785893552
+      ],
+      "final_minimum_interatomic_distance_angstrom": 2.602672919478263,
+      "initial_rms_internal_offset_from_prototype_angstrom": 0.12584066698238713,
+      "final_rms_internal_offset_from_prototype_angstrom": 0.24576677062243774,
+      "rms_atomic_displacement_angstrom": 0.15968492723774808,
+      "maximum_atomic_displacement_angstrom": 0.26859344855601,
+      "cell_linear_change_percent": -0.2605167042698642,
+      "cell_volume_change_percent": -0.7799521322320424,
+      "final_structure": "W_bcc_expanded/fp32/final.extxyz",
+      "error": null
+    },
+    {
+      "structure": "W_bcc_expanded",
+      "precision": "fp64",
+      "status": "converged",
+      "converged": true,
+      "steps": 29,
+      "prototype": "W_bcc",
+      "cell_scale_from_prototype": 1.05,
+      "initial_energy_ev_per_atom": 0.28440720156585036,
+      "final_energy_ev_per_atom": 0.27762864342563276,
+      "initial_maximum_force_ev_per_angstrom": 0.0701621085401709,
+      "final_maximum_force_ev_per_angstrom": 0.048534420711211244,
+      "final_maximum_generalized_force": 0.04848140230729863,
+      "initial_maximum_absolute_stress_ev_per_angstrom3": 0.00032320610716940126,
+      "final_maximum_absolute_stress_ev_per_angstrom3": 0.00169382858586661,
+      "initial_cell_lengths_angstrom": [
+        6.6465000000000005,
+        6.6465000000000005,
+        6.6465000000000005
+      ],
+      "final_cell_lengths_angstrom": [
+        6.632798037799802,
+        6.6278285870876354,
+        6.626923690664621
+      ],
+      "initial_cell_vectors_angstrom": [
+        [
+          6.6465000000000005,
+          0.0,
+          0.0
+        ],
+        [
+          0.0,
+          6.6465000000000005,
+          0.0
+        ],
+        [
+          0.0,
+          0.0,
+          6.6465000000000005
+        ]
+      ],
+      "final_cell_vectors_angstrom": [
+        [
+          6.632794583980177,
+          -0.00609908455376431,
+          0.0029356654691674554
+        ],
+        [
+          -0.006099266733499578,
+          6.627822324921101,
+          -0.0067681636241513675
+        ],
+        [
+          0.0029353506459640602,
+          -0.006769284438741386,
+          6.626919583214872
+        ]
+      ],
+      "initial_cell_angles_degrees": [
+        90.0,
+        90.0,
+        90.0
+      ],
+      "final_cell_angles_degrees": [
+        90.11705890013835,
+        89.94920841284939,
+        90.10543781201729
+      ],
+      "final_minimum_interatomic_distance_angstrom": 2.602672848895869,
+      "initial_rms_internal_offset_from_prototype_angstrom": 0.12584066698238713,
+      "final_rms_internal_offset_from_prototype_angstrom": 0.24576650512444068,
+      "rms_atomic_displacement_angstrom": 0.15968465405842502,
+      "maximum_atomic_displacement_angstrom": 0.26859282613939545,
+      "cell_linear_change_percent": -0.260536545289225,
+      "cell_volume_change_percent": -0.7800113455988189,
+      "final_structure": "W_bcc_expanded/fp64/final.extxyz",
+      "error": null
+    },
+    {
+      "structure": "MgO_rocksalt_compressed",
+      "precision": "fp32",
+      "status": "converged",
+      "converged": true,
+      "steps": 83,
+      "prototype": "MgO_rocksalt",
+      "cell_scale_from_prototype": 0.95,
+      "initial_energy_ev_per_atom": -0.5096566677093506,
+      "final_energy_ev_per_atom": -0.5329511761665344,
+      "initial_maximum_force_ev_per_angstrom": 0.7326063929139558,
+      "final_maximum_force_ev_per_angstrom": 0.03752586842729177,
+      "final_maximum_generalized_force": 0.04729804214769383,
+      "initial_maximum_absolute_stress_ev_per_angstrom3": 0.0399937629699707,
+      "final_maximum_absolute_stress_ev_per_angstrom3": 0.005732141435146332,
+      "initial_cell_lengths_angstrom": [
+        8.002799999999999,
+        8.002799999999999,
+        8.002799999999999
+      ],
+      "final_cell_lengths_angstrom": [
+        8.121594129594952,
+        8.12165474281663,
+        8.121120552542164
+      ],
+      "initial_cell_vectors_angstrom": [
+        [
+          8.002799999999999,
+          0.0,
+          0.0
+        ],
+        [
+          0.0,
+          8.002799999999999,
+          0.0
+        ],
+        [
+          0.0,
+          0.0,
+          8.002799999999999
+        ]
+      ],
+      "final_cell_vectors_angstrom": [
+        [
+          8.121594075648417,
+          0.0003895881544661718,
+          0.0008511667142149217
+        ],
+        [
+          0.0003895790475673438,
+          8.121654692407922,
+          0.0008167205337826611
+        ],
+        [
+          0.000851187824913569,
+          0.0008167362785904785,
+          8.121120466865634
+        ]
+      ],
+      "initial_cell_angles_degrees": [
+        90.0,
+        90.0,
+        90.0
+      ],
+      "final_cell_angles_degrees": [
+        89.98847579688942,
+        89.98798969543574,
+        89.99450259039399
+      ],
+      "final_minimum_interatomic_distance_angstrom": 1.998078380663633,
+      "initial_rms_internal_offset_from_prototype_angstrom": 0.12393269757610195,
+      "final_rms_internal_offset_from_prototype_angstrom": 0.019788890596432386,
+      "rms_atomic_displacement_angstrom": 0.12491718098525688,
+      "maximum_atomic_displacement_angstrom": 0.16084503056522645,
+      "cell_linear_change_percent": 1.4826869968584067,
+      "cell_volume_change_percent": 4.514332734082771,
+      "final_structure": "MgO_rocksalt_compressed/fp32/final.extxyz",
+      "error": null
+    },
+    {
+      "structure": "MgO_rocksalt_compressed",
+      "precision": "fp64",
+      "status": "converged",
+      "converged": true,
+      "steps": 83,
+      "prototype": "MgO_rocksalt",
+      "cell_scale_from_prototype": 0.95,
+      "initial_energy_ev_per_atom": -0.5096562301774727,
+      "final_energy_ev_per_atom": -0.532951159670527,
+      "initial_maximum_force_ev_per_angstrom": 0.7326061329580624,
+      "final_maximum_force_ev_per_angstrom": 0.037525620546159516,
+      "final_maximum_generalized_force": 0.04729815661352781,
+      "initial_maximum_absolute_stress_ev_per_angstrom3": 0.03999379731678098,
+      "final_maximum_absolute_stress_ev_per_angstrom3": 0.00573215516032515,
+      "initial_cell_lengths_angstrom": [
+        8.002799999999999,
+        8.002799999999999,
+        8.002799999999999
+      ],
+      "final_cell_lengths_angstrom": [
+        8.121594192875824,
+        8.121654813235637,
+        8.121120619108018
+      ],
+      "initial_cell_vectors_angstrom": [
+        [
+          8.002799999999999,
+          0.0,
+          0.0
+        ],
+        [
+          0.0,
+          8.002799999999999,
+          0.0
+        ],
+        [
+          0.0,
+          0.0,
+          8.002799999999999
+        ]
+      ],
+      "final_cell_vectors_angstrom": [
+        [
+          8.12159413892936,
+          0.00038958621909472845,
+          0.0008511669346025375
+        ],
+        [
+          0.0003895771120203744,
+          8.121654762827134,
+          0.000816719400822613
+        ],
+        [
+          0.0008511880451109448,
+          0.0008167351453665655,
+          8.12112053343158
+        ]
+      ],
+      "initial_cell_angles_degrees": [
+        90.0,
+        90.0,
+        90.0
+      ],
+      "final_cell_angles_degrees": [
+        89.98847581297572,
+        89.9879896924252,
+        89.99450261774817
+      ],
+      "final_minimum_interatomic_distance_angstrom": 1.9980786298008237,
+      "initial_rms_internal_offset_from_prototype_angstrom": 0.12393269757610195,
+      "final_rms_internal_offset_from_prototype_angstrom": 0.019788843310053164,
+      "rms_atomic_displacement_angstrom": 0.12491722206568519,
+      "maximum_atomic_displacement_angstrom": 0.16084500150542852,
+      "cell_linear_change_percent": 1.4826878310070013,
+      "cell_volume_change_percent": 4.514335311294615,
+      "final_structure": "MgO_rocksalt_compressed/fp64/final.extxyz",
+      "error": null
+    },
+    {
+      "structure": "MgO_rocksalt_expanded",
+      "precision": "fp32",
+      "status": "converged",
+      "converged": true,
+      "steps": 176,
+      "prototype": "MgO_rocksalt",
+      "cell_scale_from_prototype": 1.05,
+      "initial_energy_ev_per_atom": -0.514652669429779,
+      "final_energy_ev_per_atom": -0.5330353379249573,
+      "initial_maximum_force_ev_per_angstrom": 0.17175594895407204,
+      "final_maximum_force_ev_per_angstrom": 0.035360793263271934,
+      "final_maximum_generalized_force": 0.049769560324056154,
+      "initial_maximum_absolute_stress_ev_per_angstrom3": 0.010253798216581345,
+      "final_maximum_absolute_stress_ev_per_angstrom3": 0.0050003668293356895,
+      "initial_cell_lengths_angstrom": [
+        8.8452,
+        8.8452,
+        8.8452
+      ],
+      "final_cell_lengths_angstrom": [
+        8.486130720044812,
+        8.486090340634977,
+        8.48580834214523
+      ],
+      "initial_cell_vectors_angstrom": [
+        [
+          8.8452,
+          0.0,
+          0.0
+        ],
+        [
+          0.0,
+          8.8452,
+          0.0
+        ],
+        [
+          0.0,
+          0.0,
+          8.8452
+        ]
+      ],
+      "final_cell_vectors_angstrom": [
+        [
+          8.486130706297125,
+          0.00022628308446310928,
+          0.00042676143349248236
+        ],
+        [
+          0.00022629735037187258,
+          8.486090316986092,
+          0.0005917454449979453
+        ],
+        [
+          0.0004267514126621878,
+          0.0005917453282697512,
+          8.48580831078232
+        ]
+      ],
+      "initial_cell_angles_degrees": [
+        90.0,
+        90.0,
+        90.0
+      ],
+      "final_cell_angles_degrees": [
+        89.99200918179744,
+        89.99423712426642,
+        89.99694410605322
+      ],
+      "final_minimum_interatomic_distance_angstrom": 2.101957550823061,
+      "initial_rms_internal_offset_from_prototype_angstrom": 0.12393269757610201,
+      "final_rms_internal_offset_from_prototype_angstrom": 0.015229842876630295,
+      "rms_atomic_displacement_angstrom": 0.11826645255114876,
+      "maximum_atomic_displacement_angstrom": 0.1496790409698056,
+      "cell_linear_change_percent": -4.060848811313789,
+      "cell_volume_change_percent": -11.694529650648233,
+      "final_structure": "MgO_rocksalt_expanded/fp32/final.extxyz",
+      "error": null
+    },
+    {
+      "structure": "MgO_rocksalt_expanded",
+      "precision": "fp64",
+      "status": "converged",
+      "converged": true,
+      "steps": 183,
+      "prototype": "MgO_rocksalt",
+      "cell_scale_from_prototype": 1.05,
+      "initial_energy_ev_per_atom": -0.514652931459545,
+      "final_energy_ev_per_atom": -0.5331976575153343,
+      "initial_maximum_force_ev_per_angstrom": 0.17175555734222742,
+      "final_maximum_force_ev_per_angstrom": 0.03239371967159151,
+      "final_maximum_generalized_force": 0.0499398863313971,
+      "initial_maximum_absolute_stress_ev_per_angstrom3": 0.010253821624848315,
+      "final_maximum_absolute_stress_ev_per_angstrom3": 0.005037440528689077,
+      "initial_cell_lengths_angstrom": [
+        8.8452,
+        8.8452,
+        8.8452
+      ],
+      "final_cell_lengths_angstrom": [
+        8.469541657674132,
+        8.469493653259871,
+        8.469190543824487
+      ],
+      "initial_cell_vectors_angstrom": [
+        [
+          8.8452,
+          0.0,
+          0.0
+        ],
+        [
+          0.0,
+          8.8452,
+          0.0
+        ],
+        [
+          0.0,
+          0.0,
+          8.8452
+        ]
+      ],
+      "final_cell_vectors_angstrom": [
+        [
+          8.469541639505296,
+          0.00030407730095064373,
+          0.00046400473419960146
+        ],
+        [
+          0.0003040931086247433,
+          8.46949362241353,
+          0.0006557691262539986
+        ],
+        [
+          0.00046399169044697474,
+          0.0006557667072304219,
+          8.469190505726496
+        ]
+      ],
+      "initial_cell_angles_degrees": [
+        90.0,
+        90.0,
+        90.0
+      ],
+      "final_cell_angles_degrees": [
+        89.9911272420442,
+        89.99372188817689,
+        89.99588552058349
+      ],
+      "final_minimum_interatomic_distance_angstrom": 2.0949912993491258,
+      "initial_rms_internal_offset_from_prototype_angstrom": 0.12393269757610201,
+      "final_rms_internal_offset_from_prototype_angstrom": 0.015630830926055005,
+      "rms_atomic_displacement_angstrom": 0.1182260997345706,
+      "maximum_atomic_displacement_angstrom": 0.1498772182438669,
+      "cell_linear_change_percent": -4.248534592176211,
+      "cell_volume_change_percent": -12.211772865912163,
+      "final_structure": "MgO_rocksalt_expanded/fp64/final.extxyz",
+      "error": null
+    },
+    {
+      "structure": "NaCl_rocksalt_compressed",
+      "precision": "fp32",
+      "status": "converged",
+      "converged": true,
+      "steps": 170,
+      "prototype": "NaCl_rocksalt",
+      "cell_scale_from_prototype": 0.95,
+      "initial_energy_ev_per_atom": 0.24830646812915802,
+      "final_energy_ev_per_atom": 0.21218517422676086,
+      "initial_maximum_force_ev_per_angstrom": 0.37032571504257167,
+      "final_maximum_force_ev_per_angstrom": 0.00948598914323518,
+      "final_maximum_generalized_force": 0.04992577523762852,
+      "initial_maximum_absolute_stress_ev_per_angstrom3": 0.021663226187229156,
+      "final_maximum_absolute_stress_ev_per_angstrom3": 0.0023938827216625214,
+      "initial_cell_lengths_angstrom": [
+        10.716,
+        10.716,
+        10.716
+      ],
+      "final_cell_lengths_angstrom": [
+        11.159249080467857,
+        11.1594736243072,
+        11.159294606611944
+      ],
+      "initial_cell_vectors_angstrom": [
+        [
+          10.716,
+          0.0,
+          0.0
+        ],
+        [
+          0.0,
+          10.716,
+          0.0
+        ],
+        [
+          0.0,
+          0.0,
+          10.716
+        ]
+      ],
+      "final_cell_vectors_angstrom": [
+        [
+          11.159248572977168,
+          0.002575472693346852,
+          0.0021664187438154674
+        ],
+        [
+          0.0025754692758855925,
+          11.15947323523467,
+          0.0014320080796595804
+        ],
+        [
+          0.002166498464080152,
+          0.00143209545689961,
+          11.159294304414837
+        ]
+      ],
+      "initial_cell_angles_degrees": [
+        90.0,
+        90.0,
+        90.0
+      ],
+      "final_cell_angles_degrees": [
+        89.98529222688329,
+        89.97775152295827,
+        89.97355196654581
+      ],
+      "final_minimum_interatomic_distance_angstrom": 2.763162445657212,
+      "initial_rms_internal_offset_from_prototype_angstrom": 0.12760394422063262,
+      "final_rms_internal_offset_from_prototype_angstrom": 0.03006090467615219,
+      "rms_atomic_displacement_angstrom": 0.13061192485029074,
+      "maximum_atomic_displacement_angstrom": 0.18101992750289056,
+      "cell_linear_change_percent": 4.13716968827611,
+      "cell_volume_change_percent": 12.932051232634368,
+      "final_structure": "NaCl_rocksalt_compressed/fp32/final.extxyz",
+      "error": null
+    },
+    {
+      "structure": "NaCl_rocksalt_compressed",
+      "precision": "fp64",
+      "status": "converged",
+      "converged": true,
+      "steps": 170,
+      "prototype": "NaCl_rocksalt",
+      "cell_scale_from_prototype": 0.95,
+      "initial_energy_ev_per_atom": 0.24830637535354663,
+      "final_energy_ev_per_atom": 0.21218512100211218,
+      "initial_maximum_force_ev_per_angstrom": 0.3703254673738702,
+      "final_maximum_force_ev_per_angstrom": 0.009485474158875865,
+      "final_maximum_generalized_force": 0.049925872299936586,
+      "initial_maximum_absolute_stress_ev_per_angstrom3": 0.021663208847911786,
+      "final_maximum_absolute_stress_ev_per_angstrom3": 0.002393887344655549,
+      "initial_cell_lengths_angstrom": [
+        10.716,
+        10.716,
+        10.716
+      ],
+      "final_cell_lengths_angstrom": [
+        11.159249095568372,
+        11.15947365673319,
+        11.15929460917607
+      ],
+      "initial_cell_vectors_angstrom": [
+        [
+          10.716,
+          0.0,
+          0.0
+        ],
+        [
+          0.0,
+          10.716,
+          0.0
+        ],
+        [
+          0.0,
+          0.0,
+          10.716
+        ]
+      ],
+      "final_cell_vectors_angstrom": [
+        [
+          11.159248588064205,
+          0.0025755045383654093,
+          0.0021664503079217834
+        ],
+        [
+          0.002575501121343279,
+          11.15947326764947,
+          0.0014320380124512137
+        ],
+        [
+          0.002166530030462959,
+          0.0014321253919919949,
+          11.159294306968993
+        ]
+      ],
+      "initial_cell_angles_degrees": [
+        90.0,
+        90.0,
+        90.0
+      ],
+      "final_cell_angles_degrees": [
+        89.98529191945671,
+        89.97775119878445,
+        89.97355163954394
+      ],
+      "final_minimum_interatomic_distance_angstrom": 2.763162153002566,
+      "initial_rms_internal_offset_from_prototype_angstrom": 0.12760394422063262,
+      "final_rms_internal_offset_from_prototype_angstrom": 0.030061019908392113,
+      "rms_atomic_displacement_angstrom": 0.1306119016930287,
+      "maximum_atomic_displacement_angstrom": 0.1810201740702349,
+      "cell_linear_change_percent": 4.137169844088695,
+      "cell_volume_change_percent": 12.93205173884584,
+      "final_structure": "NaCl_rocksalt_compressed/fp64/final.extxyz",
+      "error": null
+    },
+    {
+      "structure": "NaCl_rocksalt_expanded",
+      "precision": "fp32",
+      "status": "converged",
+      "converged": true,
+      "steps": 166,
+      "prototype": "NaCl_rocksalt",
+      "cell_scale_from_prototype": 1.05,
+      "initial_energy_ev_per_atom": 0.22515837848186493,
+      "final_energy_ev_per_atom": 0.21250417828559875,
+      "initial_maximum_force_ev_per_angstrom": 0.08602527572308417,
+      "final_maximum_force_ev_per_angstrom": 0.01220653841800494,
+      "final_maximum_generalized_force": 0.04947803035495468,
+      "initial_maximum_absolute_stress_ev_per_angstrom3": 0.003675773274153471,
+      "final_maximum_absolute_stress_ev_per_angstrom3": 0.0020648217760026455,
+      "initial_cell_lengths_angstrom": [
+        11.844,
+        11.844,
+        11.844
+      ],
+      "final_cell_lengths_angstrom": [
+        11.37775388715295,
+        11.37766849247017,
+        11.37943957303222
+      ],
+      "initial_cell_vectors_angstrom": [
+        [
+          11.844,
+          0.0,
+          0.0
+        ],
+        [
+          0.0,
+          11.844,
+          0.0
+        ],
+        [
+          0.0,
+          0.0,
+          11.844
+        ]
+      ],
+      "final_cell_vectors_angstrom": [
+        [
+          11.377753855055216,
+          0.0007741553806090395,
+          0.00036205479816260415
+        ],
+        [
+          0.000774140865279436,
+          11.37766844843231,
+          0.0006346670605684279
+        ],
+        [
+          0.00036200100016748574,
+          0.0006346261819522609,
+          11.379439549577853
+        ]
+      ],
+      "initial_cell_angles_degrees": [
+        90.0,
+        90.0,
+        90.0
+      ],
+      "final_cell_angles_degrees": [
+        89.99360845347888,
+        89.9963538723947,
+        89.99220300146786
+      ],
+      "final_minimum_interatomic_distance_angstrom": 2.8109651176148653,
+      "initial_rms_internal_offset_from_prototype_angstrom": 0.1276039442206325,
+      "final_rms_internal_offset_from_prototype_angstrom": 0.030656388968765828,
+      "rms_atomic_displacement_angstrom": 0.1164872706972267,
+      "maximum_atomic_displacement_angstrom": 0.1563456120996054,
+      "cell_linear_change_percent": -3.93205574508797,
+      "cell_volume_change_percent": -11.338416974909693,
+      "final_structure": "NaCl_rocksalt_expanded/fp32/final.extxyz",
+      "error": null
+    },
+    {
+      "structure": "NaCl_rocksalt_expanded",
+      "precision": "fp64",
+      "status": "converged",
+      "converged": true,
+      "steps": 166,
+      "prototype": "NaCl_rocksalt",
+      "cell_scale_from_prototype": 1.05,
+      "initial_energy_ev_per_atom": 0.22515844420325654,
+      "final_energy_ev_per_atom": 0.21250411668927843,
+      "initial_maximum_force_ev_per_angstrom": 0.08602527214162227,
+      "final_maximum_force_ev_per_angstrom": 0.0125911838678958,
+      "final_maximum_generalized_force": 0.04947425627096248,
+      "initial_maximum_absolute_stress_ev_per_angstrom3": 0.0036757692136990816,
+      "final_maximum_absolute_stress_ev_per_angstrom3": 0.0020646628568999664,
+      "initial_cell_lengths_angstrom": [
+        11.844,
+        11.844,
+        11.844
+      ],
+      "final_cell_lengths_angstrom": [
+        11.377753740215672,
+        11.377668454864029,
+        11.3794393989631
+      ],
+      "initial_cell_vectors_angstrom": [
+        [
+          11.844,
+          0.0,
+          0.0
+        ],
+        [
+          0.0,
+          11.844,
+          0.0
+        ],
+        [
+          0.0,
+          0.0,
+          11.844
+        ]
+      ],
+      "final_cell_vectors_angstrom": [
+        [
+          11.377753708126328,
+          0.0007736478305305633,
+          0.0003628751710404905
+        ],
+        [
+          0.0007736332761926605,
+          11.377668410883894,
+          0.0006342510112310923
+        ],
+        [
+          0.00036282125854307084,
+          0.0006342102287033467,
+          11.379439375505799
+        ]
+      ],
+      "initial_cell_angles_degrees": [
+        90.0,
+        90.0,
+        90.0
+      ],
+      "final_cell_angles_degrees": [
+        89.99361264270111,
+        89.99634561139433,
+        89.99220811327008
+      ],
+      "final_minimum_interatomic_distance_angstrom": 2.8109664657873252,
+      "initial_rms_internal_offset_from_prototype_angstrom": 0.1276039442206325,
+      "final_rms_internal_offset_from_prototype_angstrom": 0.030656618466446735,
+      "rms_atomic_displacement_angstrom": 0.1164840293809284,
+      "maximum_atomic_displacement_angstrom": 0.15635823946662813,
+      "cell_linear_change_percent": -3.9320567543543627,
+      "cell_volume_change_percent": -11.338419768228214,
+      "final_structure": "NaCl_rocksalt_expanded/fp64/final.extxyz",
+      "error": null
+    },
+    {
+      "structure": "GaAs_zincblende_compressed",
+      "precision": "fp32",
+      "status": "converged",
+      "converged": true,
+      "steps": 352,
+      "prototype": "GaAs_zincblende",
+      "cell_scale_from_prototype": 0.95,
+      "initial_energy_ev_per_atom": 0.02031347155570984,
+      "final_energy_ev_per_atom": -0.15493729710578918,
+      "initial_maximum_force_ev_per_angstrom": 1.679701649663935,
+      "final_maximum_force_ev_per_angstrom": 0.03681439519421377,
+      "final_maximum_generalized_force": 0.04975882860342211,
+      "initial_maximum_absolute_stress_ev_per_angstrom3": 0.06699596345424652,
+      "final_maximum_absolute_stress_ev_per_angstrom3": 0.0021582513581961393,
+      "initial_cell_lengths_angstrom": [
+        10.740699999999999,
+        10.740699999999999,
+        10.740699999999999
+      ],
+      "final_cell_lengths_angstrom": [
+        11.715067290265733,
+        11.71400403715733,
+        11.711329940379473
+      ],
+      "initial_cell_vectors_angstrom": [
+        [
+          10.740699999999999,
+          0.0,
+          0.0
+        ],
+        [
+          0.0,
+          10.740699999999999,
+          0.0
+        ],
+        [
+          0.0,
+          0.0,
+          10.740699999999999
+        ]
+      ],
+      "final_cell_vectors_angstrom": [
+        [
+          11.715045400156018,
+          0.01707967736593999,
+          0.014871864660110055
+        ],
+        [
+          0.017078415072666556,
+          11.713984769054608,
+          0.012638854121151918
+        ],
+        [
+          0.014870690539674715,
+          0.012637917884653582,
+          11.711313680284679
+        ]
+      ],
+      "initial_cell_angles_degrees": [
+        90.0,
+        90.0,
+        90.0
+      ],
+      "final_cell_angles_degrees": [
+        89.8762456360409,
+        89.85442252938002,
+        89.83285439069299
+      ],
+      "final_minimum_interatomic_distance_angstrom": 2.521545781190677,
+      "initial_rms_internal_offset_from_prototype_angstrom": 0.12530737041638926,
+      "final_rms_internal_offset_from_prototype_angstrom": 0.020075043262679396,
+      "rms_atomic_displacement_angstrom": 0.13490314223289768,
+      "maximum_atomic_displacement_angstrom": 0.17884604532112688,
+      "cell_linear_change_percent": 9.05683139150626,
+      "cell_volume_change_percent": 29.70429518809801,
+      "final_structure": "GaAs_zincblende_compressed/fp32/final.extxyz",
+      "error": null
+    },
+    {
+      "structure": "GaAs_zincblende_compressed",
+      "precision": "fp64",
+      "status": "converged",
+      "converged": true,
+      "steps": 352,
+      "prototype": "GaAs_zincblende",
+      "cell_scale_from_prototype": 0.95,
+      "initial_energy_ev_per_atom": 0.020313879756488677,
+      "final_energy_ev_per_atom": -0.15493833590561543,
+      "initial_maximum_force_ev_per_angstrom": 1.6797071282460394,
+      "final_maximum_force_ev_per_angstrom": 0.03720400917865636,
+      "final_maximum_generalized_force": 0.04985879625371438,
+      "initial_maximum_absolute_stress_ev_per_angstrom3": 0.06699613017912996,
+      "final_maximum_absolute_stress_ev_per_angstrom3": 0.002162265742051374,
+      "initial_cell_lengths_angstrom": [
+        10.740699999999999,
+        10.740699999999999,
+        10.740699999999999
+      ],
+      "final_cell_lengths_angstrom": [
+        11.715161015714898,
+        11.713976113214517,
+        11.71127710021931
+      ],
+      "initial_cell_vectors_angstrom": [
+        [
+          10.740699999999999,
+          0.0,
+          0.0
+        ],
+        [
+          0.0,
+          10.740699999999999,
+          0.0
+        ],
+        [
+          0.0,
+          0.0,
+          10.740699999999999
+        ]
+      ],
+      "final_cell_vectors_angstrom": [
+        [
+          11.715139021922797,
+          0.017113691712331423,
+          0.014914513196535526
+        ],
+        [
+          0.017112277466909853,
+          11.713956806818418,
+          0.012628496055701644
+        ],
+        [
+          0.014913200626223646,
+          0.012627552512790642,
+          11.711260797176614
+        ]
+      ],
+      "initial_cell_angles_degrees": [
+        90.0,
+        90.0,
+        90.0
+      ],
+      "final_cell_angles_degrees": [
+        89.87634607018994,
+        89.85400612071587,
+        89.83252271584048
+      ],
+      "final_minimum_interatomic_distance_angstrom": 2.5213047058334728,
+      "initial_rms_internal_offset_from_prototype_angstrom": 0.12530737041638926,
+      "final_rms_internal_offset_from_prototype_angstrom": 0.020085133790913923,
+      "rms_atomic_displacement_angstrom": 0.13498102377585414,
+      "maximum_atomic_displacement_angstrom": 0.17933319897903677,
+      "cell_linear_change_percent": 9.05687161652633,
+      "cell_volume_change_percent": 29.70443437828545,
+      "final_structure": "GaAs_zincblende_compressed/fp64/final.extxyz",
+      "error": null
+    },
+    {
+      "structure": "GaAs_zincblende_expanded",
+      "precision": "fp32",
+      "status": "converged",
+      "converged": true,
+      "steps": 37,
+      "prototype": "GaAs_zincblende",
+      "cell_scale_from_prototype": 1.05,
+      "initial_energy_ev_per_atom": -0.14479689300060272,
+      "final_energy_ev_per_atom": -0.1546550989151001,
+      "initial_maximum_force_ev_per_angstrom": 0.3637229575189345,
+      "final_maximum_force_ev_per_angstrom": 0.043328699058548574,
+      "final_maximum_generalized_force": 0.04843110811206153,
+      "initial_maximum_absolute_stress_ev_per_angstrom3": 0.00047442037612199783,
+      "final_maximum_absolute_stress_ev_per_angstrom3": 0.0018592876149341464,
+      "initial_cell_lengths_angstrom": [
+        11.8713,
+        11.8713,
+        11.8713
+      ],
+      "final_cell_lengths_angstrom": [
+        11.8500767325913,
+        11.850060229218947,
+        11.849902924081183
+      ],
+      "initial_cell_vectors_angstrom": [
+        [
+          11.8713,
+          0.0,
+          0.0
+        ],
+        [
+          0.0,
+          11.8713,
+          0.0
+        ],
+        [
+          0.0,
+          0.0,
+          11.8713
+        ]
+      ],
+      "final_cell_vectors_angstrom": [
+        [
+          11.850076602621991,
+          0.0010797043982399422,
+          0.0013836657762831977
+        ],
+        [
+          0.0010796724671818727,
+          11.850060108575802,
+          0.001301370207451408
+        ],
+        [
+          0.001383609562036288,
+          0.0013013390061746178,
+          11.849902771849614
+        ]
+      ],
+      "initial_cell_angles_degrees": [
+        90.0,
+        90.0,
+        90.0
+      ],
+      "final_cell_angles_degrees": [
+        89.98741504578423,
+        89.98661939857573,
+        89.98955855093617
+      ],
+      "final_minimum_interatomic_distance_angstrom": 2.5345164188399827,
+      "initial_rms_internal_offset_from_prototype_angstrom": 0.12530737041638912,
+      "final_rms_internal_offset_from_prototype_angstrom": 0.03592844298933758,
+      "rms_atomic_displacement_angstrom": 0.1186143304413191,
+      "maximum_atomic_displacement_angstrom": 0.17299099284848152,
+      "cell_linear_change_percent": -0.17931233060284324,
+      "cell_volume_change_percent": -0.5369797498224971,
+      "final_structure": "GaAs_zincblende_expanded/fp32/final.extxyz",
+      "error": null
+    },
+    {
+      "structure": "GaAs_zincblende_expanded",
+      "precision": "fp64",
+      "status": "converged",
+      "converged": true,
+      "steps": 37,
+      "prototype": "GaAs_zincblende",
+      "cell_scale_from_prototype": 1.05,
+      "initial_energy_ev_per_atom": -0.14479720310578817,
+      "final_energy_ev_per_atom": -0.1546550765721214,
+      "initial_maximum_force_ev_per_angstrom": 0.3637237254599669,
+      "final_maximum_force_ev_per_angstrom": 0.04332777970888217,
+      "final_maximum_generalized_force": 0.048431002158160145,
+      "initial_maximum_absolute_stress_ev_per_angstrom3": 0.0004744249266821003,
+      "final_maximum_absolute_stress_ev_per_angstrom3": 0.001859283501914802,
+      "initial_cell_lengths_angstrom": [
+        11.8713,
+        11.8713,
+        11.8713
+      ],
+      "final_cell_lengths_angstrom": [
+        11.85007677033259,
+        11.85006026603071,
+        11.849902960442435
+      ],
+      "initial_cell_vectors_angstrom": [
+        [
+          11.8713,
+          0.0,
+          0.0
+        ],
+        [
+          0.0,
+          11.8713,
+          0.0
+        ],
+        [
+          0.0,
+          0.0,
+          11.8713
+        ]
+      ],
+      "final_cell_vectors_angstrom": [
+        [
+          11.850076640362555,
+          0.0010797089667139927,
+          0.0013836684084351787
+        ],
+        [
+          0.0010796770362527,
+          11.850060145385266,
+          0.0013013873453786688
+        ],
+        [
+          0.0013836121940827893,
+          0.001301356143826662,
+          11.849902808208677
+        ]
+      ],
+      "initial_cell_angles_degrees": [
+        90.0,
+        90.0,
+        90.0
+      ],
+      "final_cell_angles_degrees": [
+        89.9874148800937,
+        89.98661937315471,
+        89.98955850677737
+      ],
+      "final_minimum_interatomic_distance_angstrom": 2.5345163962745274,
+      "initial_rms_internal_offset_from_prototype_angstrom": 0.12530737041638912,
+      "final_rms_internal_offset_from_prototype_angstrom": 0.03592839838984932,
+      "rms_atomic_displacement_angstrom": 0.1186143595029678,
+      "maximum_atomic_displacement_angstrom": 0.17299097412492248,
+      "cell_linear_change_percent": -0.17931201916741024,
+      "cell_volume_change_percent": -0.5369788189514724,
+      "final_structure": "GaAs_zincblende_expanded/fp64/final.extxyz",
+      "error": null
+    },
+    {
+      "structure": "ZnO_wurtzite_compressed",
+      "precision": "fp32",
+      "status": "converged",
+      "converged": true,
+      "steps": 51,
+      "prototype": "ZnO_wurtzite",
+      "cell_scale_from_prototype": 0.95,
+      "initial_energy_ev_per_atom": 0.03132740408182144,
+      "final_energy_ev_per_atom": 0.012618131935596466,
+      "initial_maximum_force_ev_per_angstrom": 1.0726351761262496,
+      "final_maximum_force_ev_per_angstrom": 0.012695890766828435,
+      "final_maximum_generalized_force": 0.049306548847641324,
+      "initial_maximum_absolute_stress_ev_per_angstrom3": 0.03921983763575554,
+      "final_maximum_absolute_stress_ev_per_angstrom3": 0.004662403371185064,
+      "initial_cell_lengths_angstrom": [
+        6.175,
+        6.175,
+        9.879999999999999
+      ],
+      "final_cell_lengths_angstrom": [
+        6.296147027807977,
+        6.300718375785779,
+        10.050714852536741
+      ],
+      "initial_cell_vectors_angstrom": [
+        [
+          6.175,
+          0.0,
+          0.0
+        ],
+        [
+          -3.0875,
+          5.347706868368908,
+          0.0
+        ],
+        [
+          0.0,
+          0.0,
+          9.879999999999999
+        ]
+      ],
+      "final_cell_vectors_angstrom": [
+        [
+          6.296147010323961,
+          5.709588166535928e-05,
+          0.000465729460419786
+        ],
+        [
+          -3.1480243183195316,
+          5.4579295319526535,
+          0.00040801044266951475
+        ],
+        [
+          0.0007448251164264048,
+          0.00118481130176781,
+          10.050714755103757
+        ]
+      ],
+      "initial_cell_angles_degrees": [
+        90.0,
+        90.0,
+        120.00000000000001
+      ],
+      "final_cell_angles_degrees": [
+        89.99256040492936,
+        89.9915157383935,
+        119.97496619584386
+      ],
+      "final_minimum_interatomic_distance_angstrom": 1.8822979774815716,
+      "initial_rms_internal_offset_from_prototype_angstrom": 0.12338362659611896,
+      "final_rms_internal_offset_from_prototype_angstrom": 0.07606219938025449,
+      "rms_atomic_displacement_angstrom": 0.10870966219780356,
+      "maximum_atomic_displacement_angstrom": 0.166331173619259,
+      "cell_linear_change_percent": 1.8784536937944019,
+      "cell_volume_change_percent": 5.862097518756237,
+      "final_structure": "ZnO_wurtzite_compressed/fp32/final.extxyz",
+      "error": null
+    },
+    {
+      "structure": "ZnO_wurtzite_compressed",
+      "precision": "fp64",
+      "status": "converged",
+      "converged": true,
+      "steps": 51,
+      "prototype": "ZnO_wurtzite",
+      "cell_scale_from_prototype": 0.95,
+      "initial_energy_ev_per_atom": 0.03132744487296923,
+      "final_energy_ev_per_atom": 0.012618076157763988,
+      "initial_maximum_force_ev_per_angstrom": 1.0726329699433519,
+      "final_maximum_force_ev_per_angstrom": 0.012696421378968181,
+      "final_maximum_generalized_force": 0.04930646573303521,
+      "initial_maximum_absolute_stress_ev_per_angstrom3": 0.03921986464381172,
+      "final_maximum_absolute_stress_ev_per_angstrom3": 0.004662395483753663,
+      "initial_cell_lengths_angstrom": [
+        6.175,
+        6.175,
+        9.879999999999999
+      ],
+      "final_cell_lengths_angstrom": [
+        6.29614701738961,
+        6.300718369730703,
+        10.05071491676247
+      ],
+      "initial_cell_vectors_angstrom": [
+        [
+          6.175,
+          0.0,
+          0.0
+        ],
+        [
+          -3.0875,
+          5.347706868368908,
+          0.0
+        ],
+        [
+          0.0,
+          0.0,
+          9.879999999999999
+        ]
+      ],
+      "final_cell_vectors_angstrom": [
+        [
+          6.296146999905805,
+          5.7096985074131054e-05,
+          0.00046572647785071854
+        ],
+        [
+          -3.1480243121581686,
+          5.457929528516329,
+          0.0004080104586362708
+        ],
+        [
+          0.0007448203476697462,
+          0.0011848085808428485,
+          10.05071481933016
+        ]
+      ],
+      "initial_cell_angles_degrees": [
+        90.0,
+        90.0,
+        120.00000000000001
+      ],
+      "final_cell_angles_degrees": [
+        89.99256040465421,
+        89.99151579273945,
+        119.97496615288347
+      ],
+      "final_minimum_interatomic_distance_angstrom": 1.882298086133272,
+      "initial_rms_internal_offset_from_prototype_angstrom": 0.12338362659611896,
+      "final_rms_internal_offset_from_prototype_angstrom": 0.07606223549242672,
+      "rms_atomic_displacement_angstrom": 0.10870971028272096,
+      "maximum_atomic_displacement_angstrom": 0.16633120121384648,
+      "cell_linear_change_percent": 1.878453908604527,
+      "cell_volume_change_percent": 5.862097964134905,
+      "final_structure": "ZnO_wurtzite_compressed/fp64/final.extxyz",
+      "error": null
+    },
+    {
+      "structure": "ZnO_wurtzite_expanded",
+      "precision": "fp32",
+      "status": "converged",
+      "converged": true,
+      "steps": 0,
+      "prototype": "ZnO_wurtzite",
+      "cell_scale_from_prototype": 1.05,
+      "initial_energy_ev_per_atom": 0.014552973210811615,
+      "final_energy_ev_per_atom": 0.014552973210811615,
+      "initial_maximum_force_ev_per_angstrom": 0.031521799314329274,
+      "final_maximum_force_ev_per_angstrom": 0.031521799314329274,
+      "final_maximum_generalized_force": 0.03152179931432927,
+      "initial_maximum_absolute_stress_ev_per_angstrom3": 0.002057055477052927,
+      "final_maximum_absolute_stress_ev_per_angstrom3": 0.002057055477052927,
+      "initial_cell_lengths_angstrom": [
+        6.825,
+        6.825,
+        10.920000000000002
+      ],
+      "final_cell_lengths_angstrom": [
+        6.825,
+        6.825,
+        10.920000000000002
+      ],
+      "initial_cell_vectors_angstrom": [
+        [
+          6.825,
+          0.0,
+          0.0
+        ],
+        [
+          -3.4125,
+          5.910623380828794,
+          0.0
+        ],
+        [
+          0.0,
+          0.0,
+          10.920000000000002
+        ]
+      ],
+      "final_cell_vectors_angstrom": [
+        [
+          6.825,
+          0.0,
+          0.0
+        ],
+        [
+          -3.4125,
+          5.910623380828794,
+          0.0
+        ],
+        [
+          0.0,
+          0.0,
+          10.920000000000002
+        ]
+      ],
+      "initial_cell_angles_degrees": [
+        90.0,
+        90.0,
+        120.00000000000001
+      ],
+      "final_cell_angles_degrees": [
+        90.0,
+        90.0,
+        120.00000000000001
+      ],
+      "final_minimum_interatomic_distance_angstrom": 1.8877417307731017,
+      "initial_rms_internal_offset_from_prototype_angstrom": 0.12338362659611887,
+      "final_rms_internal_offset_from_prototype_angstrom": 0.12338362656734396,
+      "rms_atomic_displacement_angstrom": 5.033875475158138e-09,
+      "maximum_atomic_displacement_angstrom": 7.186629844147442e-09,
+      "cell_linear_change_percent": 0.0,
+      "cell_volume_change_percent": 0.0,
+      "final_structure": "ZnO_wurtzite_expanded/fp32/final.extxyz",
+      "error": null
+    },
+    {
+      "structure": "ZnO_wurtzite_expanded",
+      "precision": "fp64",
+      "status": "converged",
+      "converged": true,
+      "steps": 0,
+      "prototype": "ZnO_wurtzite",
+      "cell_scale_from_prototype": 1.05,
+      "initial_energy_ev_per_atom": 0.014552733042130013,
+      "final_energy_ev_per_atom": 0.014552733042130013,
+      "initial_maximum_force_ev_per_angstrom": 0.031522241645554304,
+      "final_maximum_force_ev_per_angstrom": 0.031522241645554304,
+      "final_maximum_generalized_force": 0.031522241645554304,
+      "initial_maximum_absolute_stress_ev_per_angstrom3": 0.00205705566352528,
+      "final_maximum_absolute_stress_ev_per_angstrom3": 0.00205705566352528,
+      "initial_cell_lengths_angstrom": [
+        6.825,
+        6.825,
+        10.920000000000002
+      ],
+      "final_cell_lengths_angstrom": [
+        6.825,
+        6.825,
+        10.920000000000002
+      ],
+      "initial_cell_vectors_angstrom": [
+        [
+          6.825,
+          0.0,
+          0.0
+        ],
+        [
+          -3.4125,
+          5.910623380828794,
+          0.0
+        ],
+        [
+          0.0,
+          0.0,
+          10.920000000000002
+        ]
+      ],
+      "final_cell_vectors_angstrom": [
+        [
+          6.825,
+          0.0,
+          0.0
+        ],
+        [
+          -3.4125,
+          5.910623380828794,
+          0.0
+        ],
+        [
+          0.0,
+          0.0,
+          10.920000000000002
+        ]
+      ],
+      "initial_cell_angles_degrees": [
+        90.0,
+        90.0,
+        120.00000000000001
+      ],
+      "final_cell_angles_degrees": [
+        90.0,
+        90.0,
+        120.00000000000001
+      ],
+      "final_minimum_interatomic_distance_angstrom": 1.8877417307731017,
+      "initial_rms_internal_offset_from_prototype_angstrom": 0.12338362659611887,
+      "final_rms_internal_offset_from_prototype_angstrom": 0.12338362656734396,
+      "rms_atomic_displacement_angstrom": 5.033875475158138e-09,
+      "maximum_atomic_displacement_angstrom": 7.186629844147442e-09,
+      "cell_linear_change_percent": 0.0,
+      "cell_volume_change_percent": 0.0,
+      "final_structure": "ZnO_wurtzite_expanded/fp64/final.extxyz",
+      "error": null
+    },
+    {
+      "structure": "SrTiO3_perovskite_compressed",
+      "precision": "fp32",
+      "status": "converged",
+      "converged": true,
+      "steps": 39,
+      "prototype": "SrTiO3_perovskite",
+      "cell_scale_from_prototype": 0.95,
+      "initial_energy_ev_per_atom": -0.007908058166503907,
+      "final_energy_ev_per_atom": -0.035696929693222045,
+      "initial_maximum_force_ev_per_angstrom": 5.176092143224108,
+      "final_maximum_force_ev_per_angstrom": 0.02922790409201876,
+      "final_maximum_generalized_force": 0.04949720527902081,
+      "initial_maximum_absolute_stress_ev_per_angstrom3": 0.057100336998701096,
+      "final_maximum_absolute_stress_ev_per_angstrom3": 0.004766060039401054,
+      "initial_cell_lengths_angstrom": [
+        7.419499999999999,
+        7.419499999999999,
+        7.419499999999999
+      ],
+      "final_cell_lengths_angstrom": [
+        7.482760588078489,
+        7.480318325132098,
+        7.4824620222716485
+      ],
+      "initial_cell_vectors_angstrom": [
+        [
+          7.419499999999999,
+          0.0,
+          0.0
+        ],
+        [
+          0.0,
+          7.419499999999999,
+          0.0
+        ],
+        [
+          0.0,
+          0.0,
+          7.419499999999999
+        ]
+      ],
+      "final_cell_vectors_angstrom": [
+        [
+          7.482760585241863,
+          3.584658396136839e-05,
+          0.00020289556547892112
+        ],
+        [
+          3.583856227845093e-05,
+          7.480318325035433,
+          -1.2718244985020544e-05
+        ],
+        [
+          0.0002028954952199327,
+          -1.2705267627586289e-05,
+          7.48246201950999
+        ]
+      ],
+      "initial_cell_angles_degrees": [
+        90.0,
+        90.0,
+        90.0
+      ],
+      "final_cell_angles_degrees": [
+        90.00019469702652,
+        89.99689278104682,
+        89.99945101718319
+      ],
+      "final_minimum_interatomic_distance_angstrom": 1.8443483735472128,
+      "initial_rms_internal_offset_from_prototype_angstrom": 0.11889767315045746,
+      "final_rms_internal_offset_from_prototype_angstrom": 0.05651779258123148,
+      "rms_atomic_displacement_angstrom": 0.08791390959333314,
+      "maximum_atomic_displacement_angstrom": 0.13535789711292973,
+      "cell_linear_change_percent": 0.8403123996775896,
+      "cell_volume_change_percent": 2.542176875898261,
+      "final_structure": "SrTiO3_perovskite_compressed/fp32/final.extxyz",
+      "error": null
+    },
+    {
+      "structure": "SrTiO3_perovskite_compressed",
+      "precision": "fp64",
+      "status": "converged",
+      "converged": true,
+      "steps": 39,
+      "prototype": "SrTiO3_perovskite",
+      "cell_scale_from_prototype": 0.95,
+      "initial_energy_ev_per_atom": -0.00790827309496026,
+      "final_energy_ev_per_atom": -0.035697196255927245,
+      "initial_maximum_force_ev_per_angstrom": 5.176080988899486,
+      "final_maximum_force_ev_per_angstrom": 0.029227495668548275,
+      "final_maximum_generalized_force": 0.04949738060605761,
+      "initial_maximum_absolute_stress_ev_per_angstrom3": 0.0571001959689534,
+      "final_maximum_absolute_stress_ev_per_angstrom3": 0.004766076906418426,
+      "initial_cell_lengths_angstrom": [
+        7.419499999999999,
+        7.419499999999999,
+        7.419499999999999
+      ],
+      "final_cell_lengths_angstrom": [
+        7.482760599581879,
+        7.480318359992918,
+        7.482462034506907
+      ],
+      "initial_cell_vectors_angstrom": [
+        [
+          7.419499999999999,
+          0.0,
+          0.0
+        ],
+        [
+          0.0,
+          7.419499999999999,
+          0.0
+        ],
+        [
+          0.0,
+          0.0,
+          7.419499999999999
+        ]
+      ],
+      "final_cell_vectors_angstrom": [
+        [
+          7.482760596745273,
+          3.584493218011664e-05,
+          0.00020289514521304827
+        ],
+        [
+          3.583691030872061e-05,
+          7.480318359896262,
+          -1.2718268436988123e-05
+        ],
+        [
+          0.0002028950748903763,
+          -1.2705291147248664e-05,
+          7.48246203174526
+        ]
+      ],
+      "initial_cell_angles_degrees": [
+        90.0,
+        90.0,
+        90.0
+      ],
+      "final_cell_angles_degrees": [
+        90.000194697386,
+        89.99689278748833,
+        89.99945104248597
+      ],
+      "final_minimum_interatomic_distance_angstrom": 1.8443482256747321,
+      "initial_rms_internal_offset_from_prototype_angstrom": 0.11889767315045746,
+      "final_rms_internal_offset_from_prototype_angstrom": 0.0565177953732242,
+      "rms_atomic_displacement_angstrom": 0.08791389598500743,
+      "maximum_atomic_displacement_angstrom": 0.13535782555946174,
+      "cell_linear_change_percent": 0.8403126629454194,
+      "cell_volume_change_percent": 2.5421776790967687,
+      "final_structure": "SrTiO3_perovskite_compressed/fp64/final.extxyz",
+      "error": null
+    },
+    {
+      "structure": "SrTiO3_perovskite_expanded",
+      "precision": "fp32",
+      "status": "converged",
+      "converged": true,
+      "steps": 0,
+      "prototype": "SrTiO3_perovskite",
+      "cell_scale_from_prototype": 1.05,
+      "initial_energy_ev_per_atom": -0.03348467946052551,
+      "final_energy_ev_per_atom": -0.03348467946052551,
+      "initial_maximum_force_ev_per_angstrom": 0.03179593071461799,
+      "final_maximum_force_ev_per_angstrom": 0.03179593071461799,
+      "final_maximum_generalized_force": 0.03179593071461799,
+      "initial_maximum_absolute_stress_ev_per_angstrom3": 7.673105574212968e-05,
+      "final_maximum_absolute_stress_ev_per_angstrom3": 7.673105574212968e-05,
+      "initial_cell_lengths_angstrom": [
+        8.2005,
+        8.2005,
+        8.2005
+      ],
+      "final_cell_lengths_angstrom": [
+        8.2005,
+        8.2005,
+        8.2005
+      ],
+      "initial_cell_vectors_angstrom": [
+        [
+          8.2005,
+          0.0,
+          0.0
+        ],
+        [
+          0.0,
+          8.2005,
+          0.0
+        ],
+        [
+          0.0,
+          0.0,
+          8.2005
+        ]
+      ],
+      "final_cell_vectors_angstrom": [
+        [
+          8.2005,
+          0.0,
+          0.0
+        ],
+        [
+          0.0,
+          8.2005,
+          0.0
+        ],
+        [
+          0.0,
+          0.0,
+          8.2005
+        ]
+      ],
+      "initial_cell_angles_degrees": [
+        90.0,
+        90.0,
+        90.0
+      ],
+      "final_cell_angles_degrees": [
+        90.0,
+        90.0,
+        90.0
+      ],
+      "final_minimum_interatomic_distance_angstrom": 1.8116636637764656,
+      "initial_rms_internal_offset_from_prototype_angstrom": 0.11889767315045746,
+      "final_rms_internal_offset_from_prototype_angstrom": 0.1188976723312911,
+      "rms_atomic_displacement_angstrom": 4.897940526194902e-09,
+      "maximum_atomic_displacement_angstrom": 7.573008878262827e-09,
+      "cell_linear_change_percent": 0.0,
+      "cell_volume_change_percent": 0.0,
+      "final_structure": "SrTiO3_perovskite_expanded/fp32/final.extxyz",
+      "error": null
+    },
+    {
+      "structure": "SrTiO3_perovskite_expanded",
+      "precision": "fp64",
+      "status": "converged",
+      "converged": true,
+      "steps": 0,
+      "prototype": "SrTiO3_perovskite",
+      "cell_scale_from_prototype": 1.05,
+      "initial_energy_ev_per_atom": -0.03348475533140026,
+      "final_energy_ev_per_atom": -0.03348475533140026,
+      "initial_maximum_force_ev_per_angstrom": 0.03179626772760269,
+      "final_maximum_force_ev_per_angstrom": 0.03179626772760269,
+      "final_maximum_generalized_force": 0.03179626772760269,
+      "initial_maximum_absolute_stress_ev_per_angstrom3": 7.672735699032865e-05,
+      "final_maximum_absolute_stress_ev_per_angstrom3": 7.672735699032865e-05,
+      "initial_cell_lengths_angstrom": [
+        8.2005,
+        8.2005,
+        8.2005
+      ],
+      "final_cell_lengths_angstrom": [
+        8.2005,
+        8.2005,
+        8.2005
+      ],
+      "initial_cell_vectors_angstrom": [
+        [
+          8.2005,
+          0.0,
+          0.0
+        ],
+        [
+          0.0,
+          8.2005,
+          0.0
+        ],
+        [
+          0.0,
+          0.0,
+          8.2005
+        ]
+      ],
+      "final_cell_vectors_angstrom": [
+        [
+          8.2005,
+          0.0,
+          0.0
+        ],
+        [
+          0.0,
+          8.2005,
+          0.0
+        ],
+        [
+          0.0,
+          0.0,
+          8.2005
+        ]
+      ],
+      "initial_cell_angles_degrees": [
+        90.0,
+        90.0,
+        90.0
+      ],
+      "final_cell_angles_degrees": [
+        90.0,
+        90.0,
+        90.0
+      ],
+      "final_minimum_interatomic_distance_angstrom": 1.8116636637764656,
+      "initial_rms_internal_offset_from_prototype_angstrom": 0.11889767315045746,
+      "final_rms_internal_offset_from_prototype_angstrom": 0.1188976723312911,
+      "rms_atomic_displacement_angstrom": 4.897940526194902e-09,
+      "maximum_atomic_displacement_angstrom": 7.573008878262827e-09,
+      "cell_linear_change_percent": 0.0,
+      "cell_volume_change_percent": 0.0,
+      "final_structure": "SrTiO3_perovskite_expanded/fp64/final.extxyz",
+      "error": null
+    }
+  ],
+  "initial_cases": {
+    "C_diamond_compressed": {
+      "prototype": "C_diamond",
+      "cell_scale_from_prototype": 0.95,
+      "initial_structure": "C_diamond_compressed/initial.extxyz"
+    },
+    "C_diamond_expanded": {
+      "prototype": "C_diamond",
+      "cell_scale_from_prototype": 1.05,
+      "initial_structure": "C_diamond_expanded/initial.extxyz"
+    },
+    "Si_diamond_compressed": {
+      "prototype": "Si_diamond",
+      "cell_scale_from_prototype": 0.95,
+      "initial_structure": "Si_diamond_compressed/initial.extxyz"
+    },
+    "Si_diamond_expanded": {
+      "prototype": "Si_diamond",
+      "cell_scale_from_prototype": 1.05,
+      "initial_structure": "Si_diamond_expanded/initial.extxyz"
+    },
+    "Ge_diamond_compressed": {
+      "prototype": "Ge_diamond",
+      "cell_scale_from_prototype": 0.95,
+      "initial_structure": "Ge_diamond_compressed/initial.extxyz"
+    },
+    "Ge_diamond_expanded": {
+      "prototype": "Ge_diamond",
+      "cell_scale_from_prototype": 1.05,
+      "initial_structure": "Ge_diamond_expanded/initial.extxyz"
+    },
+    "Al_fcc_compressed": {
+      "prototype": "Al_fcc",
+      "cell_scale_from_prototype": 0.95,
+      "initial_structure": "Al_fcc_compressed/initial.extxyz"
+    },
+    "Al_fcc_expanded": {
+      "prototype": "Al_fcc",
+      "cell_scale_from_prototype": 1.05,
+      "initial_structure": "Al_fcc_expanded/initial.extxyz"
+    },
+    "Cu_fcc_compressed": {
+      "prototype": "Cu_fcc",
+      "cell_scale_from_prototype": 0.95,
+      "initial_structure": "Cu_fcc_compressed/initial.extxyz"
+    },
+    "Cu_fcc_expanded": {
+      "prototype": "Cu_fcc",
+      "cell_scale_from_prototype": 1.05,
+      "initial_structure": "Cu_fcc_expanded/initial.extxyz"
+    },
+    "Ni_fcc_compressed": {
+      "prototype": "Ni_fcc",
+      "cell_scale_from_prototype": 0.95,
+      "initial_structure": "Ni_fcc_compressed/initial.extxyz"
+    },
+    "Ni_fcc_expanded": {
+      "prototype": "Ni_fcc",
+      "cell_scale_from_prototype": 1.05,
+      "initial_structure": "Ni_fcc_expanded/initial.extxyz"
+    },
+    "Fe_bcc_compressed": {
+      "prototype": "Fe_bcc",
+      "cell_scale_from_prototype": 0.95,
+      "initial_structure": "Fe_bcc_compressed/initial.extxyz"
+    },
+    "Fe_bcc_expanded": {
+      "prototype": "Fe_bcc",
+      "cell_scale_from_prototype": 1.05,
+      "initial_structure": "Fe_bcc_expanded/initial.extxyz"
+    },
+    "W_bcc_compressed": {
+      "prototype": "W_bcc",
+      "cell_scale_from_prototype": 0.95,
+      "initial_structure": "W_bcc_compressed/initial.extxyz"
+    },
+    "W_bcc_expanded": {
+      "prototype": "W_bcc",
+      "cell_scale_from_prototype": 1.05,
+      "initial_structure": "W_bcc_expanded/initial.extxyz"
+    },
+    "MgO_rocksalt_compressed": {
+      "prototype": "MgO_rocksalt",
+      "cell_scale_from_prototype": 0.95,
+      "initial_structure": "MgO_rocksalt_compressed/initial.extxyz"
+    },
+    "MgO_rocksalt_expanded": {
+      "prototype": "MgO_rocksalt",
+      "cell_scale_from_prototype": 1.05,
+      "initial_structure": "MgO_rocksalt_expanded/initial.extxyz"
+    },
+    "NaCl_rocksalt_compressed": {
+      "prototype": "NaCl_rocksalt",
+      "cell_scale_from_prototype": 0.95,
+      "initial_structure": "NaCl_rocksalt_compressed/initial.extxyz"
+    },
+    "NaCl_rocksalt_expanded": {
+      "prototype": "NaCl_rocksalt",
+      "cell_scale_from_prototype": 1.05,
+      "initial_structure": "NaCl_rocksalt_expanded/initial.extxyz"
+    },
+    "GaAs_zincblende_compressed": {
+      "prototype": "GaAs_zincblende",
+      "cell_scale_from_prototype": 0.95,
+      "initial_structure": "GaAs_zincblende_compressed/initial.extxyz"
+    },
+    "GaAs_zincblende_expanded": {
+      "prototype": "GaAs_zincblende",
+      "cell_scale_from_prototype": 1.05,
+      "initial_structure": "GaAs_zincblende_expanded/initial.extxyz"
+    },
+    "ZnO_wurtzite_compressed": {
+      "prototype": "ZnO_wurtzite",
+      "cell_scale_from_prototype": 0.95,
+      "initial_structure": "ZnO_wurtzite_compressed/initial.extxyz"
+    },
+    "ZnO_wurtzite_expanded": {
+      "prototype": "ZnO_wurtzite",
+      "cell_scale_from_prototype": 1.05,
+      "initial_structure": "ZnO_wurtzite_expanded/initial.extxyz"
+    },
+    "SrTiO3_perovskite_compressed": {
+      "prototype": "SrTiO3_perovskite",
+      "cell_scale_from_prototype": 0.95,
+      "initial_structure": "SrTiO3_perovskite_compressed/initial.extxyz"
+    },
+    "SrTiO3_perovskite_expanded": {
+      "prototype": "SrTiO3_perovskite",
+      "cell_scale_from_prototype": 1.05,
+      "initial_structure": "SrTiO3_perovskite_expanded/initial.extxyz"
+    }
+  },
+  "scientific_limit": "Predictions from the frozen learned potential only; no independent DFT or experimental reference validation was performed.",
+  "active_case": null,
+  "precision_comparisons": [
+    {
+      "structure": "C_diamond_compressed",
+      "both_converged": false,
+      "absolute_energy_delta_ev_per_atom": 0.024840545025043237,
+      "maximum_cell_length_delta_angstrom": 0.02329416460045408,
+      "maximum_cell_angle_delta_degrees": 0.2889521854241366
+    },
+    {
+      "structure": "C_diamond_expanded",
+      "both_converged": false,
+      "absolute_energy_delta_ev_per_atom": 0.0006587109201237062,
+      "maximum_cell_length_delta_angstrom": 0.001254938772962788,
+      "maximum_cell_angle_delta_degrees": 0.005065046784324068
+    },
+    {
+      "structure": "Si_diamond_compressed",
+      "both_converged": true,
+      "absolute_energy_delta_ev_per_atom": 2.747246657497371e-06,
+      "maximum_cell_length_delta_angstrom": 8.62995555550583e-06,
+      "maximum_cell_angle_delta_degrees": 5.069492506493134e-05
+    },
+    {
+      "structure": "Si_diamond_expanded",
+      "both_converged": true,
+      "absolute_energy_delta_ev_per_atom": 1.4527922557405759e-05,
+      "maximum_cell_length_delta_angstrom": 0.00011662419970370763,
+      "maximum_cell_angle_delta_degrees": 0.0055152317419384644
+    },
+    {
+      "structure": "Ge_diamond_compressed",
+      "both_converged": true,
+      "absolute_energy_delta_ev_per_atom": 5.878575282947107e-07,
+      "maximum_cell_length_delta_angstrom": 1.2862833351334757e-05,
+      "maximum_cell_angle_delta_degrees": 0.00022584813991954888
+    },
+    {
+      "structure": "Ge_diamond_expanded",
+      "both_converged": true,
+      "absolute_energy_delta_ev_per_atom": 1.0060311633475205e-06,
+      "maximum_cell_length_delta_angstrom": 2.78170835699143e-07,
+      "maximum_cell_angle_delta_degrees": 1.34940175655629e-06
+    },
+    {
+      "structure": "Al_fcc_compressed",
+      "both_converged": true,
+      "absolute_energy_delta_ev_per_atom": 3.166850353064632e-07,
+      "maximum_cell_length_delta_angstrom": 2.6361504978922312e-08,
+      "maximum_cell_angle_delta_degrees": 5.6531149539296166e-08
+    },
+    {
+      "structure": "Al_fcc_expanded",
+      "both_converged": true,
+      "absolute_energy_delta_ev_per_atom": 1.2664827095942854e-06,
+      "maximum_cell_length_delta_angstrom": 1.0638950159957972e-05,
+      "maximum_cell_angle_delta_degrees": 0.0001629529217268555
+    },
+    {
+      "structure": "Cu_fcc_compressed",
+      "both_converged": true,
+      "absolute_energy_delta_ev_per_atom": 1.1627462043195536e-07,
+      "maximum_cell_length_delta_angstrom": 2.0354487872964455e-08,
+      "maximum_cell_angle_delta_degrees": 1.1044302539175987e-07
+    },
+    {
+      "structure": "Cu_fcc_expanded",
+      "both_converged": true,
+      "absolute_energy_delta_ev_per_atom": 5.911910542222287e-07,
+      "maximum_cell_length_delta_angstrom": 3.1441120373898457e-06,
+      "maximum_cell_angle_delta_degrees": 1.5086121322838153e-05
+    },
+    {
+      "structure": "Ni_fcc_compressed",
+      "both_converged": true,
+      "absolute_energy_delta_ev_per_atom": 8.214046657295526e-07,
+      "maximum_cell_length_delta_angstrom": 1.3489370331853934e-07,
+      "maximum_cell_angle_delta_degrees": 6.187444512306683e-08
+    },
+    {
+      "structure": "Ni_fcc_expanded",
+      "both_converged": true,
+      "absolute_energy_delta_ev_per_atom": 1.160391747356826e-06,
+      "maximum_cell_length_delta_angstrom": 2.5001452463868645e-08,
+      "maximum_cell_angle_delta_degrees": 1.2315781816596427e-07
+    },
+    {
+      "structure": "Fe_bcc_compressed",
+      "both_converged": true,
+      "absolute_energy_delta_ev_per_atom": 4.205900038800614e-07,
+      "maximum_cell_length_delta_angstrom": 5.984535089709198e-08,
+      "maximum_cell_angle_delta_degrees": 1.1956177559113712e-07
+    },
+    {
+      "structure": "Fe_bcc_expanded",
+      "both_converged": true,
+      "absolute_energy_delta_ev_per_atom": 4.373535454904598e-07,
+      "maximum_cell_length_delta_angstrom": 1.2419380546191405e-07,
+      "maximum_cell_angle_delta_degrees": 5.329236785200919e-07
+    },
+    {
+      "structure": "W_bcc_compressed",
+      "both_converged": true,
+      "absolute_energy_delta_ev_per_atom": 2.622486093284415e-07,
+      "maximum_cell_length_delta_angstrom": 4.2379357090283065e-07,
+      "maximum_cell_angle_delta_degrees": 2.629617767979653e-07
+    },
+    {
+      "structure": "W_bcc_expanded",
+      "both_converged": true,
+      "absolute_energy_delta_ev_per_atom": 4.34008907035377e-07,
+      "maximum_cell_length_delta_angstrom": 1.357785149203039e-06,
+      "maximum_cell_angle_delta_degrees": 4.106717312879482e-07
+    },
+    {
+      "structure": "MgO_rocksalt_compressed",
+      "both_converged": true,
+      "absolute_energy_delta_ev_per_atom": 1.6496007448907335e-08,
+      "maximum_cell_length_delta_angstrom": 7.041900573767634e-08,
+      "maximum_cell_angle_delta_degrees": 2.7354175813343318e-08
+    },
+    {
+      "structure": "MgO_rocksalt_expanded",
+      "both_converged": true,
+      "absolute_energy_delta_ev_per_atom": 0.0001623195903770469,
+      "maximum_cell_length_delta_angstrom": 0.01661779832074295,
+      "maximum_cell_angle_delta_degrees": 0.0010585854697353625
+    },
+    {
+      "structure": "NaCl_rocksalt_compressed",
+      "both_converged": true,
+      "absolute_energy_delta_ev_per_atom": 5.3224648688399157e-08,
+      "maximum_cell_length_delta_angstrom": 3.2425990781348446e-08,
+      "maximum_cell_angle_delta_degrees": 3.270018709145006e-07
+    },
+    {
+      "structure": "NaCl_rocksalt_expanded",
+      "both_converged": true,
+      "absolute_energy_delta_ev_per_atom": 6.159632032209927e-08,
+      "maximum_cell_length_delta_angstrom": 1.7406912000694774e-07,
+      "maximum_cell_angle_delta_degrees": 8.261000374432115e-06
+    },
+    {
+      "structure": "GaAs_zincblende_compressed",
+      "both_converged": true,
+      "absolute_energy_delta_ev_per_atom": 1.0387998262417764e-06,
+      "maximum_cell_length_delta_angstrom": 9.372544916530501e-05,
+      "maximum_cell_angle_delta_degrees": 0.0004164086641509357
+    },
+    {
+      "structure": "GaAs_zincblende_expanded",
+      "both_converged": true,
+      "absolute_energy_delta_ev_per_atom": 2.2342978689415816e-08,
+      "maximum_cell_length_delta_angstrom": 3.7741290981330167e-08,
+      "maximum_cell_angle_delta_degrees": 1.6569053684634127e-07
+    },
+    {
+      "structure": "ZnO_wurtzite_compressed",
+      "both_converged": true,
+      "absolute_energy_delta_ev_per_atom": 5.5777832477788e-08,
+      "maximum_cell_length_delta_angstrom": 6.422572873532317e-08,
+      "maximum_cell_angle_delta_degrees": 5.4345946409739554e-08
+    },
+    {
+      "structure": "ZnO_wurtzite_expanded",
+      "both_converged": true,
+      "absolute_energy_delta_ev_per_atom": 2.401686816019821e-07,
+      "maximum_cell_length_delta_angstrom": 0.0,
+      "maximum_cell_angle_delta_degrees": 0.0
+    },
+    {
+      "structure": "SrTiO3_perovskite_compressed",
+      "both_converged": true,
+      "absolute_energy_delta_ev_per_atom": 2.6656270520064584e-07,
+      "maximum_cell_length_delta_angstrom": 3.486082000847546e-08,
+      "maximum_cell_angle_delta_degrees": 2.5302782091785048e-08
+    },
+    {
+      "structure": "SrTiO3_perovskite_expanded",
+      "both_converged": true,
+      "absolute_energy_delta_ev_per_atom": 7.587087474947296e-08,
+      "maximum_cell_length_delta_angstrom": 0.0,
+      "maximum_cell_angle_delta_degrees": 0.0
+    }
+  ],
+  "starting_point_comparisons": [
+    {
+      "prototype": "C_diamond",
+      "precision": "fp32",
+      "both_converged": false,
+      "absolute_final_energy_delta_ev_per_atom": 0.018580317497253418,
+      "maximum_final_cell_length_delta_angstrom": 0.6633863066432149,
+      "maximum_final_cell_angle_delta_degrees": 0.3429002811666919
+    },
+    {
+      "prototype": "C_diamond",
+      "precision": "fp64",
+      "both_converged": false,
+      "absolute_final_energy_delta_ev_per_atom": 0.006918938447913525,
+      "maximum_final_cell_length_delta_angstrom": 0.6664074092251875,
+      "maximum_final_cell_angle_delta_degrees": 0.13585543871123207
+    },
+    {
+      "prototype": "Si_diamond",
+      "precision": "fp32",
+      "both_converged": true,
+      "absolute_final_energy_delta_ev_per_atom": 7.271766662597656e-05,
+      "maximum_final_cell_length_delta_angstrom": 0.3042656681603866,
+      "maximum_final_cell_angle_delta_degrees": 0.04985170482611068
+    },
+    {
+      "prototype": "Si_diamond",
+      "precision": "fp64",
+      "both_converged": true,
+      "absolute_final_energy_delta_ev_per_atom": 6.0936990726068174e-05,
+      "maximum_final_cell_length_delta_angstrom": 0.3041495755146979,
+      "maximum_final_cell_angle_delta_degrees": 0.0553589679260682
+    },
+    {
+      "prototype": "Ge_diamond",
+      "precision": "fp32",
+      "both_converged": true,
+      "absolute_final_energy_delta_ev_per_atom": 1.6301870346069336e-05,
+      "maximum_final_cell_length_delta_angstrom": 0.20445751116576538,
+      "maximum_final_cell_angle_delta_degrees": 0.016493903485937267
+    },
+    {
+      "prototype": "Ge_diamond",
+      "precision": "fp64",
+      "both_converged": true,
+      "absolute_final_energy_delta_ev_per_atom": 1.5883696711016526e-05,
+      "maximum_final_cell_length_delta_angstrom": 0.20444578610389108,
+      "maximum_final_cell_angle_delta_degrees": 0.016616409962949774
+    },
+    {
+      "prototype": "Al_fcc",
+      "precision": "fp32",
+      "both_converged": true,
+      "absolute_final_energy_delta_ev_per_atom": 0.0084075927734375,
+      "maximum_final_cell_length_delta_angstrom": 0.3766237619108681,
+      "maximum_final_cell_angle_delta_degrees": 0.008129172534921736
+    },
+    {
+      "prototype": "Al_fcc",
+      "precision": "fp64",
+      "both_converged": true,
+      "absolute_final_energy_delta_ev_per_atom": 0.0084091759411824,
+      "maximum_final_cell_length_delta_angstrom": 0.3766306632994416,
+      "maximum_final_cell_angle_delta_degrees": 0.008292141884751913
+    },
+    {
+      "prototype": "Cu_fcc",
+      "precision": "fp32",
+      "both_converged": true,
+      "absolute_final_energy_delta_ev_per_atom": 0.00015494227409362793,
+      "maximum_final_cell_length_delta_angstrom": 0.21274884398917493,
+      "maximum_final_cell_angle_delta_degrees": 0.050983879245293906
+    },
+    {
+      "prototype": "Cu_fcc",
+      "precision": "fp64",
+      "both_converged": true,
+      "absolute_final_energy_delta_ev_per_atom": 0.0001554171905274182,
+      "maximum_final_cell_length_delta_angstrom": 0.21274853828318907,
+      "maximum_final_cell_angle_delta_degrees": 0.0509757266055999
+    },
+    {
+      "prototype": "Ni_fcc",
+      "precision": "fp32",
+      "both_converged": true,
+      "absolute_final_energy_delta_ev_per_atom": 0.0012913346290588379,
+      "maximum_final_cell_length_delta_angstrom": 0.008493813154199614,
+      "maximum_final_cell_angle_delta_degrees": 0.1559652498655737
+    },
+    {
+      "prototype": "Ni_fcc",
+      "precision": "fp64",
+      "both_converged": true,
+      "absolute_final_energy_delta_ev_per_atom": 0.0012916736161404652,
+      "maximum_final_cell_length_delta_angstrom": 0.008493697001767941,
+      "maximum_final_cell_angle_delta_degrees": 0.15596531703627647
+    },
+    {
+      "prototype": "Fe_bcc",
+      "precision": "fp32",
+      "both_converged": true,
+      "absolute_final_energy_delta_ev_per_atom": 0.059167519211769104,
+      "maximum_final_cell_length_delta_angstrom": 0.4997801028136859,
+      "maximum_final_cell_angle_delta_degrees": 0.023102995432921603
+    },
+    {
+      "prototype": "Fe_bcc",
+      "precision": "fp64",
+      "both_converged": true,
+      "absolute_final_energy_delta_ev_per_atom": 0.059167535975310714,
+      "maximum_final_cell_length_delta_angstrom": 0.49978016378685464,
+      "maximum_final_cell_angle_delta_degrees": 0.02310300305175872
+    },
+    {
+      "prototype": "W_bcc",
+      "precision": "fp32",
+      "both_converged": true,
+      "absolute_final_energy_delta_ev_per_atom": 0.016892194747924805,
+      "maximum_final_cell_length_delta_angstrom": 0.6894569141890408,
+      "maximum_final_cell_angle_delta_degrees": 0.12194616384729784
+    },
+    {
+      "prototype": "W_bcc",
+      "precision": "fp64",
+      "both_converged": true,
+      "absolute_final_energy_delta_ev_per_atom": 0.016892022987627098,
+      "maximum_final_cell_length_delta_angstrom": 0.6894551841890681,
+      "maximum_final_cell_angle_delta_degrees": 0.12194669259096713
+    },
+    {
+      "prototype": "MgO_rocksalt",
+      "precision": "fp32",
+      "both_converged": true,
+      "absolute_final_energy_delta_ev_per_atom": 8.416175842285156e-05,
+      "maximum_final_cell_length_delta_angstrom": 0.3646877896030656,
+      "maximum_final_cell_angle_delta_degrees": 0.006247428830675972
+    },
+    {
+      "prototype": "MgO_rocksalt",
+      "precision": "fp64",
+      "both_converged": true,
+      "absolute_final_energy_delta_ev_per_atom": 0.0002464978448073474,
+      "maximum_final_cell_length_delta_angstrom": 0.34806992471646936,
+      "maximum_final_cell_angle_delta_degrees": 0.005732195751690483
+    },
+    {
+      "prototype": "NaCl_rocksalt",
+      "precision": "fp32",
+      "both_converged": true,
+      "absolute_final_energy_delta_ev_per_atom": 0.0003190040588378906,
+      "maximum_final_cell_length_delta_angstrom": 0.2201449664202766,
+      "maximum_final_cell_angle_delta_degrees": 0.01865103492204412
+    },
+    {
+      "prototype": "NaCl_rocksalt",
+      "precision": "fp64",
+      "both_converged": true,
+      "absolute_final_energy_delta_ev_per_atom": 0.0003189956871662569,
+      "maximum_final_cell_length_delta_angstrom": 0.2201447897870299,
+      "maximum_final_cell_angle_delta_degrees": 0.01865647372613921
+    },
+    {
+      "prototype": "GaAs_zincblende",
+      "precision": "fp32",
+      "both_converged": true,
+      "absolute_final_energy_delta_ev_per_atom": 0.0002821981906890869,
+      "maximum_final_cell_length_delta_angstrom": 0.13857298370171023,
+      "maximum_final_cell_angle_delta_degrees": 0.15670416024318
+    },
+    {
+      "prototype": "GaAs_zincblende",
+      "precision": "fp64",
+      "both_converged": true,
+      "absolute_final_energy_delta_ev_per_atom": 0.0002832593334940181,
+      "maximum_final_cell_length_delta_angstrom": 0.13862586022312584,
+      "maximum_final_cell_angle_delta_degrees": 0.15703579093688802
+    },
+    {
+      "prototype": "ZnO_wurtzite",
+      "precision": "fp32",
+      "both_converged": true,
+      "absolute_final_energy_delta_ev_per_atom": 0.001934841275215149,
+      "maximum_final_cell_length_delta_angstrom": 0.8692851474632608,
+      "maximum_final_cell_angle_delta_degrees": 0.025033804156151973
+    },
+    {
+      "prototype": "ZnO_wurtzite",
+      "precision": "fp64",
+      "both_converged": true,
+      "absolute_final_energy_delta_ev_per_atom": 0.0019346568843660247,
+      "maximum_final_cell_length_delta_angstrom": 0.8692850832375321,
+      "maximum_final_cell_angle_delta_degrees": 0.025033847116546326
+    },
+    {
+      "prototype": "SrTiO3_perovskite",
+      "precision": "fp32",
+      "both_converged": true,
+      "absolute_final_energy_delta_ev_per_atom": 0.0022122502326965346,
+      "maximum_final_cell_length_delta_angstrom": 0.7201816748679022,
+      "maximum_final_cell_angle_delta_degrees": 0.003107218953175561
+    },
+    {
+      "prototype": "SrTiO3_perovskite",
+      "precision": "fp64",
+      "both_converged": true,
+      "absolute_final_energy_delta_ev_per_atom": 0.0022124409245269858,
+      "maximum_final_cell_length_delta_angstrom": 0.7201816400070822,
+      "maximum_final_cell_angle_delta_degrees": 0.003107212511665125
+    }
+  ]
+}

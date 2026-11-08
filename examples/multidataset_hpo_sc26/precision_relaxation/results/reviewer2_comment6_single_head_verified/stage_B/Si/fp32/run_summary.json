@@ -1,0 +1,21 @@
+{
+  "precision": "fp32",
+  "head_mode": "single",
+  "selected_branch_id": 7,
+  "status": "max_steps_without_convergence",
+  "converged": false,
+  "force_tolerance_ev_per_angstrom": 0.05,
+  "maximum_steps": 200,
+  "steps_taken": 200,
+  "total_calculation_time_seconds": 0.9508095420897007,
+  "initial_energy_ev": 1.448456048965454,
+  "final_energy_ev": 1.342067003250122,
+  "final_maximum_force_ev_per_angstrom": 0.25391047914162773,
+  "final_rms_force_ev_per_angstrom": 0.10264382345808624,
+  "initial_branch_weights_json": "[0.0, 0.0, 0.0, 0.0, 0.0, 0.0, 0.0, 1.0, 0.0, 0.0, 0.0, 0.0, 0.0, 0.0, 0.0, 0.0]",
+  "final_branch_weights_json": "[0.0, 0.0, 0.0, 0.0, 0.0, 0.0, 0.0, 1.0, 0.0, 0.0, 0.0, 0.0, 0.0, 0.0, 0.0, 0.0]",
+  "graph_edges_final": 160,
+  "trajectory_csv": "trajectory.csv",
+  "trajectory_file": "trajectory.traj",
+  "error": null
+}

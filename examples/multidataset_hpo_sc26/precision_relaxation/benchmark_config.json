@@ -57,8 +57,52 @@
     "spin": 0.0,
     "rebuild_graph_at_every_calculation": true
   },
+  "branch_dataset_mapping": [
+    "Alexandria",
+    "ANI1x",
+    "MPTrj",
+    "OC2020",
+    "OC2022",
+    "OC25",
+    "ODAC23",
+    "OMat24",
+    "OMol25",
+    "OMol25-neutral",
+    "OMol25-non-neutral",
+    "OPoly2026",
+    "Nabla2DFT",
+    "QCML",
+    "QM7X",
+    "transition1x"
+  ],
+  "single_head_selection": {
+    "rule": "For each fixed composition, select the highest-weight branch from the already-validated FP64 fused single-point comparison, then run all relaxation steps using only that frozen head. The single-head runner does not load or invoke the MLP.",
+    "selected_heads": {
+      "H2O": {
+        "branch_id": 8,
+        "dataset": "OMol25"
+      },
+      "CH4": {
+        "branch_id": 8,
+        "dataset": "OMol25"
+      },
+      "Si": {
+        "branch_id": 7,
+        "dataset": "OMat24"
+      },
+      "MgO": {
+        "branch_id": 2,
+        "dataset": "MPTrj"
+      },
+      "Al": {
+        "branch_id": 7,
+        "dataset": "OMat24"
+      }
+    }
+  },
   "relaxation": {
     "optimizer": "ASE BFGS",
+    "default_optimizer_maxstep_angstrom": 0.2,
     "force_convergence_tolerance_ev_per_angstrom": 0.05,
     "maximum_steps": 200,
     "cell_relaxation": false,
@@ -76,6 +120,11 @@
     "maximum_absolute_force_error_ev_per_angstrom": {
       "fp32": 0.01,
       "fp64": 0.001
+    },
+    "stress_strain_step": 0.0001,
+    "maximum_absolute_stress_error_ev_per_angstrom3": {
+      "fp32": 0.05,
+      "fp64": 0.005
     }
   },
   "expected_checkpoint_sha256": {

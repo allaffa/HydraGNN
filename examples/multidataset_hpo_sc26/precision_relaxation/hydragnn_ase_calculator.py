@@ -13,6 +13,7 @@ import torch
 import torch.nn.functional as F
 from ase.calculators.calculator import Calculator, all_changes
 from ase import Atoms
+from ase.stress import full_3x3_to_voigt_6_stress
 from torch_geometric.data import Batch, Data
 
 SC26_DIR = Path(__file__).resolve().parents[1]
@@ -21,11 +22,11 @@ sys.path.insert(0, str(REPO_ROOT))
 sys.path.insert(0, str(SC26_DIR))
 
 from inference_fused import (  # noqa: E402
-    _fused_energy_forces,
     _predict_branch_energy_only,
     _reshape_composition,
     load_fused_stack,
 )
+from inference_random_structures import load_config_and_model  # noqa: E402
 from hydragnn.preprocess.graph_samples_checks_and_updates import (  # noqa: E402
     get_radius_graph_pbc,
 )
@@ -121,12 +122,12 @@ def _graph_from_atoms(
 class FusedHydraGNNCalculator(Calculator):
     """Evaluate the complete 16-head weighted energy and its coordinate gradient."""
 
-    implemented_properties = ["energy", "forces"]
+    implemented_properties = ["energy", "forces", "stress"]
 
     def __init__(
         self,
         model: torch.nn.Module,
-        mlp: torch.nn.Module,
+        mlp: torch.nn.Module | None,
         *,
         precision: str,
         param_dtype: torch.dtype,
@@ -138,10 +139,11 @@ class FusedHydraGNNCalculator(Calculator):
         max_neighbours: int,
         charge: float = 0.0,
         spin: float = 0.0,
+        single_branch_id: int | None = None,
     ) -> None:
         super().__init__()
         self.model = model.eval()
-        self.mlp = mlp.eval()
+        self.mlp = mlp.eval() if mlp is not None else None
         self.precision = precision
         self.param_dtype = param_dtype
         self.device = device
@@ -155,9 +157,19 @@ class FusedHydraGNNCalculator(Calculator):
         self.num_branches = int(getattr(model, "num_branches", 1))
         if self.num_branches != NUM_BRANCHES:
             raise ValueError(f"Expected {NUM_BRANCHES} model branches, got {self.num_branches}")
-        if sum(1 for _ in mlp.parameters()) == 0:
+        if single_branch_id is not None and not 0 <= single_branch_id < self.num_branches:
+            raise ValueError(
+                f"Single branch ID must be in [0, {self.num_branches - 1}]"
+            )
+        self.single_branch_id = single_branch_id
+        if self.mlp is None and self.single_branch_id is None:
+            raise ValueError("The MLP is required unless a single branch is selected")
+        if self.mlp is not None and sum(1 for _ in self.mlp.parameters()) == 0:
             raise ValueError("BranchWeightMLP has no parameters")
-        for parameter in (*model.parameters(), *mlp.parameters()):
+        parameters = list(model.parameters())
+        if self.mlp is not None:
+            parameters.extend(self.mlp.parameters())
+        for parameter in parameters:
             if parameter.requires_grad:
                 raise ValueError("Model parameters must be frozen during relaxation")
         expected_dtype = torch.float32 if precision == "fp32" else torch.float64
@@ -167,13 +179,16 @@ class FusedHydraGNNCalculator(Calculator):
             )
         if any(parameter.dtype != expected_dtype for parameter in model.parameters()):
             raise ValueError("HydraGNN parameters do not match the requested precision")
-        if any(parameter.dtype != expected_dtype for parameter in mlp.parameters()):
+        if self.mlp is not None and any(
+            parameter.dtype != expected_dtype for parameter in self.mlp.parameters()
+        ):
             raise ValueError("BranchWeightMLP parameters do not match the requested precision")
         self.last_branch_weights: np.ndarray | None = None
         self.last_branch_energies: np.ndarray | None = None
         self.last_graph_edges = 0
         self.graph_build_count = 0
         self.last_graph_positions: np.ndarray | None = None
+        self.last_graph_cell: np.ndarray | None = None
 
     def evaluate_atoms(self, atoms: Atoms) -> dict[str, Any]:
         torch.set_default_dtype(self.param_dtype)
@@ -188,6 +203,7 @@ class FusedHydraGNNCalculator(Calculator):
         self.graph_build_count += 1
         self.last_graph_edges = int(data.edge_index.size(1))
         self.last_graph_positions = np.array(atoms.positions, dtype=np.float64, copy=True)
+        self.last_graph_cell = np.array(atoms.cell, dtype=np.float64, copy=True)
         original_composition = np.bincount(
             atoms.get_atomic_numbers(), minlength=119
         )[1:119]
@@ -198,26 +214,47 @@ class FusedHydraGNNCalculator(Calculator):
             if isinstance(value, torch.Tensor) and torch.is_floating_point(value):
                 batch[key] = value.to(dtype=self.param_dtype)
         batch.pos = batch.pos.detach().requires_grad_(True)
-
-        composition = _reshape_composition(batch)
-        if composition.shape != (1, 118):
-            raise ValueError(
-                f"Expected one 118-element composition vector, got {tuple(composition.shape)}"
-            )
-        actual_composition = composition.detach().cpu().numpy()[0]
-        if not np.array_equal(actual_composition, original_composition):
-            raise ValueError("Graph composition does not match the exact atomic-number counts")
+        cell = batch.cell.reshape(-1, 3, 3)[0].detach().clone().requires_grad_(True)
+        edge_shifts = batch.edge_shifts.reshape(-1, 3)
+        if edge_shifts.numel():
+            if np.any(atoms.pbc):
+                image_shifts = torch.linalg.solve(
+                    cell.T, edge_shifts.T
+                ).T.round().detach()
+            else:
+                image_shifts = torch.zeros_like(edge_shifts)
+            batch.edge_shifts = image_shifts @ cell
 
         with torch.enable_grad():
-            with self.mlp_autocast_ctx:
-                mlp_input = composition.to(
-                    device=self.mlp_device,
-                    dtype=next(self.mlp.parameters()).dtype,
+            if self.single_branch_id is None:
+                composition = _reshape_composition(batch)
+                if composition.shape != (1, 118):
+                    raise ValueError(
+                        f"Expected one 118-element composition vector, got {tuple(composition.shape)}"
+                    )
+                actual_composition = composition.detach().cpu().numpy()[0]
+                if not np.array_equal(actual_composition, original_composition):
+                    raise ValueError(
+                        "Graph composition does not match the exact atomic-number counts"
+                    )
+                if self.mlp is None:
+                    raise RuntimeError("Fused mode requires the BranchWeightMLP")
+                with self.mlp_autocast_ctx:
+                    mlp_input = composition.to(
+                        device=self.mlp_device,
+                        dtype=next(self.mlp.parameters()).dtype,
+                    )
+                    logits = self.mlp(mlp_input)
+                    weights = F.softmax(logits, dim=-1).to(
+                        device=self.device, dtype=self.param_dtype
+                    )
+            else:
+                weights = torch.zeros(
+                    (1, self.num_branches),
+                    device=self.device,
+                    dtype=self.param_dtype,
                 )
-                logits = self.mlp(mlp_input)
-                weights = F.softmax(logits, dim=-1).to(
-                    device=self.device, dtype=self.param_dtype
-                )
+                weights[0, self.single_branch_id] = 1.0
             if weights.shape != (1, NUM_BRANCHES):
                 raise ValueError(f"Unexpected BranchWeightMLP output shape {tuple(weights.shape)}")
             if not torch.isfinite(weights).all() or not torch.allclose(
@@ -230,7 +267,12 @@ class FusedHydraGNNCalculator(Calculator):
 
             branch_energies: list[torch.Tensor] = []
             with self.autocast_ctx:
-                for branch_id in range(self.num_branches):
+                branch_ids = (
+                    [self.single_branch_id]
+                    if self.single_branch_id is not None
+                    else range(self.num_branches)
+                )
+                for branch_id in branch_ids:
                     branch_energy = _predict_branch_energy_only(
                         self.model, batch, branch_id
                     )
@@ -240,13 +282,40 @@ class FusedHydraGNNCalculator(Calculator):
                             "for one structure"
                         )
                     branch_energies.append(branch_energy.reshape(1))
-                weighted_energy, forces = _fused_energy_forces(
-                    branch_energies,
-                    [weights[:, branch_id] for branch_id in range(self.num_branches)],
-                    [],
-                    [],
-                    batch.pos,
-                    batch.batch,
+                energy_weights = (
+                    [weights[:, self.single_branch_id]]
+                    if self.single_branch_id is not None
+                    else [
+                        weights[:, branch_id]
+                        for branch_id in range(self.num_branches)
+                    ]
+                )
+                weighted_energy = torch.zeros(
+                    (1,), device=self.device, dtype=self.param_dtype
+                )
+                for branch_energy, weight in zip(branch_energies, energy_weights):
+                    weighted_energy = weighted_energy + weight * branch_energy
+                position_gradient, cell_gradient = torch.autograd.grad(
+                    weighted_energy.sum(),
+                    (batch.pos, cell),
+                    retain_graph=False,
+                    create_graph=False,
+                )
+                forces = -position_gradient
+                strain_gradient = position_gradient.T @ batch.pos + (
+                    cell_gradient.T @ cell
+                )
+                strain_gradient = 0.5 * (strain_gradient + strain_gradient.T)
+                volume = abs(float(np.linalg.det(np.asarray(atoms.cell))))
+                if np.any(atoms.pbc) and volume <= 1e-12:
+                    raise ValueError("Periodic cell must have nonzero volume for stress")
+                stress_tensor = (
+                    strain_gradient / volume
+                    if np.any(atoms.pbc)
+                    else torch.zeros_like(strain_gradient)
+                )
+                stress = full_3x3_to_voigt_6_stress(
+                    stress_tensor.detach().cpu().numpy()
                 )
 
         branch_energy_values = torch.stack(
@@ -267,8 +336,14 @@ class FusedHydraGNNCalculator(Calculator):
         return {
             "energy": float(weighted_energy.reshape(-1)[0].item()),
             "forces": forces.detach().cpu().numpy().astype(np.float64),
+            "stress": np.asarray(stress, dtype=np.float64),
             "branch_weights": self.last_branch_weights.copy(),
             "branch_energies": self.last_branch_energies.copy(),
+            "evaluated_branch_ids": (
+                [self.single_branch_id]
+                if self.single_branch_id is not None
+                else list(range(self.num_branches))
+            ),
             "edge_count": self.last_graph_edges,
             "edge_index": data.edge_index.detach().cpu().numpy().copy(),
         }
@@ -285,6 +360,7 @@ class FusedHydraGNNCalculator(Calculator):
         result = self.evaluate_atoms(atoms)
         self.results["energy"] = result["energy"]
         self.results["forces"] = result["forces"]
+        self.results["stress"] = result["stress"]
 
 
 def load_fused_calculator(
@@ -361,6 +437,8 @@ def load_fused_calculator(
         spin=spin,
     )
     provenance = {
+        "head_mode": "fused",
+        "mlp_loaded": True,
         "precision": precision,
         "device": str(device),
         "mlp_device": str(mlp_device),
@@ -383,6 +461,82 @@ def load_fused_calculator(
         "all_parameters_frozen": all(
             not parameter.requires_grad
             for parameter in (*calculator.model.parameters(), *calculator.mlp.parameters())
+        ),
+    }
+    return calculator, provenance
+
+
+def load_single_head_calculator(
+    *,
+    logdir: Path,
+    backbone_checkpoint: Path,
+    precision: str,
+    charge: float,
+    spin: float,
+    branch_id: int,
+) -> tuple[FusedHydraGNNCalculator, dict[str, Any]]:
+    if not 0 <= branch_id < NUM_BRANCHES:
+        raise ValueError(f"Single branch ID must be in [0, {NUM_BRANCHES - 1}]")
+    if not backbone_checkpoint.is_file():
+        raise FileNotFoundError(f"HydraGNN checkpoint not found: {backbone_checkpoint}")
+    observed_hash = sha256_file(backbone_checkpoint)
+    if observed_hash != BACKBONE_SHA256:
+        raise ValueError(
+            "HydraGNN checkpoint SHA-256 mismatch: "
+            f"expected {BACKBONE_SHA256}, got {observed_hash}"
+        )
+
+    model, config, device, autocast_ctx, param_dtype = load_config_and_model(
+        str(logdir), str(backbone_checkpoint), precision
+    )
+    backbone_state = torch.load(
+        backbone_checkpoint, map_location=device, weights_only=True
+    )["model_state_dict"]
+    _restore_verified_state(model, backbone_state, label="HydraGNN")
+    model.eval()
+    for parameter in model.parameters():
+        parameter.requires_grad_(False)
+    num_branches = int(getattr(model, "num_branches", 1))
+    if num_branches != NUM_BRANCHES:
+        raise ValueError(f"Expected {NUM_BRANCHES} branches, got {num_branches}")
+    architecture = config["NeuralNetwork"]["Architecture"]
+    calculator = FusedHydraGNNCalculator(
+        model,
+        None,
+        precision=precision,
+        param_dtype=param_dtype,
+        device=device,
+        autocast_ctx=autocast_ctx,
+        mlp_device=device,
+        mlp_autocast_ctx=None,
+        radius=float(architecture.get("radius", 5.0)),
+        max_neighbours=int(architecture.get("max_neighbours", 20)),
+        charge=charge,
+        spin=spin,
+        single_branch_id=branch_id,
+    )
+    branch_output_order = [
+        item["type"]
+        for item in architecture["output_heads"]["graph"]
+    ]
+    provenance = {
+        "head_mode": "single",
+        "mlp_loaded": False,
+        "selected_branch_id": branch_id,
+        "selected_branch_name": branch_output_order[branch_id],
+        "evaluated_branch_ids": [branch_id],
+        "precision": precision,
+        "device": str(device),
+        "parameter_dtype": str(param_dtype),
+        "number_of_branches": calculator.num_branches,
+        "branch_output_order": branch_output_order,
+        "checkpoint_sha256": {"hydragNN": BACKBONE_SHA256},
+        "state_dict_prefix_normalization": "Repeated leading 'module.' prefixes removed; strict key match then enforced",
+        "radius_angstrom": calculator.radius,
+        "max_neighbours": calculator.max_neighbours,
+        "model_eval_mode": not calculator.model.training,
+        "all_model_parameters_frozen": all(
+            not parameter.requires_grad for parameter in calculator.model.parameters()
         ),
     }
     return calculator, provenance

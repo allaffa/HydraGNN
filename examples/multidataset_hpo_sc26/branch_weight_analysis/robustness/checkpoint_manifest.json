@@ -1,0 +1,20 @@
+{
+  "mlp_checkpoint": "mlp_branch_weights.pt",
+  "mlp_sha256": "c984b338ee947534bbdedf1fc4dd2aea92bb846e3302638d6719b1e3f5ca7ca8",
+  "mlp_epoch": 207,
+  "hydragNN_checkpoint": "multidataset_hpo-BEST6-fp64/multidataset_hpo-BEST6-fp64_epoch_97.pk",
+  "backbone_sha256": "8532b03296a8ab4cfc3b37beb6d57b2091a50807b155fac93cb1882253d32867",
+  "mlp_hydragNN_pairing": "user-confirmed; MLP checkpoint does not embed base-checkpoint identity",
+  "git_commit": "590fcb910e4d88b8ed2ce1c7838a159b09365d54",
+  "input_dim": 118,
+  "hidden_dims": [
+    128,
+    64
+  ],
+  "output_branches": 16,
+  "parameter_dtype": "torch.float64",
+  "inference_precision": "float64; checkpoint parameter dtype preserved",
+  "backbone_forward_used": false,
+  "rechecked_for_robustness": true,
+  "architecture_discrepancy": null
+}
