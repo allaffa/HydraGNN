@@ -1,0 +1,30 @@
+[
+  {
+    "case": "C_diamond_compressed",
+    "geometry": "initial",
+    "absolute_energy_delta_ev_per_atom": 0.0,
+    "absolute_maximum_force_delta_ev_per_angstrom": 0.0,
+    "coordinate_serialization": "extxyz uses eight decimal places; final input can switch near-tied capped neighbors relative to full-precision trajectory"
+  },
+  {
+    "case": "C_diamond_compressed",
+    "geometry": "final",
+    "absolute_energy_delta_ev_per_atom": 1.2898587753440438e-10,
+    "absolute_maximum_force_delta_ev_per_angstrom": 1.0428599739320532e-07,
+    "coordinate_serialization": "extxyz uses eight decimal places; final input can switch near-tied capped neighbors relative to full-precision trajectory"
+  },
+  {
+    "case": "C_diamond_expanded",
+    "geometry": "initial",
+    "absolute_energy_delta_ev_per_atom": 0.0,
+    "absolute_maximum_force_delta_ev_per_angstrom": 0.0,
+    "coordinate_serialization": "extxyz uses eight decimal places; final input can switch near-tied capped neighbors relative to full-precision trajectory"
+  },
+  {
+    "case": "C_diamond_expanded",
+    "geometry": "final",
+    "absolute_energy_delta_ev_per_atom": 1.4040213436317117e-11,
+    "absolute_maximum_force_delta_ev_per_angstrom": 1.8420028438659308e-07,
+    "coordinate_serialization": "extxyz uses eight decimal places; final input can switch near-tied capped neighbors relative to full-precision trajectory"
+  }
+]

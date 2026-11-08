@@ -190,6 +190,16 @@ the report are updated after every run, and indicate whether the study is
 still running or complete. Capped endpoints are explicitly labeled.
 The legacy two-material hydrostatic command above remains unchanged.
 
+## Diamond-carbon failure diagnostics
+
+The separate `results/c_diamond_diagnostics/` workspace investigates the
+four unsuccessful carbon trajectories from the full-cell stress test.
+Its [README](results/c_diamond_diagnostics/README.md) documents staged
+trajectory/graph analysis, fixed-cell FIRE and full-cell BFGS controls,
+smaller-perturbation experiments, complete atomic/stress finite differences,
+and the diamond lattice scan. Original results, checkpoints, and manuscript
+are preserved.
+
 ## Outputs
 
 `results/run_*/` contains the exact reference and initial geometries, input and

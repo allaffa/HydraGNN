@@ -1,0 +1,450 @@
+[
+  {
+    "geometry": "C_diamond_expanded_final",
+    "kind": "worst_atomic_component",
+    "h": 1e-05,
+    "component": "16/1",
+    "absolute_error": 1.3594460812477172e-06,
+    "graph_unchanged": true
+  },
+  {
+    "geometry": "C_diamond_expanded_final",
+    "kind": "stress",
+    "h": 1e-05,
+    "component": "00",
+    "absolute_error": 8.56936530090383e-08,
+    "graph_unchanged": true
+  },
+  {
+    "geometry": "C_diamond_expanded_final",
+    "kind": "stress",
+    "h": 1e-05,
+    "component": "11",
+    "absolute_error": 5.058891280270621e-06,
+    "graph_unchanged": true
+  },
+  {
+    "geometry": "C_diamond_expanded_final",
+    "kind": "stress",
+    "h": 1e-05,
+    "component": "22",
+    "absolute_error": 1.553344659639645e-05,
+    "graph_unchanged": true
+  },
+  {
+    "geometry": "C_diamond_expanded_final",
+    "kind": "stress",
+    "h": 1e-05,
+    "component": "01",
+    "absolute_error": 2.228406897593696e-08,
+    "graph_unchanged": true
+  },
+  {
+    "geometry": "C_diamond_expanded_final",
+    "kind": "stress",
+    "h": 1e-05,
+    "component": "02",
+    "absolute_error": 2.750726225037069e-08,
+    "graph_unchanged": true
+  },
+  {
+    "geometry": "C_diamond_expanded_final",
+    "kind": "stress",
+    "h": 1e-05,
+    "component": "12",
+    "absolute_error": 3.351126575572901e-08,
+    "graph_unchanged": true
+  },
+  {
+    "geometry": "C_diamond_expanded_final",
+    "kind": "worst_atomic_component",
+    "h": 3e-06,
+    "component": "16/1",
+    "absolute_error": 1.2256881397332275e-07,
+    "graph_unchanged": true
+  },
+  {
+    "geometry": "C_diamond_expanded_final",
+    "kind": "stress",
+    "h": 3e-06,
+    "component": "00",
+    "absolute_error": 7.76503097514895e-09,
+    "graph_unchanged": true
+  },
+  {
+    "geometry": "C_diamond_expanded_final",
+    "kind": "stress",
+    "h": 3e-06,
+    "component": "11",
+    "absolute_error": 3.724002053452115e-09,
+    "graph_unchanged": true
+  },
+  {
+    "geometry": "C_diamond_expanded_final",
+    "kind": "stress",
+    "h": 3e-06,
+    "component": "22",
+    "absolute_error": 8.581546067937956e-09,
+    "graph_unchanged": true
+  },
+  {
+    "geometry": "C_diamond_expanded_final",
+    "kind": "stress",
+    "h": 3e-06,
+    "component": "01",
+    "absolute_error": 2.007874290660752e-09,
+    "graph_unchanged": true
+  },
+  {
+    "geometry": "C_diamond_expanded_final",
+    "kind": "stress",
+    "h": 3e-06,
+    "component": "02",
+    "absolute_error": 2.478251660148218e-09,
+    "graph_unchanged": true
+  },
+  {
+    "geometry": "C_diamond_expanded_final",
+    "kind": "stress",
+    "h": 3e-06,
+    "component": "12",
+    "absolute_error": 3.0183372663229735e-09,
+    "graph_unchanged": true
+  },
+  {
+    "geometry": "C_diamond_expanded_final",
+    "kind": "worst_atomic_component",
+    "h": 1e-06,
+    "component": "16/1",
+    "absolute_error": 2.1316474127508478e-08,
+    "graph_unchanged": true
+  },
+  {
+    "geometry": "C_diamond_expanded_final",
+    "kind": "stress",
+    "h": 1e-06,
+    "component": "00",
+    "absolute_error": 8.468019795570755e-10,
+    "graph_unchanged": true
+  },
+  {
+    "geometry": "C_diamond_expanded_final",
+    "kind": "stress",
+    "h": 1e-06,
+    "component": "11",
+    "absolute_error": 3.9168467872319895e-10,
+    "graph_unchanged": true
+  },
+  {
+    "geometry": "C_diamond_expanded_final",
+    "kind": "stress",
+    "h": 1e-06,
+    "component": "22",
+    "absolute_error": 9.173644066606812e-10,
+    "graph_unchanged": true
+  },
+  {
+    "geometry": "C_diamond_expanded_final",
+    "kind": "stress",
+    "h": 1e-06,
+    "component": "01",
+    "absolute_error": 2.082449475446918e-10,
+    "graph_unchanged": true
+  },
+  {
+    "geometry": "C_diamond_expanded_final",
+    "kind": "stress",
+    "h": 1e-06,
+    "component": "02",
+    "absolute_error": 2.730198238169203e-10,
+    "graph_unchanged": true
+  },
+  {
+    "geometry": "C_diamond_expanded_final",
+    "kind": "stress",
+    "h": 1e-06,
+    "component": "12",
+    "absolute_error": 3.378015945307636e-10,
+    "graph_unchanged": true
+  },
+  {
+    "geometry": "C_diamond_expanded_final",
+    "kind": "worst_atomic_component",
+    "h": 3e-07,
+    "component": "16/1",
+    "absolute_error": 3.67115667344875e-08,
+    "graph_unchanged": true
+  },
+  {
+    "geometry": "C_diamond_expanded_final",
+    "kind": "stress",
+    "h": 3e-07,
+    "component": "00",
+    "absolute_error": 7.563819015565798e-11,
+    "graph_unchanged": true
+  },
+  {
+    "geometry": "C_diamond_expanded_final",
+    "kind": "stress",
+    "h": 3e-07,
+    "component": "11",
+    "absolute_error": 1.351782043506472e-11,
+    "graph_unchanged": true
+  },
+  {
+    "geometry": "C_diamond_expanded_final",
+    "kind": "stress",
+    "h": 3e-07,
+    "component": "22",
+    "absolute_error": 5.7220179983108466e-11,
+    "graph_unchanged": true
+  },
+  {
+    "geometry": "C_diamond_expanded_final",
+    "kind": "stress",
+    "h": 3e-07,
+    "component": "01",
+    "absolute_error": 2.848438065278236e-12,
+    "graph_unchanged": true
+  },
+  {
+    "geometry": "C_diamond_expanded_final",
+    "kind": "stress",
+    "h": 3e-07,
+    "component": "02",
+    "absolute_error": 4.0187679735664145e-11,
+    "graph_unchanged": true
+  },
+  {
+    "geometry": "C_diamond_expanded_final",
+    "kind": "stress",
+    "h": 3e-07,
+    "component": "12",
+    "absolute_error": 3.1560589645179826e-11,
+    "graph_unchanged": true
+  },
+  {
+    "geometry": "compressed_problem_step_94",
+    "kind": "worst_atomic_component",
+    "h": 1e-05,
+    "component": "42/1",
+    "absolute_error": 0.0031806200562994325,
+    "graph_unchanged": true
+  },
+  {
+    "geometry": "compressed_problem_step_94",
+    "kind": "stress",
+    "h": 1e-05,
+    "component": "00",
+    "absolute_error": 1.7812902541880504e-10,
+    "graph_unchanged": true
+  },
+  {
+    "geometry": "compressed_problem_step_94",
+    "kind": "stress",
+    "h": 1e-05,
+    "component": "11",
+    "absolute_error": 1.322745246667978e-10,
+    "graph_unchanged": true
+  },
+  {
+    "geometry": "compressed_problem_step_94",
+    "kind": "stress",
+    "h": 1e-05,
+    "component": "22",
+    "absolute_error": 1.0725081052917473e-05,
+    "graph_unchanged": true
+  },
+  {
+    "geometry": "compressed_problem_step_94",
+    "kind": "stress",
+    "h": 1e-05,
+    "component": "01",
+    "absolute_error": 5.974099166750069e-11,
+    "graph_unchanged": true
+  },
+  {
+    "geometry": "compressed_problem_step_94",
+    "kind": "stress",
+    "h": 1e-05,
+    "component": "02",
+    "absolute_error": 8.025070279821939e-05,
+    "graph_unchanged": true
+  },
+  {
+    "geometry": "compressed_problem_step_94",
+    "kind": "stress",
+    "h": 1e-05,
+    "component": "12",
+    "absolute_error": 1.180568064803461e-06,
+    "graph_unchanged": true
+  },
+  {
+    "geometry": "compressed_problem_step_94",
+    "kind": "worst_atomic_component",
+    "h": 3e-06,
+    "component": "42/1",
+    "absolute_error": 4.714667795058247e-09,
+    "graph_unchanged": true
+  },
+  {
+    "geometry": "compressed_problem_step_94",
+    "kind": "stress",
+    "h": 3e-06,
+    "component": "00",
+    "absolute_error": 1.5067253000822234e-12,
+    "graph_unchanged": true
+  },
+  {
+    "geometry": "compressed_problem_step_94",
+    "kind": "stress",
+    "h": 3e-06,
+    "component": "11",
+    "absolute_error": 2.5837929018557304e-11,
+    "graph_unchanged": true
+  },
+  {
+    "geometry": "compressed_problem_step_94",
+    "kind": "stress",
+    "h": 3e-06,
+    "component": "22",
+    "absolute_error": 2.6048621593055543e-11,
+    "graph_unchanged": true
+  },
+  {
+    "geometry": "compressed_problem_step_94",
+    "kind": "stress",
+    "h": 3e-06,
+    "component": "01",
+    "absolute_error": 5.9653493082734155e-12,
+    "graph_unchanged": true
+  },
+  {
+    "geometry": "compressed_problem_step_94",
+    "kind": "stress",
+    "h": 3e-06,
+    "component": "02",
+    "absolute_error": 4.5261254506216014e-06,
+    "graph_unchanged": true
+  },
+  {
+    "geometry": "compressed_problem_step_94",
+    "kind": "stress",
+    "h": 3e-06,
+    "component": "12",
+    "absolute_error": 1.7433724602833323e-11,
+    "graph_unchanged": true
+  },
+  {
+    "geometry": "compressed_problem_step_94",
+    "kind": "worst_atomic_component",
+    "h": 1e-06,
+    "component": "42/1",
+    "absolute_error": 3.5749974647281135e-09,
+    "graph_unchanged": true
+  },
+  {
+    "geometry": "compressed_problem_step_94",
+    "kind": "stress",
+    "h": 1e-06,
+    "component": "00",
+    "absolute_error": 1.4955411908879057e-11,
+    "graph_unchanged": true
+  },
+  {
+    "geometry": "compressed_problem_step_94",
+    "kind": "stress",
+    "h": 1e-06,
+    "component": "11",
+    "absolute_error": 3.5444105983550855e-11,
+    "graph_unchanged": true
+  },
+  {
+    "geometry": "compressed_problem_step_94",
+    "kind": "stress",
+    "h": 1e-06,
+    "component": "22",
+    "absolute_error": 1.0674060246795847e-10,
+    "graph_unchanged": true
+  },
+  {
+    "geometry": "compressed_problem_step_94",
+    "kind": "stress",
+    "h": 1e-06,
+    "component": "01",
+    "absolute_error": 2.680221062451027e-12,
+    "graph_unchanged": true
+  },
+  {
+    "geometry": "compressed_problem_step_94",
+    "kind": "stress",
+    "h": 1e-06,
+    "component": "02",
+    "absolute_error": 3.062105777273949e-11,
+    "graph_unchanged": true
+  },
+  {
+    "geometry": "compressed_problem_step_94",
+    "kind": "stress",
+    "h": 1e-06,
+    "component": "12",
+    "absolute_error": 1.1031939251004985e-12,
+    "graph_unchanged": true
+  },
+  {
+    "geometry": "compressed_problem_step_94",
+    "kind": "worst_atomic_component",
+    "h": 3e-07,
+    "component": "42/1",
+    "absolute_error": 1.0680424822329115e-08,
+    "graph_unchanged": true
+  },
+  {
+    "geometry": "compressed_problem_step_94",
+    "kind": "stress",
+    "h": 3e-07,
+    "component": "00",
+    "absolute_error": 1.3034170964765224e-11,
+    "graph_unchanged": true
+  },
+  {
+    "geometry": "compressed_problem_step_94",
+    "kind": "stress",
+    "h": 3e-07,
+    "component": "11",
+    "absolute_error": 4.697153777044605e-11,
+    "graph_unchanged": true
+  },
+  {
+    "geometry": "compressed_problem_step_94",
+    "kind": "stress",
+    "h": 3e-07,
+    "component": "22",
+    "absolute_error": 4.6912057571901755e-12,
+    "graph_unchanged": true
+  },
+  {
+    "geometry": "compressed_problem_step_94",
+    "kind": "stress",
+    "h": 3e-07,
+    "component": "01",
+    "absolute_error": 2.680221062451027e-12,
+    "graph_unchanged": true
+  },
+  {
+    "geometry": "compressed_problem_step_94",
+    "kind": "stress",
+    "h": 3e-07,
+    "component": "02",
+    "absolute_error": 1.2284048431232542e-10,
+    "graph_unchanged": true
+  },
+  {
+    "geometry": "compressed_problem_step_94",
+    "kind": "stress",
+    "h": 3e-07,
+    "component": "12",
+    "absolute_error": 9.207684961709539e-11,
+    "graph_unchanged": true
+  }
+]

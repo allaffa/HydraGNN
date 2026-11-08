@@ -1,0 +1,822 @@
+[
+  {
+    "path": "",
+    "class": "EnhancedModelWrapper",
+    "parameters_recursive": 12205540
+  },
+  {
+    "path": "model",
+    "class": "PAINNStack",
+    "parameters_recursive": 12205540
+  },
+  {
+    "path": "model.graph_convs",
+    "class": "ModuleList",
+    "parameters_recursive": 1486880
+  },
+  {
+    "path": "model.graph_convs.0",
+    "class": "Sequential",
+    "parameters_recursive": 115290
+  },
+  {
+    "path": "model.graph_convs.0.module_0",
+    "class": "PainnMessage",
+    "parameters_recursive": 23
+  },
+  {
+    "path": "model.graph_convs.0.module_0.scalar_message_mlp",
+    "class": "Sequential",
+    "parameters_recursive": 8
+  },
+  {
+    "path": "model.graph_convs.0.module_0.scalar_message_mlp.0",
+    "class": "Linear",
+    "parameters_recursive": 2
+  },
+  {
+    "path": "model.graph_convs.0.module_0.scalar_message_mlp.1",
+    "class": "SiLU",
+    "parameters_recursive": 0
+  },
+  {
+    "path": "model.graph_convs.0.module_0.scalar_message_mlp.2",
+    "class": "Linear",
+    "parameters_recursive": 6
+  },
+  {
+    "path": "model.graph_convs.0.module_0.filter_layer",
+    "class": "Linear",
+    "parameters_recursive": 15
+  },
+  {
+    "path": "model.graph_convs.0.module_1",
+    "class": "PainnUpdate",
+    "parameters_recursive": 13
+  },
+  {
+    "path": "model.graph_convs.0.module_1.update_U",
+    "class": "Linear",
+    "parameters_recursive": 2
+  },
+  {
+    "path": "model.graph_convs.0.module_1.update_V",
+    "class": "Linear",
+    "parameters_recursive": 2
+  },
+  {
+    "path": "model.graph_convs.0.module_1.update_mlp",
+    "class": "Sequential",
+    "parameters_recursive": 9
+  },
+  {
+    "path": "model.graph_convs.0.module_1.update_mlp.0",
+    "class": "Linear",
+    "parameters_recursive": 3
+  },
+  {
+    "path": "model.graph_convs.0.module_1.update_mlp.1",
+    "class": "SiLU",
+    "parameters_recursive": 0
+  },
+  {
+    "path": "model.graph_convs.0.module_1.update_mlp.2",
+    "class": "Linear",
+    "parameters_recursive": 6
+  },
+  {
+    "path": "model.graph_convs.0.module_2",
+    "class": "Sequential",
+    "parameters_recursive": 114580
+  },
+  {
+    "path": "model.graph_convs.0.module_2.0",
+    "class": "Linear",
+    "parameters_recursive": 674
+  },
+  {
+    "path": "model.graph_convs.0.module_2.1",
+    "class": "Tanh",
+    "parameters_recursive": 0
+  },
+  {
+    "path": "model.graph_convs.0.module_2.2",
+    "class": "Linear",
+    "parameters_recursive": 113906
+  },
+  {
+    "path": "model.graph_convs.0.module_3",
+    "class": "Linear",
+    "parameters_recursive": 674
+  },
+  {
+    "path": "model.graph_convs.1",
+    "class": "Sequential",
+    "parameters_recursive": 1371590
+  },
+  {
+    "path": "model.graph_convs.1.module_0",
+    "class": "PainnMessage",
+    "parameters_recursive": 460679
+  },
+  {
+    "path": "model.graph_convs.1.module_0.scalar_message_mlp",
+    "class": "Sequential",
+    "parameters_recursive": 455624
+  },
+  {
+    "path": "model.graph_convs.1.module_0.scalar_message_mlp.0",
+    "class": "Linear",
+    "parameters_recursive": 113906
+  },
+  {
+    "path": "model.graph_convs.1.module_0.scalar_message_mlp.1",
+    "class": "SiLU",
+    "parameters_recursive": 0
+  },
+  {
+    "path": "model.graph_convs.1.module_0.scalar_message_mlp.2",
+    "class": "Linear",
+    "parameters_recursive": 341718
+  },
+  {
+    "path": "model.graph_convs.1.module_0.filter_layer",
+    "class": "Linear",
+    "parameters_recursive": 5055
+  },
+  {
+    "path": "model.graph_convs.1.module_1",
+    "class": "PainnUpdate",
+    "parameters_recursive": 683099
+  },
+  {
+    "path": "model.graph_convs.1.module_1.update_U",
+    "class": "Linear",
+    "parameters_recursive": 113906
+  },
+  {
+    "path": "model.graph_convs.1.module_1.update_V",
+    "class": "Linear",
+    "parameters_recursive": 113906
+  },
+  {
+    "path": "model.graph_convs.1.module_1.update_mlp",
+    "class": "Sequential",
+    "parameters_recursive": 455287
+  },
+  {
+    "path": "model.graph_convs.1.module_1.update_mlp.0",
+    "class": "Linear",
+    "parameters_recursive": 227475
+  },
+  {
+    "path": "model.graph_convs.1.module_1.update_mlp.1",
+    "class": "SiLU",
+    "parameters_recursive": 0
+  },
+  {
+    "path": "model.graph_convs.1.module_1.update_mlp.2",
+    "class": "Linear",
+    "parameters_recursive": 227812
+  },
+  {
+    "path": "model.graph_convs.1.module_2",
+    "class": "Sequential",
+    "parameters_recursive": 227812
+  },
+  {
+    "path": "model.graph_convs.1.module_2.0",
+    "class": "Linear",
+    "parameters_recursive": 113906
+  },
+  {
+    "path": "model.graph_convs.1.module_2.1",
+    "class": "Tanh",
+    "parameters_recursive": 0
+  },
+  {
+    "path": "model.graph_convs.1.module_2.2",
+    "class": "Linear",
+    "parameters_recursive": 113906
+  },
+  {
+    "path": "model.feature_layers",
+    "class": "ModuleList",
+    "parameters_recursive": 0
+  },
+  {
+    "path": "model.feature_layers.0",
+    "class": "Identity",
+    "parameters_recursive": 0
+  },
+  {
+    "path": "model.feature_layers.1",
+    "class": "Identity",
+    "parameters_recursive": 0
+  },
+  {
+    "path": "model.heads_NN",
+    "class": "ModuleList",
+    "parameters_recursive": 10292880
+  },
+  {
+    "path": "model.heads_NN.0",
+    "class": "ModuleDict",
+    "parameters_recursive": 10292880
+  },
+  {
+    "path": "model.heads_NN.0.branch-0",
+    "class": "Sequential",
+    "parameters_recursive": 643305
+  },
+  {
+    "path": "model.heads_NN.0.branch-0.0",
+    "class": "Linear",
+    "parameters_recursive": 39576
+  },
+  {
+    "path": "model.heads_NN.0.branch-0.1",
+    "class": "ReLU",
+    "parameters_recursive": 0
+  },
+  {
+    "path": "model.heads_NN.0.branch-0.2",
+    "class": "Linear",
+    "parameters_recursive": 602952
+  },
+  {
+    "path": "model.heads_NN.0.branch-0.4",
+    "class": "Linear",
+    "parameters_recursive": 777
+  },
+  {
+    "path": "model.heads_NN.0.branch-1",
+    "class": "Sequential",
+    "parameters_recursive": 643305
+  },
+  {
+    "path": "model.heads_NN.0.branch-1.0",
+    "class": "Linear",
+    "parameters_recursive": 39576
+  },
+  {
+    "path": "model.heads_NN.0.branch-1.2",
+    "class": "Linear",
+    "parameters_recursive": 602952
+  },
+  {
+    "path": "model.heads_NN.0.branch-1.4",
+    "class": "Linear",
+    "parameters_recursive": 777
+  },
+  {
+    "path": "model.heads_NN.0.branch-2",
+    "class": "Sequential",
+    "parameters_recursive": 643305
+  },
+  {
+    "path": "model.heads_NN.0.branch-2.0",
+    "class": "Linear",
+    "parameters_recursive": 39576
+  },
+  {
+    "path": "model.heads_NN.0.branch-2.2",
+    "class": "Linear",
+    "parameters_recursive": 602952
+  },
+  {
+    "path": "model.heads_NN.0.branch-2.4",
+    "class": "Linear",
+    "parameters_recursive": 777
+  },
+  {
+    "path": "model.heads_NN.0.branch-3",
+    "class": "Sequential",
+    "parameters_recursive": 643305
+  },
+  {
+    "path": "model.heads_NN.0.branch-3.0",
+    "class": "Linear",
+    "parameters_recursive": 39576
+  },
+  {
+    "path": "model.heads_NN.0.branch-3.2",
+    "class": "Linear",
+    "parameters_recursive": 602952
+  },
+  {
+    "path": "model.heads_NN.0.branch-3.4",
+    "class": "Linear",
+    "parameters_recursive": 777
+  },
+  {
+    "path": "model.heads_NN.0.branch-4",
+    "class": "Sequential",
+    "parameters_recursive": 643305
+  },
+  {
+    "path": "model.heads_NN.0.branch-4.0",
+    "class": "Linear",
+    "parameters_recursive": 39576
+  },
+  {
+    "path": "model.heads_NN.0.branch-4.2",
+    "class": "Linear",
+    "parameters_recursive": 602952
+  },
+  {
+    "path": "model.heads_NN.0.branch-4.4",
+    "class": "Linear",
+    "parameters_recursive": 777
+  },
+  {
+    "path": "model.heads_NN.0.branch-5",
+    "class": "Sequential",
+    "parameters_recursive": 643305
+  },
+  {
+    "path": "model.heads_NN.0.branch-5.0",
+    "class": "Linear",
+    "parameters_recursive": 39576
+  },
+  {
+    "path": "model.heads_NN.0.branch-5.2",
+    "class": "Linear",
+    "parameters_recursive": 602952
+  },
+  {
+    "path": "model.heads_NN.0.branch-5.4",
+    "class": "Linear",
+    "parameters_recursive": 777
+  },
+  {
+    "path": "model.heads_NN.0.branch-6",
+    "class": "Sequential",
+    "parameters_recursive": 643305
+  },
+  {
+    "path": "model.heads_NN.0.branch-6.0",
+    "class": "Linear",
+    "parameters_recursive": 39576
+  },
+  {
+    "path": "model.heads_NN.0.branch-6.2",
+    "class": "Linear",
+    "parameters_recursive": 602952
+  },
+  {
+    "path": "model.heads_NN.0.branch-6.4",
+    "class": "Linear",
+    "parameters_recursive": 777
+  },
+  {
+    "path": "model.heads_NN.0.branch-7",
+    "class": "Sequential",
+    "parameters_recursive": 643305
+  },
+  {
+    "path": "model.heads_NN.0.branch-7.0",
+    "class": "Linear",
+    "parameters_recursive": 39576
+  },
+  {
+    "path": "model.heads_NN.0.branch-7.2",
+    "class": "Linear",
+    "parameters_recursive": 602952
+  },
+  {
+    "path": "model.heads_NN.0.branch-7.4",
+    "class": "Linear",
+    "parameters_recursive": 777
+  },
+  {
+    "path": "model.heads_NN.0.branch-8",
+    "class": "Sequential",
+    "parameters_recursive": 643305
+  },
+  {
+    "path": "model.heads_NN.0.branch-8.0",
+    "class": "Linear",
+    "parameters_recursive": 39576
+  },
+  {
+    "path": "model.heads_NN.0.branch-8.2",
+    "class": "Linear",
+    "parameters_recursive": 602952
+  },
+  {
+    "path": "model.heads_NN.0.branch-8.4",
+    "class": "Linear",
+    "parameters_recursive": 777
+  },
+  {
+    "path": "model.heads_NN.0.branch-9",
+    "class": "Sequential",
+    "parameters_recursive": 643305
+  },
+  {
+    "path": "model.heads_NN.0.branch-9.0",
+    "class": "Linear",
+    "parameters_recursive": 39576
+  },
+  {
+    "path": "model.heads_NN.0.branch-9.2",
+    "class": "Linear",
+    "parameters_recursive": 602952
+  },
+  {
+    "path": "model.heads_NN.0.branch-9.4",
+    "class": "Linear",
+    "parameters_recursive": 777
+  },
+  {
+    "path": "model.heads_NN.0.branch-10",
+    "class": "Sequential",
+    "parameters_recursive": 643305
+  },
+  {
+    "path": "model.heads_NN.0.branch-10.0",
+    "class": "Linear",
+    "parameters_recursive": 39576
+  },
+  {
+    "path": "model.heads_NN.0.branch-10.2",
+    "class": "Linear",
+    "parameters_recursive": 602952
+  },
+  {
+    "path": "model.heads_NN.0.branch-10.4",
+    "class": "Linear",
+    "parameters_recursive": 777
+  },
+  {
+    "path": "model.heads_NN.0.branch-11",
+    "class": "Sequential",
+    "parameters_recursive": 643305
+  },
+  {
+    "path": "model.heads_NN.0.branch-11.0",
+    "class": "Linear",
+    "parameters_recursive": 39576
+  },
+  {
+    "path": "model.heads_NN.0.branch-11.2",
+    "class": "Linear",
+    "parameters_recursive": 602952
+  },
+  {
+    "path": "model.heads_NN.0.branch-11.4",
+    "class": "Linear",
+    "parameters_recursive": 777
+  },
+  {
+    "path": "model.heads_NN.0.branch-12",
+    "class": "Sequential",
+    "parameters_recursive": 643305
+  },
+  {
+    "path": "model.heads_NN.0.branch-12.0",
+    "class": "Linear",
+    "parameters_recursive": 39576
+  },
+  {
+    "path": "model.heads_NN.0.branch-12.2",
+    "class": "Linear",
+    "parameters_recursive": 602952
+  },
+  {
+    "path": "model.heads_NN.0.branch-12.4",
+    "class": "Linear",
+    "parameters_recursive": 777
+  },
+  {
+    "path": "model.heads_NN.0.branch-13",
+    "class": "Sequential",
+    "parameters_recursive": 643305
+  },
+  {
+    "path": "model.heads_NN.0.branch-13.0",
+    "class": "Linear",
+    "parameters_recursive": 39576
+  },
+  {
+    "path": "model.heads_NN.0.branch-13.2",
+    "class": "Linear",
+    "parameters_recursive": 602952
+  },
+  {
+    "path": "model.heads_NN.0.branch-13.4",
+    "class": "Linear",
+    "parameters_recursive": 777
+  },
+  {
+    "path": "model.heads_NN.0.branch-14",
+    "class": "Sequential",
+    "parameters_recursive": 643305
+  },
+  {
+    "path": "model.heads_NN.0.branch-14.0",
+    "class": "Linear",
+    "parameters_recursive": 39576
+  },
+  {
+    "path": "model.heads_NN.0.branch-14.2",
+    "class": "Linear",
+    "parameters_recursive": 602952
+  },
+  {
+    "path": "model.heads_NN.0.branch-14.4",
+    "class": "Linear",
+    "parameters_recursive": 777
+  },
+  {
+    "path": "model.heads_NN.0.branch-15",
+    "class": "Sequential",
+    "parameters_recursive": 643305
+  },
+  {
+    "path": "model.heads_NN.0.branch-15.0",
+    "class": "Linear",
+    "parameters_recursive": 39576
+  },
+  {
+    "path": "model.heads_NN.0.branch-15.2",
+    "class": "Linear",
+    "parameters_recursive": 602952
+  },
+  {
+    "path": "model.heads_NN.0.branch-15.4",
+    "class": "Linear",
+    "parameters_recursive": 777
+  },
+  {
+    "path": "model.convs_node_hidden",
+    "class": "ModuleDict",
+    "parameters_recursive": 0
+  },
+  {
+    "path": "model.batch_norms_node_hidden",
+    "class": "ModuleDict",
+    "parameters_recursive": 0
+  },
+  {
+    "path": "model.convs_node_output",
+    "class": "ModuleDict",
+    "parameters_recursive": 0
+  },
+  {
+    "path": "model.batch_norms_node_output",
+    "class": "ModuleDict",
+    "parameters_recursive": 0
+  },
+  {
+    "path": "model.graph_shared",
+    "class": "ModuleDict",
+    "parameters_recursive": 311200
+  },
+  {
+    "path": "model.graph_shared.branch-0",
+    "class": "Sequential",
+    "parameters_recursive": 19450
+  },
+  {
+    "path": "model.graph_shared.branch-0.0",
+    "class": "Linear",
+    "parameters_recursive": 16900
+  },
+  {
+    "path": "model.graph_shared.branch-0.2",
+    "class": "Linear",
+    "parameters_recursive": 2550
+  },
+  {
+    "path": "model.graph_shared.branch-1",
+    "class": "Sequential",
+    "parameters_recursive": 19450
+  },
+  {
+    "path": "model.graph_shared.branch-1.0",
+    "class": "Linear",
+    "parameters_recursive": 16900
+  },
+  {
+    "path": "model.graph_shared.branch-1.2",
+    "class": "Linear",
+    "parameters_recursive": 2550
+  },
+  {
+    "path": "model.graph_shared.branch-2",
+    "class": "Sequential",
+    "parameters_recursive": 19450
+  },
+  {
+    "path": "model.graph_shared.branch-2.0",
+    "class": "Linear",
+    "parameters_recursive": 16900
+  },
+  {
+    "path": "model.graph_shared.branch-2.2",
+    "class": "Linear",
+    "parameters_recursive": 2550
+  },
+  {
+    "path": "model.graph_shared.branch-3",
+    "class": "Sequential",
+    "parameters_recursive": 19450
+  },
+  {
+    "path": "model.graph_shared.branch-3.0",
+    "class": "Linear",
+    "parameters_recursive": 16900
+  },
+  {
+    "path": "model.graph_shared.branch-3.2",
+    "class": "Linear",
+    "parameters_recursive": 2550
+  },
+  {
+    "path": "model.graph_shared.branch-4",
+    "class": "Sequential",
+    "parameters_recursive": 19450
+  },
+  {
+    "path": "model.graph_shared.branch-4.0",
+    "class": "Linear",
+    "parameters_recursive": 16900
+  },
+  {
+    "path": "model.graph_shared.branch-4.2",
+    "class": "Linear",
+    "parameters_recursive": 2550
+  },
+  {
+    "path": "model.graph_shared.branch-5",
+    "class": "Sequential",
+    "parameters_recursive": 19450
+  },
+  {
+    "path": "model.graph_shared.branch-5.0",
+    "class": "Linear",
+    "parameters_recursive": 16900
+  },
+  {
+    "path": "model.graph_shared.branch-5.2",
+    "class": "Linear",
+    "parameters_recursive": 2550
+  },
+  {
+    "path": "model.graph_shared.branch-6",
+    "class": "Sequential",
+    "parameters_recursive": 19450
+  },
+  {
+    "path": "model.graph_shared.branch-6.0",
+    "class": "Linear",
+    "parameters_recursive": 16900
+  },
+  {
+    "path": "model.graph_shared.branch-6.2",
+    "class": "Linear",
+    "parameters_recursive": 2550
+  },
+  {
+    "path": "model.graph_shared.branch-7",
+    "class": "Sequential",
+    "parameters_recursive": 19450
+  },
+  {
+    "path": "model.graph_shared.branch-7.0",
+    "class": "Linear",
+    "parameters_recursive": 16900
+  },
+  {
+    "path": "model.graph_shared.branch-7.2",
+    "class": "Linear",
+    "parameters_recursive": 2550
+  },
+  {
+    "path": "model.graph_shared.branch-8",
+    "class": "Sequential",
+    "parameters_recursive": 19450
+  },
+  {
+    "path": "model.graph_shared.branch-8.0",
+    "class": "Linear",
+    "parameters_recursive": 16900
+  },
+  {
+    "path": "model.graph_shared.branch-8.2",
+    "class": "Linear",
+    "parameters_recursive": 2550
+  },
+  {
+    "path": "model.graph_shared.branch-9",
+    "class": "Sequential",
+    "parameters_recursive": 19450
+  },
+  {
+    "path": "model.graph_shared.branch-9.0",
+    "class": "Linear",
+    "parameters_recursive": 16900
+  },
+  {
+    "path": "model.graph_shared.branch-9.2",
+    "class": "Linear",
+    "parameters_recursive": 2550
+  },
+  {
+    "path": "model.graph_shared.branch-10",
+    "class": "Sequential",
+    "parameters_recursive": 19450
+  },
+  {
+    "path": "model.graph_shared.branch-10.0",
+    "class": "Linear",
+    "parameters_recursive": 16900
+  },
+  {
+    "path": "model.graph_shared.branch-10.2",
+    "class": "Linear",
+    "parameters_recursive": 2550
+  },
+  {
+    "path": "model.graph_shared.branch-11",
+    "class": "Sequential",
+    "parameters_recursive": 19450
+  },
+  {
+    "path": "model.graph_shared.branch-11.0",
+    "class": "Linear",
+    "parameters_recursive": 16900
+  },
+  {
+    "path": "model.graph_shared.branch-11.2",
+    "class": "Linear",
+    "parameters_recursive": 2550
+  },
+  {
+    "path": "model.graph_shared.branch-12",
+    "class": "Sequential",
+    "parameters_recursive": 19450
+  },
+  {
+    "path": "model.graph_shared.branch-12.0",
+    "class": "Linear",
+    "parameters_recursive": 16900
+  },
+  {
+    "path": "model.graph_shared.branch-12.2",
+    "class": "Linear",
+    "parameters_recursive": 2550
+  },
+  {
+    "path": "model.graph_shared.branch-13",
+    "class": "Sequential",
+    "parameters_recursive": 19450
+  },
+  {
+    "path": "model.graph_shared.branch-13.0",
+    "class": "Linear",
+    "parameters_recursive": 16900
+  },
+  {
+    "path": "model.graph_shared.branch-13.2",
+    "class": "Linear",
+    "parameters_recursive": 2550
+  },
+  {
+    "path": "model.graph_shared.branch-14",
+    "class": "Sequential",
+    "parameters_recursive": 19450
+  },
+  {
+    "path": "model.graph_shared.branch-14.0",
+    "class": "Linear",
+    "parameters_recursive": 16900
+  },
+  {
+    "path": "model.graph_shared.branch-14.2",
+    "class": "Linear",
+    "parameters_recursive": 2550
+  },
+  {
+    "path": "model.graph_shared.branch-15",
+    "class": "Sequential",
+    "parameters_recursive": 19450
+  },
+  {
+    "path": "model.graph_shared.branch-15.0",
+    "class": "Linear",
+    "parameters_recursive": 16900
+  },
+  {
+    "path": "model.graph_shared.branch-15.2",
+    "class": "Linear",
+    "parameters_recursive": 2550
+  },
+  {
+    "path": "model.graph_concat_projector",
+    "class": "Linear",
+    "parameters_recursive": 114580
+  }
+]

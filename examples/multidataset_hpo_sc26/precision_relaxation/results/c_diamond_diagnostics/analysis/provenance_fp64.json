@@ -1,0 +1,38 @@
+{
+  "head_mode": "fused",
+  "mlp_loaded": true,
+  "precision": "fp64",
+  "device": "cpu",
+  "mlp_device": "cpu",
+  "parameter_dtype": "torch.float64",
+  "mlp_parameter_dtype": "torch.float64",
+  "number_of_branches": 16,
+  "branch_output_order": [
+    "branch-0",
+    "branch-1",
+    "branch-2",
+    "branch-3",
+    "branch-4",
+    "branch-5",
+    "branch-6",
+    "branch-7",
+    "branch-8",
+    "branch-9",
+    "branch-10",
+    "branch-11",
+    "branch-12",
+    "branch-13",
+    "branch-14",
+    "branch-15"
+  ],
+  "checkpoint_sha256": {
+    "hydragNN": "8532b03296a8ab4cfc3b37beb6d57b2091a50807b155fac93cb1882253d32867",
+    "branch_weight_mlp": "c984b338ee947534bbdedf1fc4dd2aea92bb846e3302638d6719b1e3f5ca7ca8"
+  },
+  "state_dict_prefix_normalization": "Repeated leading 'module.' prefixes removed; strict key match then enforced",
+  "radius_angstrom": 5.0,
+  "max_neighbours": 20,
+  "model_eval_mode": true,
+  "mlp_eval_mode": true,
+  "all_parameters_frozen": true
+}

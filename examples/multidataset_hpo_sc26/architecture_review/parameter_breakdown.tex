@@ -1,0 +1,20 @@
+\begin{table*}[t]
+\centering
+\small
+\caption{Unique-parameter breakdown. Branch indices are zero-based. All branch counts include both branch-local graph-shared layers and the output MLP. The conditioning projector has requires-grad enabled in the reconstructed training configuration but is missing from the saved optimizer, unlike the other parameters.}
+\label{tab:painn-parameter-breakdown}
+\begin{tabular}{p{0.38\textwidth}p{0.55\textwidth}}
+\hline
+Atomic input embedding (separate module) & 0; not instantiated \\
+PaiNN block 1, including input/output adaptations & 115,290; shared \\
+PaiNN block 2 & 1,371,590; shared \\
+Graph-attribute concat projector & 114,580; shared; absent from saved optimizer \\
+Dataset-specific branch 0 & 662,755; not shared \\
+Dataset-specific branches 1--15 & 9,941,325; not shared \\
+Other components & 0 \\
+Total HydraGNN (all 16 branches) & 12,205,540 \\
+Original optimizer-covered parameters & 12,090,960 \\
+BranchWeightMLP (separate model) & 24,528 \\
+\hline
+\end{tabular}
+\end{table*}

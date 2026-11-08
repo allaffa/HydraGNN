@@ -1,0 +1,201 @@
+name,shape,numel,component,training_configuration_requires_grad,saved_optimizer_covered,saved_optimizer_steps
+model.graph_convs.0.module_0.scalar_message_mlp.0.weight,1x1,1,PaiNN block 1,True,True,93572.0
+model.graph_convs.0.module_0.scalar_message_mlp.0.bias,1,1,PaiNN block 1,True,True,93572.0
+model.graph_convs.0.module_0.scalar_message_mlp.2.weight,3x1,3,PaiNN block 1,True,True,93572.0
+model.graph_convs.0.module_0.scalar_message_mlp.2.bias,3,3,PaiNN block 1,True,True,93572.0
+model.graph_convs.0.module_0.filter_layer.weight,3x4,12,PaiNN block 1,True,True,93572.0
+model.graph_convs.0.module_0.filter_layer.bias,3,3,PaiNN block 1,True,True,93572.0
+model.graph_convs.0.module_1.update_U.weight,1x1,1,PaiNN block 1,True,True,93572.0
+model.graph_convs.0.module_1.update_U.bias,1,1,PaiNN block 1,True,True,93572.0
+model.graph_convs.0.module_1.update_V.weight,1x1,1,PaiNN block 1,True,True,93572.0
+model.graph_convs.0.module_1.update_V.bias,1,1,PaiNN block 1,True,True,93572.0
+model.graph_convs.0.module_1.update_mlp.0.weight,1x2,2,PaiNN block 1,True,True,93572.0
+model.graph_convs.0.module_1.update_mlp.0.bias,1,1,PaiNN block 1,True,True,93572.0
+model.graph_convs.0.module_1.update_mlp.2.weight,3x1,3,PaiNN block 1,True,True,93572.0
+model.graph_convs.0.module_1.update_mlp.2.bias,3,3,PaiNN block 1,True,True,93572.0
+model.graph_convs.0.module_2.0.weight,337x1,337,PaiNN block 1,True,True,93572.0
+model.graph_convs.0.module_2.0.bias,337,337,PaiNN block 1,True,True,93572.0
+model.graph_convs.0.module_2.2.weight,337x337,113569,PaiNN block 1,True,True,93572.0
+model.graph_convs.0.module_2.2.bias,337,337,PaiNN block 1,True,True,93572.0
+model.graph_convs.0.module_3.weight,337x1,337,PaiNN block 1,True,True,93572.0
+model.graph_convs.0.module_3.bias,337,337,PaiNN block 1,True,True,93572.0
+model.graph_convs.1.module_0.scalar_message_mlp.0.weight,337x337,113569,PaiNN block 2,True,True,93572.0
+model.graph_convs.1.module_0.scalar_message_mlp.0.bias,337,337,PaiNN block 2,True,True,93572.0
+model.graph_convs.1.module_0.scalar_message_mlp.2.weight,1011x337,340707,PaiNN block 2,True,True,93572.0
+model.graph_convs.1.module_0.scalar_message_mlp.2.bias,1011,1011,PaiNN block 2,True,True,93572.0
+model.graph_convs.1.module_0.filter_layer.weight,1011x4,4044,PaiNN block 2,True,True,93572.0
+model.graph_convs.1.module_0.filter_layer.bias,1011,1011,PaiNN block 2,True,True,93572.0
+model.graph_convs.1.module_1.update_U.weight,337x337,113569,PaiNN block 2,True,True,93572.0
+model.graph_convs.1.module_1.update_U.bias,337,337,PaiNN block 2,True,True,93572.0
+model.graph_convs.1.module_1.update_V.weight,337x337,113569,PaiNN block 2,True,True,93572.0
+model.graph_convs.1.module_1.update_V.bias,337,337,PaiNN block 2,True,True,93572.0
+model.graph_convs.1.module_1.update_mlp.0.weight,337x674,227138,PaiNN block 2,True,True,93572.0
+model.graph_convs.1.module_1.update_mlp.0.bias,337,337,PaiNN block 2,True,True,93572.0
+model.graph_convs.1.module_1.update_mlp.2.weight,674x337,227138,PaiNN block 2,True,True,93572.0
+model.graph_convs.1.module_1.update_mlp.2.bias,674,674,PaiNN block 2,True,True,93572.0
+model.graph_convs.1.module_2.0.weight,337x337,113569,PaiNN block 2,True,True,93572.0
+model.graph_convs.1.module_2.0.bias,337,337,PaiNN block 2,True,True,93572.0
+model.graph_convs.1.module_2.2.weight,337x337,113569,PaiNN block 2,True,True,93572.0
+model.graph_convs.1.module_2.2.bias,337,337,PaiNN block 2,True,True,93572.0
+model.heads_NN.0.branch-0.0.weight,776x50,38800,Dataset branch-0,True,True,93572.0
+model.heads_NN.0.branch-0.0.bias,776,776,Dataset branch-0,True,True,93572.0
+model.heads_NN.0.branch-0.2.weight,776x776,602176,Dataset branch-0,True,True,93572.0
+model.heads_NN.0.branch-0.2.bias,776,776,Dataset branch-0,True,True,93572.0
+model.heads_NN.0.branch-0.4.weight,1x776,776,Dataset branch-0,True,True,93572.0
+model.heads_NN.0.branch-0.4.bias,1,1,Dataset branch-0,True,True,93572.0
+model.heads_NN.0.branch-1.0.weight,776x50,38800,Dataset branch-1,True,True,93572.0
+model.heads_NN.0.branch-1.0.bias,776,776,Dataset branch-1,True,True,93572.0
+model.heads_NN.0.branch-1.2.weight,776x776,602176,Dataset branch-1,True,True,93572.0
+model.heads_NN.0.branch-1.2.bias,776,776,Dataset branch-1,True,True,93572.0
+model.heads_NN.0.branch-1.4.weight,1x776,776,Dataset branch-1,True,True,93572.0
+model.heads_NN.0.branch-1.4.bias,1,1,Dataset branch-1,True,True,93572.0
+model.heads_NN.0.branch-2.0.weight,776x50,38800,Dataset branch-2,True,True,93571.0
+model.heads_NN.0.branch-2.0.bias,776,776,Dataset branch-2,True,True,93571.0
+model.heads_NN.0.branch-2.2.weight,776x776,602176,Dataset branch-2,True,True,93571.0
+model.heads_NN.0.branch-2.2.bias,776,776,Dataset branch-2,True,True,93571.0
+model.heads_NN.0.branch-2.4.weight,1x776,776,Dataset branch-2,True,True,93571.0
+model.heads_NN.0.branch-2.4.bias,1,1,Dataset branch-2,True,True,93571.0
+model.heads_NN.0.branch-3.0.weight,776x50,38800,Dataset branch-3,True,True,93572.0
+model.heads_NN.0.branch-3.0.bias,776,776,Dataset branch-3,True,True,93572.0
+model.heads_NN.0.branch-3.2.weight,776x776,602176,Dataset branch-3,True,True,93572.0
+model.heads_NN.0.branch-3.2.bias,776,776,Dataset branch-3,True,True,93572.0
+model.heads_NN.0.branch-3.4.weight,1x776,776,Dataset branch-3,True,True,93572.0
+model.heads_NN.0.branch-3.4.bias,1,1,Dataset branch-3,True,True,93572.0
+model.heads_NN.0.branch-4.0.weight,776x50,38800,Dataset branch-4,True,True,93572.0
+model.heads_NN.0.branch-4.0.bias,776,776,Dataset branch-4,True,True,93572.0
+model.heads_NN.0.branch-4.2.weight,776x776,602176,Dataset branch-4,True,True,93572.0
+model.heads_NN.0.branch-4.2.bias,776,776,Dataset branch-4,True,True,93572.0
+model.heads_NN.0.branch-4.4.weight,1x776,776,Dataset branch-4,True,True,93572.0
+model.heads_NN.0.branch-4.4.bias,1,1,Dataset branch-4,True,True,93572.0
+model.heads_NN.0.branch-5.0.weight,776x50,38800,Dataset branch-5,True,True,93572.0
+model.heads_NN.0.branch-5.0.bias,776,776,Dataset branch-5,True,True,93572.0
+model.heads_NN.0.branch-5.2.weight,776x776,602176,Dataset branch-5,True,True,93572.0
+model.heads_NN.0.branch-5.2.bias,776,776,Dataset branch-5,True,True,93572.0
+model.heads_NN.0.branch-5.4.weight,1x776,776,Dataset branch-5,True,True,93572.0
+model.heads_NN.0.branch-5.4.bias,1,1,Dataset branch-5,True,True,93572.0
+model.heads_NN.0.branch-6.0.weight,776x50,38800,Dataset branch-6,True,True,93572.0
+model.heads_NN.0.branch-6.0.bias,776,776,Dataset branch-6,True,True,93572.0
+model.heads_NN.0.branch-6.2.weight,776x776,602176,Dataset branch-6,True,True,93572.0
+model.heads_NN.0.branch-6.2.bias,776,776,Dataset branch-6,True,True,93572.0
+model.heads_NN.0.branch-6.4.weight,1x776,776,Dataset branch-6,True,True,93572.0
+model.heads_NN.0.branch-6.4.bias,1,1,Dataset branch-6,True,True,93572.0
+model.heads_NN.0.branch-7.0.weight,776x50,38800,Dataset branch-7,True,True,93572.0
+model.heads_NN.0.branch-7.0.bias,776,776,Dataset branch-7,True,True,93572.0
+model.heads_NN.0.branch-7.2.weight,776x776,602176,Dataset branch-7,True,True,93572.0
+model.heads_NN.0.branch-7.2.bias,776,776,Dataset branch-7,True,True,93572.0
+model.heads_NN.0.branch-7.4.weight,1x776,776,Dataset branch-7,True,True,93572.0
+model.heads_NN.0.branch-7.4.bias,1,1,Dataset branch-7,True,True,93572.0
+model.heads_NN.0.branch-8.0.weight,776x50,38800,Dataset branch-8,True,True,93572.0
+model.heads_NN.0.branch-8.0.bias,776,776,Dataset branch-8,True,True,93572.0
+model.heads_NN.0.branch-8.2.weight,776x776,602176,Dataset branch-8,True,True,93572.0
+model.heads_NN.0.branch-8.2.bias,776,776,Dataset branch-8,True,True,93572.0
+model.heads_NN.0.branch-8.4.weight,1x776,776,Dataset branch-8,True,True,93572.0
+model.heads_NN.0.branch-8.4.bias,1,1,Dataset branch-8,True,True,93572.0
+model.heads_NN.0.branch-9.0.weight,776x50,38800,Dataset branch-9,True,True,93572.0
+model.heads_NN.0.branch-9.0.bias,776,776,Dataset branch-9,True,True,93572.0
+model.heads_NN.0.branch-9.2.weight,776x776,602176,Dataset branch-9,True,True,93572.0
+model.heads_NN.0.branch-9.2.bias,776,776,Dataset branch-9,True,True,93572.0
+model.heads_NN.0.branch-9.4.weight,1x776,776,Dataset branch-9,True,True,93572.0
+model.heads_NN.0.branch-9.4.bias,1,1,Dataset branch-9,True,True,93572.0
+model.heads_NN.0.branch-10.0.weight,776x50,38800,Dataset branch-10,True,True,93572.0
+model.heads_NN.0.branch-10.0.bias,776,776,Dataset branch-10,True,True,93572.0
+model.heads_NN.0.branch-10.2.weight,776x776,602176,Dataset branch-10,True,True,93572.0
+model.heads_NN.0.branch-10.2.bias,776,776,Dataset branch-10,True,True,93572.0
+model.heads_NN.0.branch-10.4.weight,1x776,776,Dataset branch-10,True,True,93572.0
+model.heads_NN.0.branch-10.4.bias,1,1,Dataset branch-10,True,True,93572.0
+model.heads_NN.0.branch-11.0.weight,776x50,38800,Dataset branch-11,True,True,93572.0
+model.heads_NN.0.branch-11.0.bias,776,776,Dataset branch-11,True,True,93572.0
+model.heads_NN.0.branch-11.2.weight,776x776,602176,Dataset branch-11,True,True,93572.0
+model.heads_NN.0.branch-11.2.bias,776,776,Dataset branch-11,True,True,93572.0
+model.heads_NN.0.branch-11.4.weight,1x776,776,Dataset branch-11,True,True,93572.0
+model.heads_NN.0.branch-11.4.bias,1,1,Dataset branch-11,True,True,93572.0
+model.heads_NN.0.branch-12.0.weight,776x50,38800,Dataset branch-12,True,True,93572.0
+model.heads_NN.0.branch-12.0.bias,776,776,Dataset branch-12,True,True,93572.0
+model.heads_NN.0.branch-12.2.weight,776x776,602176,Dataset branch-12,True,True,93572.0
+model.heads_NN.0.branch-12.2.bias,776,776,Dataset branch-12,True,True,93572.0
+model.heads_NN.0.branch-12.4.weight,1x776,776,Dataset branch-12,True,True,93572.0
+model.heads_NN.0.branch-12.4.bias,1,1,Dataset branch-12,True,True,93572.0
+model.heads_NN.0.branch-13.0.weight,776x50,38800,Dataset branch-13,True,True,93572.0
+model.heads_NN.0.branch-13.0.bias,776,776,Dataset branch-13,True,True,93572.0
+model.heads_NN.0.branch-13.2.weight,776x776,602176,Dataset branch-13,True,True,93572.0
+model.heads_NN.0.branch-13.2.bias,776,776,Dataset branch-13,True,True,93572.0
+model.heads_NN.0.branch-13.4.weight,1x776,776,Dataset branch-13,True,True,93572.0
+model.heads_NN.0.branch-13.4.bias,1,1,Dataset branch-13,True,True,93572.0
+model.heads_NN.0.branch-14.0.weight,776x50,38800,Dataset branch-14,True,True,93572.0
+model.heads_NN.0.branch-14.0.bias,776,776,Dataset branch-14,True,True,93572.0
+model.heads_NN.0.branch-14.2.weight,776x776,602176,Dataset branch-14,True,True,93572.0
+model.heads_NN.0.branch-14.2.bias,776,776,Dataset branch-14,True,True,93572.0
+model.heads_NN.0.branch-14.4.weight,1x776,776,Dataset branch-14,True,True,93572.0
+model.heads_NN.0.branch-14.4.bias,1,1,Dataset branch-14,True,True,93572.0
+model.heads_NN.0.branch-15.0.weight,776x50,38800,Dataset branch-15,True,True,93572.0
+model.heads_NN.0.branch-15.0.bias,776,776,Dataset branch-15,True,True,93572.0
+model.heads_NN.0.branch-15.2.weight,776x776,602176,Dataset branch-15,True,True,93572.0
+model.heads_NN.0.branch-15.2.bias,776,776,Dataset branch-15,True,True,93572.0
+model.heads_NN.0.branch-15.4.weight,1x776,776,Dataset branch-15,True,True,93572.0
+model.heads_NN.0.branch-15.4.bias,1,1,Dataset branch-15,True,True,93572.0
+model.graph_shared.branch-0.0.weight,50x337,16850,Dataset branch-0,True,True,93572.0
+model.graph_shared.branch-0.0.bias,50,50,Dataset branch-0,True,True,93572.0
+model.graph_shared.branch-0.2.weight,50x50,2500,Dataset branch-0,True,True,93572.0
+model.graph_shared.branch-0.2.bias,50,50,Dataset branch-0,True,True,93572.0
+model.graph_shared.branch-1.0.weight,50x337,16850,Dataset branch-1,True,True,93572.0
+model.graph_shared.branch-1.0.bias,50,50,Dataset branch-1,True,True,93572.0
+model.graph_shared.branch-1.2.weight,50x50,2500,Dataset branch-1,True,True,93572.0
+model.graph_shared.branch-1.2.bias,50,50,Dataset branch-1,True,True,93572.0
+model.graph_shared.branch-2.0.weight,50x337,16850,Dataset branch-2,True,True,93571.0
+model.graph_shared.branch-2.0.bias,50,50,Dataset branch-2,True,True,93571.0
+model.graph_shared.branch-2.2.weight,50x50,2500,Dataset branch-2,True,True,93571.0
+model.graph_shared.branch-2.2.bias,50,50,Dataset branch-2,True,True,93571.0
+model.graph_shared.branch-3.0.weight,50x337,16850,Dataset branch-3,True,True,93572.0
+model.graph_shared.branch-3.0.bias,50,50,Dataset branch-3,True,True,93572.0
+model.graph_shared.branch-3.2.weight,50x50,2500,Dataset branch-3,True,True,93572.0
+model.graph_shared.branch-3.2.bias,50,50,Dataset branch-3,True,True,93572.0
+model.graph_shared.branch-4.0.weight,50x337,16850,Dataset branch-4,True,True,93572.0
+model.graph_shared.branch-4.0.bias,50,50,Dataset branch-4,True,True,93572.0
+model.graph_shared.branch-4.2.weight,50x50,2500,Dataset branch-4,True,True,93572.0
+model.graph_shared.branch-4.2.bias,50,50,Dataset branch-4,True,True,93572.0
+model.graph_shared.branch-5.0.weight,50x337,16850,Dataset branch-5,True,True,93572.0
+model.graph_shared.branch-5.0.bias,50,50,Dataset branch-5,True,True,93572.0
+model.graph_shared.branch-5.2.weight,50x50,2500,Dataset branch-5,True,True,93572.0
+model.graph_shared.branch-5.2.bias,50,50,Dataset branch-5,True,True,93572.0
+model.graph_shared.branch-6.0.weight,50x337,16850,Dataset branch-6,True,True,93572.0
+model.graph_shared.branch-6.0.bias,50,50,Dataset branch-6,True,True,93572.0
+model.graph_shared.branch-6.2.weight,50x50,2500,Dataset branch-6,True,True,93572.0
+model.graph_shared.branch-6.2.bias,50,50,Dataset branch-6,True,True,93572.0
+model.graph_shared.branch-7.0.weight,50x337,16850,Dataset branch-7,True,True,93572.0
+model.graph_shared.branch-7.0.bias,50,50,Dataset branch-7,True,True,93572.0
+model.graph_shared.branch-7.2.weight,50x50,2500,Dataset branch-7,True,True,93572.0
+model.graph_shared.branch-7.2.bias,50,50,Dataset branch-7,True,True,93572.0
+model.graph_shared.branch-8.0.weight,50x337,16850,Dataset branch-8,True,True,93572.0
+model.graph_shared.branch-8.0.bias,50,50,Dataset branch-8,True,True,93572.0
+model.graph_shared.branch-8.2.weight,50x50,2500,Dataset branch-8,True,True,93572.0
+model.graph_shared.branch-8.2.bias,50,50,Dataset branch-8,True,True,93572.0
+model.graph_shared.branch-9.0.weight,50x337,16850,Dataset branch-9,True,True,93572.0
+model.graph_shared.branch-9.0.bias,50,50,Dataset branch-9,True,True,93572.0
+model.graph_shared.branch-9.2.weight,50x50,2500,Dataset branch-9,True,True,93572.0
+model.graph_shared.branch-9.2.bias,50,50,Dataset branch-9,True,True,93572.0
+model.graph_shared.branch-10.0.weight,50x337,16850,Dataset branch-10,True,True,93572.0
+model.graph_shared.branch-10.0.bias,50,50,Dataset branch-10,True,True,93572.0
+model.graph_shared.branch-10.2.weight,50x50,2500,Dataset branch-10,True,True,93572.0
+model.graph_shared.branch-10.2.bias,50,50,Dataset branch-10,True,True,93572.0
+model.graph_shared.branch-11.0.weight,50x337,16850,Dataset branch-11,True,True,93572.0
+model.graph_shared.branch-11.0.bias,50,50,Dataset branch-11,True,True,93572.0
+model.graph_shared.branch-11.2.weight,50x50,2500,Dataset branch-11,True,True,93572.0
+model.graph_shared.branch-11.2.bias,50,50,Dataset branch-11,True,True,93572.0
+model.graph_shared.branch-12.0.weight,50x337,16850,Dataset branch-12,True,True,93572.0
+model.graph_shared.branch-12.0.bias,50,50,Dataset branch-12,True,True,93572.0
+model.graph_shared.branch-12.2.weight,50x50,2500,Dataset branch-12,True,True,93572.0
+model.graph_shared.branch-12.2.bias,50,50,Dataset branch-12,True,True,93572.0
+model.graph_shared.branch-13.0.weight,50x337,16850,Dataset branch-13,True,True,93572.0
+model.graph_shared.branch-13.0.bias,50,50,Dataset branch-13,True,True,93572.0
+model.graph_shared.branch-13.2.weight,50x50,2500,Dataset branch-13,True,True,93572.0
+model.graph_shared.branch-13.2.bias,50,50,Dataset branch-13,True,True,93572.0
+model.graph_shared.branch-14.0.weight,50x337,16850,Dataset branch-14,True,True,93572.0
+model.graph_shared.branch-14.0.bias,50,50,Dataset branch-14,True,True,93572.0
+model.graph_shared.branch-14.2.weight,50x50,2500,Dataset branch-14,True,True,93572.0
+model.graph_shared.branch-14.2.bias,50,50,Dataset branch-14,True,True,93572.0
+model.graph_shared.branch-15.0.weight,50x337,16850,Dataset branch-15,True,True,93572.0
+model.graph_shared.branch-15.0.bias,50,50,Dataset branch-15,True,True,93572.0
+model.graph_shared.branch-15.2.weight,50x50,2500,Dataset branch-15,True,True,93572.0
+model.graph_shared.branch-15.2.bias,50,50,Dataset branch-15,True,True,93572.0
+model.graph_concat_projector.weight,337x339,114243,Graph-attribute concat projector,True,False,
+model.graph_concat_projector.bias,337,337,Graph-attribute concat projector,True,False,

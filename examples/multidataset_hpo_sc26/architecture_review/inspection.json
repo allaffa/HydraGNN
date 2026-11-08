@@ -1,0 +1,463 @@
+{
+  "checkpoint_sha256": {
+    "HydraGNN": "8532b03296a8ab4cfc3b37beb6d57b2091a50807b155fac93cb1882253d32867",
+    "BranchWeightMLP": "c984b338ee947534bbdedf1fc4dd2aea92bb846e3302638d6719b1e3f5ca7ca8"
+  },
+  "source_sha256": {
+    "examples/multidataset_hpo_sc26/multidataset_hpo-BEST6-fp64/config.json": "7c5962f01f438bad36fc9e71cb4864ede6983111f6959980b92295620ecb8acb",
+    "examples/multidataset_hpo_sc26/multidataset_hpo-BEST6-fp64/multidataset_hpo-BEST6-fp64_epoch_97.pk": "8532b03296a8ab4cfc3b37beb6d57b2091a50807b155fac93cb1882253d32867",
+    "examples/multidataset_hpo_sc26/mlp_branch_weights.pt": "c984b338ee947534bbdedf1fc4dd2aea92bb846e3302638d6719b1e3f5ca7ca8",
+    "hydragnn/models/PAINNStack.py": "bb4b95d6e9448e4263f395c246ebfd92edc8d21255da269eac8c9d74c25ae577",
+    "hydragnn/models/Base.py": "204c95a18c78e5e6ecba5f5b79988f202e1f969685e5e976183db44144c8a99f",
+    "hydragnn/models/create.py": "c56a38e98e8ddce5bd1c538cf4b60cf4f85e7efdd8b2495d03f8377fbe44643c",
+    "examples/multidataset_hpo_sc26/precision_relaxation/hydragnn_ase_calculator.py": "2956666d621f9031a41ca4635399ff98d95d1801aa56ca59adbd0878a850ca20",
+    "examples/multidataset_hpo_sc26/gfm_mlip_all_mpnn.py": "b5b93f22762bfdbd580b4c48a7f71d48c467c21b8824b326a735410eed502101",
+    "hydragnn/utils/model/model.py": "e0f7732d6e6b38e3d3f8cfba24c70ebf28d1f45109571d638dce2c97dbb5b89e",
+    "examples/multidataset_hpo_sc26/multidataset_hpo-BEST6-fp64/run-4200350.log": "7510d89468950a130e75aec680614a4d0d7a8c27246ce8ee25d4298ae810f936",
+    "examples/multidataset_hpo_sc26/multidataset_hpo-BEST6-fp64/run-4251572.log": "444b6255b5ba40344d120884de228dd03644a8339305fe228205cf1be51d8357",
+    "examples/multidataset_hpo_sc26/multidataset_hpo-BEST6-fp64/run-4251573.log": "7c70c74badb24504f0682c4c59b37fe0afd0737963e70d6fcbd4ca79bb6e65d7",
+    "examples/multidataset_hpo_sc26/multidataset_hpo-BEST6-fp64/run-4251574.log": "1ef7c335659f2532253d557c5b3a69404bef362343fa2e43120fb8688a754540",
+    "examples/multidataset_hpo_sc26/multidataset_hpo-BEST6-fp64/run-4284444.log": "7186037ffd583160a8185e0b94328bc483970e1fbeae1fab1a91edc5d2ac5d09"
+  },
+  "number_of_branches": 16,
+  "number_of_blocks": 2,
+  "hidden_dim": 337,
+  "input_dim": 1,
+  "pooling": "add",
+  "max_neighbours": 20,
+  "total_parameters": 12205540,
+  "unique_parameter_tensors": 200,
+  "state_dictionary_elements": 12205540,
+  "training_configuration_requires_grad_parameters": 12205540,
+  "original_constructor_parameters": 12090960,
+  "optimizer_parameter_elements": 12090960,
+  "optimizer_parameter_tensors": 198,
+  "optimizer_omitted_parameter_names": [
+    "model.graph_concat_projector.bias",
+    "model.graph_concat_projector.weight"
+  ],
+  "optimizer_alignment": "Original constructor parameter order and both Adam moment shapes matched; all positive step counters",
+  "frozen_requires_grad_parameters": 0,
+  "components": {
+    "PaiNN block 1": 115290,
+    "PaiNN block 2": 1371590,
+    "Graph-attribute concat projector": 114580,
+    "Dataset branch-0": 662755,
+    "Dataset branch-1": 662755,
+    "Dataset branch-2": 662755,
+    "Dataset branch-3": 662755,
+    "Dataset branch-4": 662755,
+    "Dataset branch-5": 662755,
+    "Dataset branch-6": 662755,
+    "Dataset branch-7": 662755,
+    "Dataset branch-8": 662755,
+    "Dataset branch-9": 662755,
+    "Dataset branch-10": 662755,
+    "Dataset branch-11": 662755,
+    "Dataset branch-12": 662755,
+    "Dataset branch-13": 662755,
+    "Dataset branch-14": 662755,
+    "Dataset branch-15": 662755,
+    "Other": 0
+  },
+  "block_parameter_counts": [
+    115290,
+    1371590
+  ],
+  "head_parameter_counts": {
+    "branch-0": 662755,
+    "branch-1": 662755,
+    "branch-2": 662755,
+    "branch-3": 662755,
+    "branch-4": 662755,
+    "branch-5": 662755,
+    "branch-6": 662755,
+    "branch-7": 662755,
+    "branch-8": 662755,
+    "branch-9": 662755,
+    "branch-10": 662755,
+    "branch-11": 662755,
+    "branch-12": 662755,
+    "branch-13": 662755,
+    "branch-14": 662755,
+    "branch-15": 662755
+  },
+  "shared_parameters_including_conditioning": 1601460,
+  "per_head_graph_shared_parameters": 19450,
+  "per_head_output_mlp_parameters": 643305,
+  "unclassified_parameters": 0,
+  "branch_weight_mlp_parameters": 24528,
+  "blocks": [
+    {
+      "index": 0,
+      "message_channels": 1,
+      "update_channels": 1,
+      "num_radial": 4,
+      "cutoff": 5,
+      "filter_shape": [
+        3,
+        4
+      ],
+      "last_layer": false,
+      "linear_layers": [
+        {
+          "path": "module_0.scalar_message_mlp.0",
+          "in_features": 1,
+          "out_features": 1,
+          "bias": true
+        },
+        {
+          "path": "module_0.scalar_message_mlp.2",
+          "in_features": 1,
+          "out_features": 3,
+          "bias": true
+        },
+        {
+          "path": "module_0.filter_layer",
+          "in_features": 4,
+          "out_features": 3,
+          "bias": true
+        },
+        {
+          "path": "module_1.update_U",
+          "in_features": 1,
+          "out_features": 1,
+          "bias": true
+        },
+        {
+          "path": "module_1.update_V",
+          "in_features": 1,
+          "out_features": 1,
+          "bias": true
+        },
+        {
+          "path": "module_1.update_mlp.0",
+          "in_features": 2,
+          "out_features": 1,
+          "bias": true
+        },
+        {
+          "path": "module_1.update_mlp.2",
+          "in_features": 1,
+          "out_features": 3,
+          "bias": true
+        },
+        {
+          "path": "module_2.0",
+          "in_features": 1,
+          "out_features": 337,
+          "bias": true
+        },
+        {
+          "path": "module_2.2",
+          "in_features": 337,
+          "out_features": 337,
+          "bias": true
+        },
+        {
+          "path": "module_3",
+          "in_features": 1,
+          "out_features": 337,
+          "bias": true
+        }
+      ]
+    },
+    {
+      "index": 1,
+      "message_channels": 337,
+      "update_channels": 337,
+      "num_radial": 4,
+      "cutoff": 5,
+      "filter_shape": [
+        1011,
+        4
+      ],
+      "last_layer": true,
+      "linear_layers": [
+        {
+          "path": "module_0.scalar_message_mlp.0",
+          "in_features": 337,
+          "out_features": 337,
+          "bias": true
+        },
+        {
+          "path": "module_0.scalar_message_mlp.2",
+          "in_features": 337,
+          "out_features": 1011,
+          "bias": true
+        },
+        {
+          "path": "module_0.filter_layer",
+          "in_features": 4,
+          "out_features": 1011,
+          "bias": true
+        },
+        {
+          "path": "module_1.update_U",
+          "in_features": 337,
+          "out_features": 337,
+          "bias": true
+        },
+        {
+          "path": "module_1.update_V",
+          "in_features": 337,
+          "out_features": 337,
+          "bias": true
+        },
+        {
+          "path": "module_1.update_mlp.0",
+          "in_features": 674,
+          "out_features": 337,
+          "bias": true
+        },
+        {
+          "path": "module_1.update_mlp.2",
+          "in_features": 337,
+          "out_features": 674,
+          "bias": true
+        },
+        {
+          "path": "module_2.0",
+          "in_features": 337,
+          "out_features": 337,
+          "bias": true
+        },
+        {
+          "path": "module_2.2",
+          "in_features": 337,
+          "out_features": 337,
+          "bias": true
+        }
+      ]
+    }
+  ],
+  "head_linear_layers": [
+    {
+      "path": "0",
+      "in_features": 337,
+      "out_features": 50,
+      "bias": true
+    },
+    {
+      "path": "2",
+      "in_features": 50,
+      "out_features": 50,
+      "bias": true
+    },
+    {
+      "path": "0",
+      "in_features": 50,
+      "out_features": 776,
+      "bias": true
+    },
+    {
+      "path": "2",
+      "in_features": 776,
+      "out_features": 776,
+      "bias": true
+    },
+    {
+      "path": "4",
+      "in_features": 776,
+      "out_features": 1,
+      "bias": true
+    }
+  ],
+  "block_submodule_counts": [
+    {
+      "block": 0,
+      "module": "module_0: PainnMessage",
+      "parameters": 23
+    },
+    {
+      "block": 0,
+      "module": "module_1: PainnUpdate",
+      "parameters": 13
+    },
+    {
+      "block": 0,
+      "module": "module_2: Sequential",
+      "parameters": 114580
+    },
+    {
+      "block": 0,
+      "module": "module_3: Linear",
+      "parameters": 674
+    },
+    {
+      "block": 1,
+      "module": "module_0: PainnMessage",
+      "parameters": 460679
+    },
+    {
+      "block": 1,
+      "module": "module_1: PainnUpdate",
+      "parameters": 683099
+    },
+    {
+      "block": 1,
+      "module": "module_2: Sequential",
+      "parameters": 227812
+    }
+  ],
+  "representative_parameter_shapes": [
+    [
+      "model.graph_convs.0.module_0.filter_layer.weight",
+      "3 x 4",
+      12
+    ],
+    [
+      "model.graph_convs.0.module_2.0.weight",
+      "337 x 1",
+      337
+    ],
+    [
+      "model.graph_convs.0.module_2.2.weight",
+      "337 x 337",
+      113569
+    ],
+    [
+      "model.graph_convs.0.module_3.weight",
+      "337 x 1",
+      337
+    ],
+    [
+      "model.graph_convs.1.module_0.filter_layer.weight",
+      "1011 x 4",
+      4044
+    ],
+    [
+      "model.graph_shared.branch-0.0.weight",
+      "50 x 337",
+      16850
+    ],
+    [
+      "model.graph_shared.branch-0.2.weight",
+      "50 x 50",
+      2500
+    ],
+    [
+      "model.heads_NN.0.branch-0.0.weight",
+      "776 x 50",
+      38800
+    ],
+    [
+      "model.heads_NN.0.branch-0.2.weight",
+      "776 x 776",
+      602176
+    ],
+    [
+      "model.heads_NN.0.branch-0.4.weight",
+      "1 x 776",
+      776
+    ],
+    [
+      "model.graph_concat_projector.weight",
+      "337 x 339",
+      114243
+    ],
+    [
+      "model.graph_concat_projector.bias",
+      "337",
+      337
+    ]
+  ],
+  "sources": {
+    "PAINNStack": {
+      "path": "hydragnn/models/PAINNStack.py",
+      "line": 27
+    },
+    "PainnMessage": {
+      "path": "hydragnn/models/PAINNStack.py",
+      "line": 194
+    },
+    "PainnUpdate": {
+      "path": "hydragnn/models/PAINNStack.py",
+      "line": 275
+    },
+    "sinc_expansion": {
+      "path": "hydragnn/models/PAINNStack.py",
+      "line": 331
+    },
+    "cosine_cutoff": {
+      "path": "hydragnn/models/PAINNStack.py",
+      "line": 341
+    },
+    "create_model_config": {
+      "path": "hydragnn/models/create.py",
+      "line": 41
+    },
+    "head_construction": {
+      "path": "hydragnn/models/Base.py",
+      "line": 590
+    },
+    "graph_conditioning": {
+      "path": "hydragnn/models/Base.py",
+      "line": 299
+    },
+    "lazy_projector_creation": {
+      "path": "hydragnn/models/Base.py",
+      "line": 261
+    },
+    "strict_checkpoint_restoration": {
+      "path": "examples/multidataset_hpo_sc26/precision_relaxation/hydragnn_ase_calculator.py",
+      "line": 47
+    },
+    "BranchWeightMLP": {
+      "path": "examples/multidataset_hpo_sc26/inference_fused.py",
+      "line": 83
+    },
+    "PaiNN_model_factory": {
+      "path": "hydragnn/models/create.py",
+      "line": 483
+    },
+    "SchNet_num_filters": {
+      "path": "hydragnn/models/create.py",
+      "line": 375
+    },
+    "input_embedding_and_vector_storage": {
+      "path": "hydragnn/models/PAINNStack.py",
+      "line": 149
+    },
+    "convolution_freezing": {
+      "path": "hydragnn/models/Base.py",
+      "line": 495
+    },
+    "training_optimizer_before_forward": {
+      "path": "examples/multidataset_hpo_sc26/gfm_mlip_all_mpnn.py",
+      "line": 899
+    },
+    "legacy_parameter_log": {
+      "path": "hydragnn/utils/model/model.py",
+      "line": 451
+    },
+    "periodic_neighbor_cap": {
+      "path": "hydragnn/preprocess/graph_samples_checks_and_updates.py",
+      "line": 266
+    }
+  },
+  "training_log_totals": [
+    {
+      "path": "examples/multidataset_hpo_sc26/multidataset_hpo-BEST6-fp64/run-4200350.log",
+      "line": 4514,
+      "printed_total": 12090960
+    },
+    {
+      "path": "examples/multidataset_hpo_sc26/multidataset_hpo-BEST6-fp64/run-4251572.log",
+      "line": 33186,
+      "printed_total": 12090960
+    },
+    {
+      "path": "examples/multidataset_hpo_sc26/multidataset_hpo-BEST6-fp64/run-4251574.log",
+      "line": 33186,
+      "printed_total": 12090960
+    },
+    {
+      "path": "examples/multidataset_hpo_sc26/multidataset_hpo-BEST6-fp64/run-4284444.log",
+      "line": 33186,
+      "printed_total": 12090960
+    }
+  ],
+  "strict_tensor_equality_verified": true,
+  "manuscript_available": false
+}

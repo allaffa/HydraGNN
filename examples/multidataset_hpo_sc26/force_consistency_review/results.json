@@ -1,0 +1,1182 @@
+[
+  {
+    "structure": "C_diamond_compressed",
+    "natoms": 64,
+    "active_branches": [
+      15
+    ],
+    "skipped_branches": [
+      0,
+      1,
+      2,
+      3,
+      4,
+      5,
+      6,
+      7,
+      8,
+      9,
+      10,
+      11,
+      12,
+      13,
+      14
+    ],
+    "skipped_fraction": 0.9375,
+    "retained_weight": 1.0,
+    "skipped_weight": 0.0,
+    "weights": [
+      0.0,
+      0.0,
+      0.0,
+      0.0,
+      0.0,
+      0.0,
+      0.0,
+      0.0,
+      0.0,
+      0.0,
+      0.0,
+      0.0,
+      0.0,
+      0.0,
+      0.0,
+      1.0
+    ],
+    "methods": {
+      "A": {
+        "energy_ev": -15.13085875351547,
+        "energy_difference_ev": 0.0,
+        "energy_difference_ev_per_atom": 0.0,
+        "force_error": {
+          "rmse": 0.0,
+          "mae": 0.0,
+          "max_component": 0.0,
+          "max_atom_vector": 0.0
+        },
+        "gradient_residual": {
+          "rmse": 0.0,
+          "mae": 0.0,
+          "max_component": 0.0,
+          "max_atom_vector": 0.0
+        }
+      },
+      "B": {
+        "energy_ev": -15.130858753515463,
+        "energy_difference_ev": 7.105427357601002e-15,
+        "energy_difference_ev_per_atom": 1.1102230246251565e-16,
+        "force_error": {
+          "rmse": 0.0,
+          "mae": 0.0,
+          "max_component": 0.0,
+          "max_atom_vector": 0.0
+        },
+        "gradient_residual": {
+          "rmse": 0.0,
+          "mae": 0.0,
+          "max_component": 0.0,
+          "max_atom_vector": 0.0
+        }
+      },
+      "C": {
+        "energy_ev": -15.130858753515463,
+        "energy_difference_ev": 7.105427357601002e-15,
+        "energy_difference_ev_per_atom": 1.1102230246251565e-16,
+        "force_error": {
+          "rmse": 0.0,
+          "mae": 0.0,
+          "max_component": 0.0,
+          "max_atom_vector": 0.0
+        },
+        "gradient_residual": {
+          "rmse": 0.0,
+          "mae": 0.0,
+          "max_component": 0.0,
+          "max_atom_vector": 0.0
+        }
+      },
+      "D": {
+        "energy_ev": -15.13085875351547,
+        "energy_difference_ev": 0.0,
+        "energy_difference_ev_per_atom": 0.0,
+        "force_error": {
+          "rmse": 0.0,
+          "mae": 0.0,
+          "max_component": 0.0,
+          "max_atom_vector": 0.0
+        },
+        "gradient_residual": {
+          "rmse": 0.0,
+          "mae": 0.0,
+          "max_component": 0.0,
+          "max_atom_vector": 0.0
+        }
+      }
+    },
+    "C_energy_equals_B_exactly": true,
+    "C_minus_B_energy_ev": 0.0,
+    "omitted_gradient_identity_max_error": 0.0
+  },
+  {
+    "structure": "Si_diamond_compressed",
+    "natoms": 64,
+    "active_branches": [
+      2,
+      15
+    ],
+    "skipped_branches": [
+      0,
+      1,
+      3,
+      4,
+      5,
+      6,
+      7,
+      8,
+      9,
+      10,
+      11,
+      12,
+      13,
+      14
+    ],
+    "skipped_fraction": 0.875,
+    "retained_weight": 1.0,
+    "skipped_weight": 1.0618357576757602e-17,
+    "weights": [
+      3.567261391497948e-240,
+      0.0,
+      0.7702082600435158,
+      0.0,
+      9.832360753837295e-131,
+      0.0,
+      0.0,
+      1.0618357576757602e-17,
+      1.1489059870968204e-54,
+      0.0,
+      0.0,
+      0.0,
+      0.0,
+      0.0,
+      0.0,
+      0.22979173995648416
+    ],
+    "methods": {
+      "A": {
+        "energy_ev": 48.51356945604441,
+        "energy_difference_ev": 0.0,
+        "energy_difference_ev_per_atom": 0.0,
+        "force_error": {
+          "rmse": 0.0,
+          "mae": 0.0,
+          "max_component": 0.0,
+          "max_atom_vector": 0.0
+        },
+        "gradient_residual": {
+          "rmse": 0.0,
+          "mae": 0.0,
+          "max_component": 0.0,
+          "max_atom_vector": 0.0
+        }
+      },
+      "B": {
+        "energy_ev": 48.51356945604443,
+        "energy_difference_ev": 2.1316282072803006e-14,
+        "energy_difference_ev_per_atom": 3.3306690738754696e-16,
+        "force_error": {
+          "rmse": 5.684122167733082e-16,
+          "mae": 4.381238391468663e-16,
+          "max_component": 1.7208456881689926e-15,
+          "max_atom_vector": 1.9397156336316165e-15
+        },
+        "gradient_residual": {
+          "rmse": 0.0,
+          "mae": 0.0,
+          "max_component": 0.0,
+          "max_atom_vector": 0.0
+        }
+      },
+      "C": {
+        "energy_ev": 48.51356945604443,
+        "energy_difference_ev": 2.1316282072803006e-14,
+        "energy_difference_ev_per_atom": 3.3306690738754696e-16,
+        "force_error": {
+          "rmse": 5.743665087455362e-16,
+          "mae": 4.523743214514727e-16,
+          "max_component": 1.9984014443252818e-15,
+          "max_atom_vector": 2.284066337337019e-15
+        },
+        "gradient_residual": {
+          "rmse": 2.9433042709767494e-16,
+          "mae": 2.3237388937248177e-16,
+          "max_component": 9.992007221626409e-16,
+          "max_atom_vector": 1.0451734135809427e-15
+        }
+      },
+      "D": {
+        "energy_ev": 48.51356945604441,
+        "energy_difference_ev": 0.0,
+        "energy_difference_ev_per_atom": 0.0,
+        "force_error": {
+          "rmse": 2.7913802119328995e-17,
+          "mae": 1.555830117516699e-17,
+          "max_component": 1.1102230246251565e-16,
+          "max_atom_vector": 1.2719202621569003e-16
+        },
+        "gradient_residual": {
+          "rmse": 5.742214006311916e-16,
+          "mae": 4.521574810169756e-16,
+          "max_component": 1.9984014443252818e-15,
+          "max_atom_vector": 2.3102244613642867e-15
+        }
+      }
+    },
+    "C_energy_equals_B_exactly": true,
+    "C_minus_B_energy_ev": 0.0,
+    "omitted_gradient_identity_max_error": 2.01314813242139e-15
+  },
+  {
+    "structure": "Al_fcc_compressed",
+    "natoms": 32,
+    "active_branches": [
+      2
+    ],
+    "skipped_branches": [
+      0,
+      1,
+      3,
+      4,
+      5,
+      6,
+      7,
+      8,
+      9,
+      10,
+      11,
+      12,
+      13,
+      14,
+      15
+    ],
+    "skipped_fraction": 0.9375,
+    "retained_weight": 0.9995087092030526,
+    "skipped_weight": 0.0004912907969473279,
+    "weights": [
+      7.935380438677765e-121,
+      6.041894247145239e-195,
+      0.9995087092030526,
+      6.147069766134552e-199,
+      4.259425658880274e-32,
+      3.515206412683556e-198,
+      4.628623120087286e-199,
+      4.626716170918841e-12,
+      1.8199767379874746e-14,
+      3.0740615179100525e-199,
+      1.126266762318961e-176,
+      6.773434418894614e-196,
+      2.2989231013447116e-196,
+      6.671794886299662e-199,
+      1.6310478487439027e-197,
+      0.000491290792302412
+    ],
+    "methods": {
+      "A": {
+        "energy_ev": 39.046182084597504,
+        "energy_difference_ev": 0.0,
+        "energy_difference_ev_per_atom": 0.0,
+        "force_error": {
+          "rmse": 0.0,
+          "mae": 0.0,
+          "max_component": 0.0,
+          "max_atom_vector": 0.0
+        },
+        "gradient_residual": {
+          "rmse": 0.0,
+          "mae": 0.0,
+          "max_component": 0.0,
+          "max_atom_vector": 0.0
+        }
+      },
+      "B": {
+        "energy_ev": 39.04618208459749,
+        "energy_difference_ev": -1.4210854715202004e-14,
+        "energy_difference_ev_per_atom": -4.440892098500626e-16,
+        "force_error": {
+          "rmse": 2.1549880320342209e-16,
+          "mae": 1.712406981259814e-16,
+          "max_component": 6.106226635438361e-16,
+          "max_atom_vector": 7.028179498033701e-16
+        },
+        "gradient_residual": {
+          "rmse": 0.0,
+          "mae": 0.0,
+          "max_component": 0.0,
+          "max_atom_vector": 0.0
+        }
+      },
+      "C": {
+        "energy_ev": 39.04618208459749,
+        "energy_difference_ev": -1.4210854715202004e-14,
+        "energy_difference_ev_per_atom": -4.440892098500626e-16,
+        "force_error": {
+          "rmse": 5.98506816342861e-06,
+          "mae": 4.993440634565996e-06,
+          "max_component": 1.5273050459507775e-05,
+          "max_atom_vector": 1.6840043018484457e-05
+        },
+        "gradient_residual": {
+          "rmse": 5.985068163466489e-06,
+          "mae": 4.993440634614125e-06,
+          "max_component": 1.527305045942451e-05,
+          "max_atom_vector": 1.684004301842641e-05
+        }
+      },
+      "D": {
+        "energy_ev": 39.04820011131658,
+        "energy_difference_ev": 0.0020180267190781365,
+        "energy_difference_ev_per_atom": 6.306333497119176e-05,
+        "force_error": {
+          "rmse": 5.98506816342861e-06,
+          "mae": 4.993440634565996e-06,
+          "max_component": 1.5273050459507775e-05,
+          "max_atom_vector": 1.6840043018484457e-05
+        },
+        "gradient_residual": {
+          "rmse": 0.0,
+          "mae": 0.0,
+          "max_component": 0.0,
+          "max_atom_vector": 0.0
+        }
+      }
+    },
+    "C_energy_equals_B_exactly": true,
+    "C_minus_B_energy_ev": 0.0,
+    "omitted_gradient_identity_max_error": 6.14945919706622e-17
+  },
+  {
+    "structure": "Cu_fcc_compressed",
+    "natoms": 32,
+    "active_branches": [
+      2
+    ],
+    "skipped_branches": [
+      0,
+      1,
+      3,
+      4,
+      5,
+      6,
+      7,
+      8,
+      9,
+      10,
+      11,
+      12,
+      13,
+      14,
+      15
+    ],
+    "skipped_fraction": 0.9375,
+    "retained_weight": 1.0,
+    "skipped_weight": 1.7424450849316597e-23,
+    "weights": [
+      1.5334416254634757e-210,
+      0.0,
+      1.0,
+      0.0,
+      2.2476703971175315e-180,
+      0.0,
+      0.0,
+      4.829358240527731e-45,
+      1.592726635102317e-48,
+      0.0,
+      8.4e-323,
+      0.0,
+      0.0,
+      0.0,
+      0.0,
+      1.7424450849316597e-23
+    ],
+    "methods": {
+      "A": {
+        "energy_ev": -9.708995745454612,
+        "energy_difference_ev": 0.0,
+        "energy_difference_ev_per_atom": 0.0,
+        "force_error": {
+          "rmse": 0.0,
+          "mae": 0.0,
+          "max_component": 0.0,
+          "max_atom_vector": 0.0
+        },
+        "gradient_residual": {
+          "rmse": 0.0,
+          "mae": 0.0,
+          "max_component": 0.0,
+          "max_atom_vector": 0.0
+        }
+      },
+      "B": {
+        "energy_ev": -9.708995745454615,
+        "energy_difference_ev": -3.552713678800501e-15,
+        "energy_difference_ev_per_atom": -1.1102230246251565e-16,
+        "force_error": {
+          "rmse": 0.0,
+          "mae": 0.0,
+          "max_component": 0.0,
+          "max_atom_vector": 0.0
+        },
+        "gradient_residual": {
+          "rmse": 0.0,
+          "mae": 0.0,
+          "max_component": 0.0,
+          "max_atom_vector": 0.0
+        }
+      },
+      "C": {
+        "energy_ev": -9.708995745454615,
+        "energy_difference_ev": -3.552713678800501e-15,
+        "energy_difference_ev_per_atom": -1.1102230246251565e-16,
+        "force_error": {
+          "rmse": 0.0,
+          "mae": 0.0,
+          "max_component": 0.0,
+          "max_atom_vector": 0.0
+        },
+        "gradient_residual": {
+          "rmse": 0.0,
+          "mae": 0.0,
+          "max_component": 0.0,
+          "max_atom_vector": 0.0
+        }
+      },
+      "D": {
+        "energy_ev": -9.708995745454612,
+        "energy_difference_ev": 0.0,
+        "energy_difference_ev_per_atom": 0.0,
+        "force_error": {
+          "rmse": 0.0,
+          "mae": 0.0,
+          "max_component": 0.0,
+          "max_atom_vector": 0.0
+        },
+        "gradient_residual": {
+          "rmse": 0.0,
+          "mae": 0.0,
+          "max_component": 0.0,
+          "max_atom_vector": 0.0
+        }
+      }
+    },
+    "C_energy_equals_B_exactly": true,
+    "C_minus_B_energy_ev": 0.0,
+    "omitted_gradient_identity_max_error": 4.104439391338378e-25
+  },
+  {
+    "structure": "Fe_bcc_compressed",
+    "natoms": 16,
+    "active_branches": [
+      2
+    ],
+    "skipped_branches": [
+      0,
+      1,
+      3,
+      4,
+      5,
+      6,
+      7,
+      8,
+      9,
+      10,
+      11,
+      12,
+      13,
+      14,
+      15
+    ],
+    "skipped_fraction": 0.9375,
+    "retained_weight": 1.0,
+    "skipped_weight": 1.4157606013752172e-20,
+    "weights": [
+      2.138213880790978e-222,
+      0.0,
+      1.0,
+      0.0,
+      5.040377755004527e-101,
+      0.0,
+      0.0,
+      1.4157606001654022e-20,
+      3.6039820613144563e-44,
+      0.0,
+      1.056985237671209e-302,
+      0.0,
+      0.0,
+      0.0,
+      0.0,
+      1.2098151678921744e-29
+    ],
+    "methods": {
+      "A": {
+        "energy_ev": -3.9560839975171853,
+        "energy_difference_ev": 0.0,
+        "energy_difference_ev_per_atom": 0.0,
+        "force_error": {
+          "rmse": 0.0,
+          "mae": 0.0,
+          "max_component": 0.0,
+          "max_atom_vector": 0.0
+        },
+        "gradient_residual": {
+          "rmse": 0.0,
+          "mae": 0.0,
+          "max_component": 0.0,
+          "max_atom_vector": 0.0
+        }
+      },
+      "B": {
+        "energy_ev": -3.956083997517187,
+        "energy_difference_ev": -1.7763568394002505e-15,
+        "energy_difference_ev_per_atom": -1.1102230246251565e-16,
+        "force_error": {
+          "rmse": 0.0,
+          "mae": 0.0,
+          "max_component": 0.0,
+          "max_atom_vector": 0.0
+        },
+        "gradient_residual": {
+          "rmse": 0.0,
+          "mae": 0.0,
+          "max_component": 0.0,
+          "max_atom_vector": 0.0
+        }
+      },
+      "C": {
+        "energy_ev": -3.956083997517187,
+        "energy_difference_ev": -1.7763568394002505e-15,
+        "energy_difference_ev_per_atom": -1.1102230246251565e-16,
+        "force_error": {
+          "rmse": 0.0,
+          "mae": 0.0,
+          "max_component": 0.0,
+          "max_atom_vector": 0.0
+        },
+        "gradient_residual": {
+          "rmse": 0.0,
+          "mae": 0.0,
+          "max_component": 0.0,
+          "max_atom_vector": 0.0
+        }
+      },
+      "D": {
+        "energy_ev": -3.9560839975171853,
+        "energy_difference_ev": 0.0,
+        "energy_difference_ev_per_atom": 0.0,
+        "force_error": {
+          "rmse": 0.0,
+          "mae": 0.0,
+          "max_component": 0.0,
+          "max_atom_vector": 0.0
+        },
+        "gradient_residual": {
+          "rmse": 0.0,
+          "mae": 0.0,
+          "max_component": 0.0,
+          "max_atom_vector": 0.0
+        }
+      }
+    },
+    "C_energy_equals_B_exactly": true,
+    "C_minus_B_energy_ev": 0.0,
+    "omitted_gradient_identity_max_error": 2.300065739045193e-20
+  },
+  {
+    "structure": "MgO_rocksalt_compressed",
+    "natoms": 64,
+    "active_branches": [
+      2
+    ],
+    "skipped_branches": [
+      0,
+      1,
+      3,
+      4,
+      5,
+      6,
+      7,
+      8,
+      9,
+      10,
+      11,
+      12,
+      13,
+      14,
+      15
+    ],
+    "skipped_fraction": 0.9375,
+    "retained_weight": 1.0,
+    "skipped_weight": 3.41714837405789e-300,
+    "weights": [
+      0.0,
+      0.0,
+      1.0,
+      0.0,
+      3.41714837405789e-300,
+      0.0,
+      0.0,
+      0.0,
+      0.0,
+      0.0,
+      0.0,
+      0.0,
+      0.0,
+      0.0,
+      0.0,
+      0.0
+    ],
+    "methods": {
+      "A": {
+        "energy_ev": -32.617998731358256,
+        "energy_difference_ev": 0.0,
+        "energy_difference_ev_per_atom": 0.0,
+        "force_error": {
+          "rmse": 0.0,
+          "mae": 0.0,
+          "max_component": 0.0,
+          "max_atom_vector": 0.0
+        },
+        "gradient_residual": {
+          "rmse": 0.0,
+          "mae": 0.0,
+          "max_component": 0.0,
+          "max_atom_vector": 0.0
+        }
+      },
+      "B": {
+        "energy_ev": -32.61799873135826,
+        "energy_difference_ev": -7.105427357601002e-15,
+        "energy_difference_ev_per_atom": -1.1102230246251565e-16,
+        "force_error": {
+          "rmse": 0.0,
+          "mae": 0.0,
+          "max_component": 0.0,
+          "max_atom_vector": 0.0
+        },
+        "gradient_residual": {
+          "rmse": 0.0,
+          "mae": 0.0,
+          "max_component": 0.0,
+          "max_atom_vector": 0.0
+        }
+      },
+      "C": {
+        "energy_ev": -32.61799873135826,
+        "energy_difference_ev": -7.105427357601002e-15,
+        "energy_difference_ev_per_atom": -1.1102230246251565e-16,
+        "force_error": {
+          "rmse": 0.0,
+          "mae": 0.0,
+          "max_component": 0.0,
+          "max_atom_vector": 0.0
+        },
+        "gradient_residual": {
+          "rmse": 0.0,
+          "mae": 0.0,
+          "max_component": 0.0,
+          "max_atom_vector": 0.0
+        }
+      },
+      "D": {
+        "energy_ev": -32.617998731358256,
+        "energy_difference_ev": 0.0,
+        "energy_difference_ev_per_atom": 0.0,
+        "force_error": {
+          "rmse": 0.0,
+          "mae": 0.0,
+          "max_component": 0.0,
+          "max_atom_vector": 0.0
+        },
+        "gradient_residual": {
+          "rmse": 0.0,
+          "mae": 0.0,
+          "max_component": 0.0,
+          "max_atom_vector": 0.0
+        }
+      }
+    },
+    "C_energy_equals_B_exactly": true,
+    "C_minus_B_energy_ev": 0.0,
+    "omitted_gradient_identity_max_error": 7.233808451643047e-301
+  },
+  {
+    "structure": "NaCl_rocksalt_compressed",
+    "natoms": 64,
+    "active_branches": [
+      2
+    ],
+    "skipped_branches": [
+      0,
+      1,
+      3,
+      4,
+      5,
+      6,
+      7,
+      8,
+      9,
+      10,
+      11,
+      12,
+      13,
+      14,
+      15
+    ],
+    "skipped_fraction": 0.9375,
+    "retained_weight": 1.0,
+    "skipped_weight": 6.495503764953594e-126,
+    "weights": [
+      0.0,
+      0.0,
+      1.0,
+      0.0,
+      0.0,
+      0.0,
+      0.0,
+      6.495503764953594e-126,
+      0.0,
+      0.0,
+      0.0,
+      0.0,
+      0.0,
+      0.0,
+      0.0,
+      0.0
+    ],
+    "methods": {
+      "A": {
+        "energy_ev": 15.891608022626984,
+        "energy_difference_ev": 0.0,
+        "energy_difference_ev_per_atom": 0.0,
+        "force_error": {
+          "rmse": 0.0,
+          "mae": 0.0,
+          "max_component": 0.0,
+          "max_atom_vector": 0.0
+        },
+        "gradient_residual": {
+          "rmse": 0.0,
+          "mae": 0.0,
+          "max_component": 0.0,
+          "max_atom_vector": 0.0
+        }
+      },
+      "B": {
+        "energy_ev": 15.891608022626995,
+        "energy_difference_ev": 1.0658141036401503e-14,
+        "energy_difference_ev_per_atom": 1.6653345369377348e-16,
+        "force_error": {
+          "rmse": 0.0,
+          "mae": 0.0,
+          "max_component": 0.0,
+          "max_atom_vector": 0.0
+        },
+        "gradient_residual": {
+          "rmse": 0.0,
+          "mae": 0.0,
+          "max_component": 0.0,
+          "max_atom_vector": 0.0
+        }
+      },
+      "C": {
+        "energy_ev": 15.891608022626995,
+        "energy_difference_ev": 1.0658141036401503e-14,
+        "energy_difference_ev_per_atom": 1.6653345369377348e-16,
+        "force_error": {
+          "rmse": 0.0,
+          "mae": 0.0,
+          "max_component": 0.0,
+          "max_atom_vector": 0.0
+        },
+        "gradient_residual": {
+          "rmse": 0.0,
+          "mae": 0.0,
+          "max_component": 0.0,
+          "max_atom_vector": 0.0
+        }
+      },
+      "D": {
+        "energy_ev": 15.891608022626984,
+        "energy_difference_ev": 0.0,
+        "energy_difference_ev_per_atom": 0.0,
+        "force_error": {
+          "rmse": 0.0,
+          "mae": 0.0,
+          "max_component": 0.0,
+          "max_atom_vector": 0.0
+        },
+        "gradient_residual": {
+          "rmse": 0.0,
+          "mae": 0.0,
+          "max_component": 0.0,
+          "max_atom_vector": 0.0
+        }
+      }
+    },
+    "C_energy_equals_B_exactly": true,
+    "C_minus_B_energy_ev": 0.0,
+    "omitted_gradient_identity_max_error": 5.5366347872717833e-126
+  },
+  {
+    "structure": "GaAs_zincblende_compressed",
+    "natoms": 64,
+    "active_branches": [
+      2,
+      15
+    ],
+    "skipped_branches": [
+      0,
+      1,
+      3,
+      4,
+      5,
+      6,
+      7,
+      8,
+      9,
+      10,
+      11,
+      12,
+      13,
+      14
+    ],
+    "skipped_fraction": 0.875,
+    "retained_weight": 0.9999999999914153,
+    "skipped_weight": 8.584594673596337e-12,
+    "weights": [
+      1.3495835379510781e-132,
+      1.529249464038495e-217,
+      0.7895605829876974,
+      1.4129336880450459e-228,
+      4.844796888792818e-74,
+      4.0887233694379708e-227,
+      1.31291854377433e-227,
+      8.584594673596328e-12,
+      1.0339955764843162e-26,
+      3.702820222796565e-227,
+      3.18966080427668e-212,
+      3.736108462689569e-225,
+      2.791128844618596e-225,
+      2.6686321800309956e-228,
+      3.8357997285705935e-226,
+      0.210439417003718
+    ],
+    "methods": {
+      "A": {
+        "energy_ev": 1.3000883044152753,
+        "energy_difference_ev": 0.0,
+        "energy_difference_ev_per_atom": 0.0,
+        "force_error": {
+          "rmse": 0.0,
+          "mae": 0.0,
+          "max_component": 0.0,
+          "max_atom_vector": 0.0
+        },
+        "gradient_residual": {
+          "rmse": 0.0,
+          "mae": 0.0,
+          "max_component": 0.0,
+          "max_atom_vector": 0.0
+        }
+      },
+      "B": {
+        "energy_ev": 1.3000883044152944,
+        "energy_difference_ev": 1.9095836023552692e-14,
+        "energy_difference_ev_per_atom": 2.983724378680108e-16,
+        "force_error": {
+          "rmse": 1.0040457683423662e-15,
+          "mae": 8.248429427907636e-16,
+          "max_component": 2.7755575615628914e-15,
+          "max_atom_vector": 3.412920201770619e-15
+        },
+        "gradient_residual": {
+          "rmse": 0.0,
+          "mae": 0.0,
+          "max_component": 0.0,
+          "max_atom_vector": 0.0
+        }
+      },
+      "C": {
+        "energy_ev": 1.3000883044152942,
+        "energy_difference_ev": 1.887379141862766e-14,
+        "energy_difference_ev_per_atom": 2.949029909160572e-16,
+        "force_error": {
+          "rmse": 1.1410462899436205e-11,
+          "mae": 9.360764496434831e-12,
+          "max_component": 3.437539142225887e-11,
+          "max_atom_vector": 3.577931545678608e-11
+        },
+        "gradient_residual": {
+          "rmse": 1.1410284961273028e-11,
+          "mae": 9.360583778002715e-12,
+          "max_component": 3.437405915462932e-11,
+          "max_atom_vector": 3.577768272815509e-11
+        }
+      },
+      "D": {
+        "energy_ev": 1.300088304042561,
+        "energy_difference_ev": -3.7271430386454085e-10,
+        "energy_difference_ev_per_atom": -5.823660997883451e-12,
+        "force_error": {
+          "rmse": 1.1410275342377944e-11,
+          "mae": 9.360534627504228e-12,
+          "max_component": 3.4373837110024397e-11,
+          "max_atom_vector": 3.5777908063053424e-11
+        },
+        "gradient_residual": {
+          "rmse": 1.0930258612512634e-15,
+          "mae": 8.82630918584241e-16,
+          "max_component": 3.885780586188048e-15,
+          "max_atom_vector": 4.9663094184515624e-15
+        }
+      }
+    },
+    "C_energy_equals_B_exactly": false,
+    "C_minus_B_energy_ev": -2.220446049250313e-16,
+    "omitted_gradient_identity_max_error": 3.914061769428724e-15
+  },
+  {
+    "structure": "ZnO_wurtzite_compressed",
+    "natoms": 32,
+    "active_branches": [
+      4
+    ],
+    "skipped_branches": [
+      0,
+      1,
+      2,
+      3,
+      5,
+      6,
+      7,
+      8,
+      9,
+      10,
+      11,
+      12,
+      13,
+      14,
+      15
+    ],
+    "skipped_fraction": 0.9375,
+    "retained_weight": 1.0,
+    "skipped_weight": 0.0,
+    "weights": [
+      0.0,
+      0.0,
+      0.0,
+      0.0,
+      1.0,
+      0.0,
+      0.0,
+      0.0,
+      0.0,
+      0.0,
+      0.0,
+      0.0,
+      0.0,
+      0.0,
+      0.0,
+      0.0
+    ],
+    "methods": {
+      "A": {
+        "energy_ev": 1.0024782359350153,
+        "energy_difference_ev": 0.0,
+        "energy_difference_ev_per_atom": 0.0,
+        "force_error": {
+          "rmse": 0.0,
+          "mae": 0.0,
+          "max_component": 0.0,
+          "max_atom_vector": 0.0
+        },
+        "gradient_residual": {
+          "rmse": 0.0,
+          "mae": 0.0,
+          "max_component": 0.0,
+          "max_atom_vector": 0.0
+        }
+      },
+      "B": {
+        "energy_ev": 1.0024782359350146,
+        "energy_difference_ev": -6.661338147750939e-16,
+        "energy_difference_ev_per_atom": -2.0816681711721685e-17,
+        "force_error": {
+          "rmse": 0.0,
+          "mae": 0.0,
+          "max_component": 0.0,
+          "max_atom_vector": 0.0
+        },
+        "gradient_residual": {
+          "rmse": 0.0,
+          "mae": 0.0,
+          "max_component": 0.0,
+          "max_atom_vector": 0.0
+        }
+      },
+      "C": {
+        "energy_ev": 1.0024782359350146,
+        "energy_difference_ev": -6.661338147750939e-16,
+        "energy_difference_ev_per_atom": -2.0816681711721685e-17,
+        "force_error": {
+          "rmse": 0.0,
+          "mae": 0.0,
+          "max_component": 0.0,
+          "max_atom_vector": 0.0
+        },
+        "gradient_residual": {
+          "rmse": 0.0,
+          "mae": 0.0,
+          "max_component": 0.0,
+          "max_atom_vector": 0.0
+        }
+      },
+      "D": {
+        "energy_ev": 1.0024782359350153,
+        "energy_difference_ev": 0.0,
+        "energy_difference_ev_per_atom": 0.0,
+        "force_error": {
+          "rmse": 0.0,
+          "mae": 0.0,
+          "max_component": 0.0,
+          "max_atom_vector": 0.0
+        },
+        "gradient_residual": {
+          "rmse": 0.0,
+          "mae": 0.0,
+          "max_component": 0.0,
+          "max_atom_vector": 0.0
+        }
+      }
+    },
+    "C_energy_equals_B_exactly": true,
+    "C_minus_B_energy_ev": 0.0,
+    "omitted_gradient_identity_max_error": 0.0
+  },
+  {
+    "structure": "SrTiO3_perovskite_compressed",
+    "natoms": 40,
+    "active_branches": [
+      4
+    ],
+    "skipped_branches": [
+      0,
+      1,
+      2,
+      3,
+      5,
+      6,
+      7,
+      8,
+      9,
+      10,
+      11,
+      12,
+      13,
+      14,
+      15
+    ],
+    "skipped_fraction": 0.9375,
+    "retained_weight": 1.0,
+    "skipped_weight": 0.0,
+    "weights": [
+      0.0,
+      0.0,
+      0.0,
+      0.0,
+      1.0,
+      0.0,
+      0.0,
+      0.0,
+      0.0,
+      0.0,
+      0.0,
+      0.0,
+      0.0,
+      0.0,
+      0.0,
+      0.0
+    ],
+    "methods": {
+      "A": {
+        "energy_ev": -0.31633092379841043,
+        "energy_difference_ev": 0.0,
+        "energy_difference_ev_per_atom": 0.0,
+        "force_error": {
+          "rmse": 0.0,
+          "mae": 0.0,
+          "max_component": 0.0,
+          "max_atom_vector": 0.0
+        },
+        "gradient_residual": {
+          "rmse": 0.0,
+          "mae": 0.0,
+          "max_component": 0.0,
+          "max_atom_vector": 0.0
+        }
+      },
+      "B": {
+        "energy_ev": -0.31633092379841277,
+        "energy_difference_ev": -2.3314683517128287e-15,
+        "energy_difference_ev_per_atom": -5.828670879282072e-17,
+        "force_error": {
+          "rmse": 0.0,
+          "mae": 0.0,
+          "max_component": 0.0,
+          "max_atom_vector": 0.0
+        },
+        "gradient_residual": {
+          "rmse": 0.0,
+          "mae": 0.0,
+          "max_component": 0.0,
+          "max_atom_vector": 0.0
+        }
+      },
+      "C": {
+        "energy_ev": -0.31633092379841277,
+        "energy_difference_ev": -2.3314683517128287e-15,
+        "energy_difference_ev_per_atom": -5.828670879282072e-17,
+        "force_error": {
+          "rmse": 0.0,
+          "mae": 0.0,
+          "max_component": 0.0,
+          "max_atom_vector": 0.0
+        },
+        "gradient_residual": {
+          "rmse": 0.0,
+          "mae": 0.0,
+          "max_component": 0.0,
+          "max_atom_vector": 0.0
+        }
+      },
+      "D": {
+        "energy_ev": -0.31633092379841043,
+        "energy_difference_ev": 0.0,
+        "energy_difference_ev_per_atom": 0.0,
+        "force_error": {
+          "rmse": 0.0,
+          "mae": 0.0,
+          "max_component": 0.0,
+          "max_atom_vector": 0.0
+        },
+        "gradient_residual": {
+          "rmse": 0.0,
+          "mae": 0.0,
+          "max_component": 0.0,
+          "max_atom_vector": 0.0
+        }
+      }
+    },
+    "C_energy_equals_B_exactly": true,
+    "C_minus_B_energy_ev": 0.0,
+    "omitted_gradient_identity_max_error": 0.0
+  }
+]

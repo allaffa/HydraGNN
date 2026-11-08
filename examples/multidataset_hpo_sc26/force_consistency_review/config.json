@@ -1,0 +1,23 @@
+{
+  "precision": "fp64",
+  "weight_threshold": 0.2,
+  "threshold_provenance": "Explicit user instruction on 2026-11-08; not verified against the historical approximately 81% experiment",
+  "batch_size": 1,
+  "encoder_reuse": true,
+  "batched_decoder": true,
+  "fused_energy_grad": true,
+  "num_streams": 1,
+  "finite_difference_steps_angstrom": [0.0001, 0.00001, 0.000001],
+  "structures": [
+    "C_diamond_compressed",
+    "Si_diamond_compressed",
+    "Al_fcc_compressed",
+    "Cu_fcc_compressed",
+    "Fe_bcc_compressed",
+    "MgO_rocksalt_compressed",
+    "NaCl_rocksalt_compressed",
+    "GaAs_zincblende_compressed",
+    "ZnO_wurtzite_compressed",
+    "SrTiO3_perovskite_compressed"
+  ]
+}

@@ -1,0 +1,32 @@
+\begin{table*}[t]
+\centering
+\small
+\caption{Verified architecture of the frozen PaiNN checkpoint. The first block operates on the unembedded one-channel input; hidden width 337 is not the input width of every message block.}
+\label{tab:painn-verified-architecture}
+\begin{tabular}{p{0.38\textwidth}p{0.55\textwidth}}
+\hline
+Backbone class & PAINNStack, wrapped by EnhancedModelWrapper \\
+Message-passing blocks & 2 \\
+Hidden dimension & 337 \\
+Input scalar channels & 1 \\
+Block 1 / block 2 message channels & 1 / 337 \\
+Vector tensor dimensions & N x 3 x 1 initially; N x 3 x 337 between blocks \\
+Radial expansion & 4 fixed sin(n pi r / cutoff) / r functions \\
+Filter maps, blocks 1 / 2 & 4 to 3 / 4 to 1011 (three gates per channel) \\
+Cutoff & 5.0 Angstrom, cosine cutoff \\
+Maximum incoming neighbors & 20 \\
+Input embedding & No separate learned atomic embedding table \\
+Scalar adaptation within block 1 & 1 to 337 to 337; Tanh between linear layers \\
+Pooling & add \\
+Graph conditioning & Two attributes; shared 339 to 337 concat projector after each block \\
+Dataset-specific branches & 16 \\
+Per-branch dense dimensions & 337 to 50 to 50 to 776 to 776 to 1 \\
+Per-branch depth & 4 hidden linear layers plus 1 scalar output layer \\
+Head activation & ReLU between hidden linear layers \\
+Total HydraGNN parameters & 12,205,540 \\
+requires\_grad eligible before inference freezing & 12,205,540 \\
+Parameters in saved training optimizer & 12,090,960 \\
+BranchWeightMLP (separate) & 118 to 128 to 64 to 16; 24,528 parameters \\
+\hline
+\end{tabular}
+\end{table*}

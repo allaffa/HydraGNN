@@ -1,0 +1,24 @@
+\begin{table*}[t]
+\centering
+\scriptsize
+\setlength{\tabcolsep}{3pt}
+\caption{Energy--force consistency on ten saved periodic structures in FP64.
+Force errors are in eV/\AA\ relative to A; means are unweighted across structures.
+Max error denotes the largest absolute Cartesian force-component error.
+Skipping uses threshold 0.2 with no weight renormalization.
+Conservativity is local to fixed periodic connectivity and branch selection.}
+\label{tab:force-consistency}
+\begin{tabular}{lllrrrrl}
+\hline
+Method & Energy & Forces & Mean RMSE & Max RMSE & Mean max error & Max error & Conservative? \\
+\hline
+A: FP64 reference & $E_{\rm full}$ & $-\nabla E_{\rm full}$ & 0.000e+00 & 0.000e+00 & 0.000e+00 & 0.000e+00 & Yes \\
+B: Full fused & $E_{\rm full}$ & $-\nabla E_{\rm full}$ & 1.788e-16 & 1.004e-15 & 5.107e-16 & 2.776e-15 & Yes \\
+C: Force skipping & $E_{\rm full}$ & $-\nabla E_S$ & 5.985e-07 & 5.985e-06 & 1.527e-06 & 1.527e-05 & No \\
+D: Truncation control & $E_S$ & $-\nabla E_S$ & 5.985e-07 & 5.985e-06 & 1.527e-06 & 1.527e-05 & Yes \\
+\hline
+\end{tabular}
+\end{table*}
+% All force errors in eV/Angstrom; reference A. Mean is unweighted across ten structures.
+% C: full energy, retained-only gradient. D: retained energy and its gradient, no renormalization.
+% Conservativity statements are local to a fixed graph and selection, not across graph switches.
