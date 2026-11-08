@@ -1,0 +1,197 @@
+{
+  "seed": 42,
+  "displacement_magnitude_angstrom": [
+    0.03,
+    0.05
+  ],
+  "systems": {
+    "H2O": {
+      "formula": "H2O",
+      "atom_count": 3,
+      "atomic_numbers": [
+        8,
+        1,
+        1
+      ],
+      "pbc": [
+        false,
+        false,
+        false
+      ],
+      "cell_angstrom": [
+        [
+          0.0,
+          0.0,
+          0.0
+        ],
+        [
+          0.0,
+          0.0,
+          0.0
+        ],
+        [
+          0.0,
+          0.0,
+          0.0
+        ]
+      ],
+      "minimum_image_separation_angstrom": 0.9949709255573891,
+      "reference_geometry": "inputs/H2O_reference.extxyz",
+      "perturbed_geometry": "inputs/H2O_initial.extxyz",
+      "geometry_sha256": "62c262a7b442072d63b99adc19899ddd430de87ac0af4e7e097eb9115cdbc24f"
+    },
+    "CH4": {
+      "formula": "CH4",
+      "atom_count": 5,
+      "atomic_numbers": [
+        6,
+        1,
+        1,
+        1,
+        1
+      ],
+      "pbc": [
+        false,
+        false,
+        false
+      ],
+      "cell_angstrom": [
+        [
+          0.0,
+          0.0,
+          0.0
+        ],
+        [
+          0.0,
+          0.0,
+          0.0
+        ],
+        [
+          0.0,
+          0.0,
+          0.0
+        ]
+      ],
+      "minimum_image_separation_angstrom": 1.0448363017409608,
+      "reference_geometry": "inputs/CH4_reference.extxyz",
+      "perturbed_geometry": "inputs/CH4_initial.extxyz",
+      "geometry_sha256": "c23694acf3d246eb4eda8e592b9c4e69eb1389458338c74b7d3fc85826b699bc"
+    },
+    "Si": {
+      "formula": "Si8",
+      "atom_count": 8,
+      "atomic_numbers": [
+        14,
+        14,
+        14,
+        14,
+        14,
+        14,
+        14,
+        14
+      ],
+      "pbc": [
+        true,
+        true,
+        true
+      ],
+      "cell_angstrom": [
+        [
+          5.43,
+          0.0,
+          0.0
+        ],
+        [
+          0.0,
+          5.43,
+          0.0
+        ],
+        [
+          0.0,
+          0.0,
+          5.43
+        ]
+      ],
+      "minimum_image_separation_angstrom": 2.287069643849054,
+      "reference_geometry": "inputs/Si_reference.extxyz",
+      "perturbed_geometry": "inputs/Si_initial.extxyz",
+      "geometry_sha256": "82ac7c2ea82f5c3f9a998f93c11924eaec6e495ca3d745cc37ac8e18e08d93fe"
+    },
+    "MgO": {
+      "formula": "Mg4O4",
+      "atom_count": 8,
+      "atomic_numbers": [
+        12,
+        8,
+        12,
+        8,
+        12,
+        8,
+        12,
+        8
+      ],
+      "pbc": [
+        true,
+        true,
+        true
+      ],
+      "cell_angstrom": [
+        [
+          4.212,
+          0.0,
+          0.0
+        ],
+        [
+          0.0,
+          4.212,
+          0.0
+        ],
+        [
+          0.0,
+          0.0,
+          4.212
+        ]
+      ],
+      "minimum_image_separation_angstrom": 2.042135430804863,
+      "reference_geometry": "inputs/MgO_reference.extxyz",
+      "perturbed_geometry": "inputs/MgO_initial.extxyz",
+      "geometry_sha256": "871eb49f43730831af46dc3523c4a552fc7c5627e924db6ceb3d02373a278e12"
+    },
+    "Al": {
+      "formula": "Al4",
+      "atom_count": 4,
+      "atomic_numbers": [
+        13,
+        13,
+        13,
+        13
+      ],
+      "pbc": [
+        true,
+        true,
+        true
+      ],
+      "cell_angstrom": [
+        [
+          4.05,
+          0.0,
+          0.0
+        ],
+        [
+          0.0,
+          4.05,
+          0.0
+        ],
+        [
+          0.0,
+          0.0,
+          4.05
+        ]
+      ],
+      "minimum_image_separation_angstrom": 2.8121564021766003,
+      "reference_geometry": "inputs/Al_reference.extxyz",
+      "perturbed_geometry": "inputs/Al_initial.extxyz",
+      "geometry_sha256": "7afb20dcf59758c6c29e45cddf0f8c0095cc81618f51b7dd58c7c661aa082a79"
+    }
+  }
+}
